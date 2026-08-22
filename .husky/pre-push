@@ -1,0 +1,13 @@
+#!/bin/sh
+
+echo "Running project checks..."
+pnpm run check || exit 1
+
+echo "Typechecking application..."
+pnpm run typecheck || exit 1
+
+echo "Running tests..."
+pnpm run test || exit 1
+
+echo "Building application..."
+pnpm run build

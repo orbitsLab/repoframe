@@ -1,0 +1,6 @@
+#!/bin/sh
+
+.husky/check-package-manager || exit 1
+
+echo "Formatting and linting staged files..."
+pnpm exec lint-staged || exit 1

@@ -1,0 +1,19 @@
+#!/bin/sh
+
+check_files="package-lock.json yarn.lock bun.lock bun.lockb"
+
+echo "Checking package manager..."
+
+for file in $check_files; do
+  if git diff --cached --name-only | grep -qE "^$file$"; then
+    echo "This project uses pnpm. Remove $file and run pnpm install."
+    exit 1
+  fi
+done
+
+if [ ! -f "pnpm-lock.yaml" ]; then
+  echo "pnpm-lock.yaml is missing. Run pnpm install."
+  exit 1
+fi
+
+echo "Package manager check passed (pnpm)"

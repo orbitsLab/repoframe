@@ -1,0 +1,13 @@
+#!/bin/sh
+
+commit_msg_file="$1"
+commit_msg=$(head -n1 "$commit_msg_file")
+
+if ! echo "$commit_msg" | grep -qE "^(feat|fix|chore|docs|style|refactor|test|build|ci|perf|bump)(\(.+\))?!?: .+"; then
+  echo "Invalid commit message format."
+  echo "Use: <type>[(optional scope)]: <description>"
+  echo "Allowed types: feat, fix, chore, docs, style, refactor, test, build, ci, perf, bump"
+  exit 1
+fi
+
+echo "Commit message format valid"

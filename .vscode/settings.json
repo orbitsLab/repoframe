@@ -1,0 +1,5 @@
+{
+  "files.associations": { "*.css": "tailwindcss" },
+  "editor.quickSuggestions": { "strings": "on" },
+  "tailwindCSS.experimental.configFile": "src/app/globals.css"
+}

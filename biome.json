@@ -1,0 +1,148 @@
+{
+  "$schema": "https://biomejs.dev/schemas/2.5.5/schema.json",
+  "files": {
+    "includes": [
+      "**/*.js",
+      "**/*.jsx",
+      "**/*.mjs",
+      "**/*.cjs",
+      "**/*.ts",
+      "**/*.tsx",
+      "**/*.json",
+      "**/*.jsonc",
+      "**/*.css",
+      "!next-env.d.ts"
+    ],
+    "ignoreUnknown": true
+  },
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": true,
+    "defaultBranch": "main"
+  },
+  "formatter": {
+    "enabled": true,
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineWidth": 80,
+    "lineEnding": "lf"
+  },
+  "javascript": {
+    "formatter": {
+      "quoteStyle": "single",
+      "trailingCommas": "all",
+      "semicolons": "always",
+      "arrowParentheses": "always",
+      "bracketSpacing": true,
+      "quoteProperties": "asNeeded"
+    }
+  },
+  "css": { "parser": { "tailwindDirectives": true } },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "preset": "recommended",
+      "suspicious": {
+        "noExplicitAny": "warn",
+        "noDoubleEquals": "error",
+        "noDebugger": "error",
+        "noConsole": "off"
+      },
+      "complexity": {
+        "noForEach": "off",
+        "useLiteralKeys": "warn",
+        "noExcessiveCognitiveComplexity": {
+          "level": "warn",
+          "options": { "maxAllowedComplexity": 15 }
+        }
+      },
+      "style": {
+        "noParameterAssign": "warn",
+        "noNonNullAssertion": "warn",
+        "useConst": "error",
+        "useTemplate": "warn",
+        "useImportType": "off"
+      },
+      "correctness": {
+        "noUnusedVariables": "error",
+        "noUnusedImports": "error"
+      },
+      "performance": { "noDelete": "warn" }
+    }
+  },
+  "assist": {
+    "enabled": true,
+    "actions": { "source": { "organizeImports": "on" } }
+  },
+  "overrides": [
+    {
+      "includes": ["src/lib/renderer/**"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedImports": {
+              "level": "error",
+              "options": {
+                "patterns": [
+                  {
+                    "group": ["**/lib/github/**", "@/lib/github/*"],
+                    "message": "Rule 1: templates and the renderer consume normalized ProjectData only. Import from @/types instead."
+                  },
+                  {
+                    "group": ["**/lib/storage/**", "@/lib/storage/*"],
+                    "message": "Rule 1: templates and the renderer do not read storage. Data is passed in."
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "includes": ["src/lib/templates/**"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedImports": {
+              "level": "error",
+              "options": {
+                "paths": {
+                  "konva": "Rule 2: the scene graph and templates must stay renderer-independent. Only src/lib/renderer may import konva."
+                },
+                "patterns": [
+                  {
+                    "group": ["**/lib/github/**", "@/lib/github/*"],
+                    "message": "Rule 1: templates and the renderer consume normalized ProjectData only. Import from @/types instead."
+                  },
+                  {
+                    "group": ["**/lib/storage/**", "@/lib/storage/*"],
+                    "message": "Rule 1: templates and the renderer do not read storage. Data is passed in."
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "includes": ["src/types/**"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedImports": {
+              "level": "error",
+              "options": {
+                "paths": {
+                  "konva": "Rule 2: the scene graph and templates must stay renderer-independent. Only src/lib/renderer may import konva."
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

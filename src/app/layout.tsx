@@ -1,6 +1,19 @@
 import type { Metadata } from 'next';
 import Script from 'next/script';
 
+import '@fontsource-variable/archivo';
+import '@fontsource-variable/azeret-mono';
+import '@fontsource-variable/dm-sans';
+import '@fontsource-variable/fira-code';
+import '@fontsource-variable/inconsolata';
+import '@fontsource-variable/jetbrains-mono';
+import '@fontsource-variable/manrope';
+import '@fontsource-variable/outfit';
+import '@fontsource-variable/roboto-mono';
+import '@fontsource-variable/sora';
+import '@fontsource-variable/source-code-pro';
+import '@fontsource-variable/space-grotesk';
+
 import { themeScript } from '@/lib/theme';
 
 import './globals.css';

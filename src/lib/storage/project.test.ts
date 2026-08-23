@@ -12,7 +12,7 @@ import { readProject, type StoredProject } from '@/lib/storage/project';
 
 const storedProject: StoredProject = {
   version: 1,
-  source: { owner: 'vuejs', repo: 'core' },
+  source: { owner: 'alfaarghya', repo: 'alfa-leetcode-api' },
   templateId: 'minimal',
   ratio: '16:9',
   settings: { accent: '#42b883' },

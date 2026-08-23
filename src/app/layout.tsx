@@ -14,13 +14,24 @@ import '@fontsource-variable/sora';
 import '@fontsource-variable/source-code-pro';
 import '@fontsource-variable/space-grotesk';
 
+import { siteUrl } from '@/lib/site';
 import { themeScript } from '@/lib/theme';
 
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'RepoFrame',
+  metadataBase: new URL(siteUrl),
+  title: {
+    default: 'RepoFrame — GitHub social card generator',
+    template: '%s — RepoFrame',
+  },
   description: 'Generate polished social cards for GitHub repositories.',
+  openGraph: {
+    title: 'RepoFrame — GitHub social card generator',
+    description: 'Generate polished social cards for GitHub repositories.',
+    type: 'website',
+    siteName: 'RepoFrame',
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<'/'>) {

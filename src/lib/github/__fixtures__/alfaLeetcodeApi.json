@@ -1,0 +1,38 @@
+{
+  "repository": {
+    "name": "alfa-leetcode-api",
+    "full_name": "alfaarghya/alfa-leetcode-api",
+    "html_url": "https://github.com/alfaarghya/alfa-leetcode-api",
+    "description": "A custom LeetCode API for profiles, problems, contests, submissions, and daily questions.",
+    "homepage": "https://alfaarghya.github.io/alfa-leetcode-api/",
+    "default_branch": "main",
+    "created_at": "2024-01-21T13:58:56Z",
+    "updated_at": "2026-08-23T11:30:00Z",
+    "pushed_at": "2026-08-02T17:56:24Z",
+    "fork": false,
+    "archived": false,
+    "license": {
+      "key": "mit",
+      "name": "MIT License",
+      "spdx_id": "MIT"
+    },
+    "owner": {
+      "login": "alfaarghya",
+      "avatar_url": "https://avatars.githubusercontent.com/alfaarghya",
+      "html_url": "https://github.com/alfaarghya",
+      "type": "User"
+    },
+    "stargazers_count": 815,
+    "watchers_count": 815,
+    "forks_count": 327,
+    "subscribers_count": 1,
+    "open_issues_count": 13,
+    "topics": ["api", "leetcode-api", "typescript", "rest-api"]
+  },
+  "languages": {
+    "TypeScript": 226495,
+    "Dockerfile": 440
+  },
+  "pullRequests": 2,
+  "fetchedAt": "2026-08-23T11:30:00Z"
+}

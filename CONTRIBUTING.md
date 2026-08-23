@@ -46,4 +46,37 @@ discussed. Templates must consume normalized project data, declare the data
 they require, produce renderer-independent scene data, and keep stable node
 identifiers. Include pure-logic tests for registry behavior and node stability.
 
+Create the template under `src/lib/templates/static/`. A minimal structure is:
+
+```ts
+import type { Template } from '@/types/template';
+
+const exampleTemplate: Template = {
+  id: 'example',
+  name: 'Example',
+  description: 'A short description of the composition.',
+  category: 'editorial',
+  supportedRatios: ['1:1', '4:5', '16:9', '9:16'],
+  requiredData: () => ['repository'],
+  settingsSchema: [],
+  defaultSettings: {},
+  build({ data, ratio }) {
+    return {
+      width: ratio === '16:9' ? 1200 : 1080,
+      height: ratio === '16:9' ? 675 : 1080,
+      background: { kind: 'solid', color: '#ffffff' },
+      nodes: [],
+    };
+  },
+};
+
+export { exampleTemplate };
+```
+
+Add one import and one entry in `src/lib/templates/registry.ts`. Declare all
+controls through `settingsSchema`; do not create a React settings panel. Use
+shared spacing and type tokens, handle missing and long text, and keep every
+node ID tied to a stable visual role. Add the template to the registry and node
+stability tests before opening a pull request.
+
 By participating, you agree to follow the [Code of Conduct](CODE_OF_CONDUCT.md).

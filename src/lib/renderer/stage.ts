@@ -11,6 +11,8 @@ import type {
   TextNode,
 } from '@/types/scene';
 
+Konva.autoDrawEnabled = false;
+
 /**
  * Renders a scene into a Konva stage after renderer fonts are ready.
  *

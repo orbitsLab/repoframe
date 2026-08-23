@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
 
+import alfaLeetcodeApi from '@/lib/github/__fixtures__/alfaLeetcodeApi.json';
 import emptyRepo from '@/lib/github/__fixtures__/emptyRepo.json';
 import noRelease from '@/lib/github/__fixtures__/noRelease.json';
 import singlePr from '@/lib/github/__fixtures__/singlePr.json';
-import vuejsCore from '@/lib/github/__fixtures__/vuejsCore.json';
 import {
   mergeProjectData,
   type NormalizeInput,
@@ -16,21 +16,21 @@ function normalizeFixture(fixture: unknown) {
 
 describe('normalizeProject', () => {
   it('maps GitHub metrics and computes language percentages', () => {
-    const project = normalizeFixture(vuejsCore);
+    const project = normalizeFixture(alfaLeetcodeApi);
     const percentageTotal = project.languages.reduce(
       (total, language) => total + language.percentage,
       0,
     );
 
-    expect(project.metrics.watchers).toBe(753);
+    expect(project.metrics.watchers).toBe(1);
     expect(project.metrics.watchers).not.toBe(
-      vuejsCore.repository.watchers_count,
+      alfaLeetcodeApi.repository.watchers_count,
     );
-    expect(project.metrics.issues).toBe(558);
-    expect(project.metrics.pullRequests).toBe(351);
+    expect(project.metrics.issues).toBe(11);
+    expect(project.metrics.pullRequests).toBe(2);
     expect(
       (project.metrics.issues ?? 0) + (project.metrics.pullRequests ?? 0),
-    ).toBe(vuejsCore.repository.open_issues_count);
+    ).toBe(alfaLeetcodeApi.repository.open_issues_count);
     expect(percentageTotal).toBeCloseTo(100, 5);
   });
 

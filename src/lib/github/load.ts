@@ -5,10 +5,15 @@ import {
   fetchOpenPullRequests,
   fetchRepository,
 } from '@/lib/github/fetchers';
-import { type NormalizeInput, normalizeProject } from '@/lib/github/normalizer';
+import {
+  mergeProjectData,
+  type NormalizeInput,
+  normalizeProject,
+} from '@/lib/github/normalizer';
 import { type Fetcher, planRequests } from '@/lib/github/plan';
 import type { GitHubError, RateLimit } from '@/lib/github/rest';
 import { type ParseResult, parseGitHubUrl } from '@/lib/github/url';
+import { readCachedRepo, writeCachedRepo } from '@/lib/storage/repoCache';
 import type { ProjectDataPath } from '@/types/data/path';
 import type { ProjectData } from '@/types/data/project';
 
@@ -20,7 +25,13 @@ type LoadProjectError =
     };
 
 type LoadProjectResult =
-  | { ok: true; data: ProjectData; rateLimit: RateLimit }
+  | {
+      ok: true;
+      data: ProjectData;
+      rateLimit: RateLimit;
+      requestCount: number;
+      cacheAge?: number;
+    }
   | { ok: false; error: LoadProjectError; rateLimit?: RateLimit };
 
 /**
@@ -42,10 +53,25 @@ async function loadProject(
     };
   }
 
+  const cached = await readCachedRepo(parsed.owner, parsed.repo, required);
+  if (cached && cached.missingPaths.length === 0) {
+    return {
+      ok: true,
+      data: cached.data,
+      rateLimit: {},
+      requestCount: 0,
+      cacheAge: cached.age,
+    };
+  }
+
+  const missingPaths = cached?.missingPaths ?? required;
+  const fetchers = cached
+    ? planRequests(missingPaths).filter((fetcher) => fetcher !== 'repository')
+    : planRequests(missingPaths);
   const input = {} as NormalizeInput;
   let rateLimit: RateLimit = {};
 
-  for (const fetcher of planRequests(required)) {
+  for (const fetcher of fetchers) {
     const result = await runFetcher(fetcher, parsed.owner, parsed.repo);
     if (!result.ok) {
       return result;
@@ -55,7 +81,24 @@ async function loadProject(
     Object.assign(input, result.data);
   }
 
-  return { ok: true, data: normalizeProject(input), rateLimit };
+  const openIssuesCount =
+    cached?.openIssuesCount ?? input.repository.open_issues_count;
+  const data = cached
+    ? mergeProjectData(cached.data, input, openIssuesCount)
+    : normalizeProject(input);
+  const fetchedPaths = cached
+    ? missingPaths
+    : (['repository', ...missingPaths] as ProjectDataPath[]);
+
+  await writeCachedRepo(
+    parsed.owner,
+    parsed.repo,
+    data,
+    fetchedPaths,
+    openIssuesCount,
+  );
+
+  return { ok: true, data, rateLimit, requestCount: fetchers.length };
 }
 
 async function runFetcher(fetcher: Fetcher, owner: string, repo: string) {

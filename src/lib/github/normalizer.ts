@@ -103,24 +103,49 @@ function normalizeProject(input: NormalizeInput): ProjectData {
     },
     languages: normalizeLanguages(input.languages),
     topics: repository.topics,
-    contributors: input.contributors
-      ?.filter(hasContributorProfile)
-      .map((contributor) => ({
-        login: contributor.login,
-        avatarUrl: contributor.avatar_url,
-        url: contributor.html_url,
-        contributions: contributor.contributions,
-      })),
-    latestRelease: input.latestRelease
-      ? {
-          tagName: input.latestRelease.tag_name,
-          name: input.latestRelease.name || undefined,
-          publishedAt: input.latestRelease.published_at || undefined,
-          url: input.latestRelease.html_url,
-        }
-      : undefined,
+    contributors: normalizeContributors(input.contributors),
+    latestRelease: normalizeRelease(input.latestRelease),
     fetchedAt: input.fetchedAt ?? new Date().toISOString(),
   };
+}
+
+/**
+ * Applies partial GitHub responses to cached project data without mutating it.
+ *
+ * @param data - Cached project data to use as the base.
+ * @param input - Responses fetched for data missing from the cache.
+ * @param openIssuesCount - GitHub's combined issue and pull request count.
+ * @returns A new project value containing the merged responses.
+ */
+function mergeProjectData(
+  data: ProjectData,
+  input: Partial<Omit<NormalizeInput, 'repository'>>,
+  openIssuesCount: number,
+): ProjectData {
+  const project = {
+    ...data,
+    metrics: { ...data.metrics },
+    fetchedAt: new Date().toISOString(),
+  };
+
+  if (input.languages !== undefined) {
+    project.languages = normalizeLanguages(input.languages);
+  }
+
+  if (input.contributors !== undefined) {
+    project.contributors = normalizeContributors(input.contributors);
+  }
+
+  if (input.pullRequests !== undefined) {
+    project.metrics.pullRequests = input.pullRequests;
+    project.metrics.issues = Math.max(0, openIssuesCount - input.pullRequests);
+  }
+
+  if ('latestRelease' in input) {
+    project.latestRelease = normalizeRelease(input.latestRelease);
+  }
+
+  return project;
 }
 
 function hasContributorProfile(
@@ -133,6 +158,26 @@ function hasContributorProfile(
   return Boolean(
     contributor.login && contributor.avatar_url && contributor.html_url,
   );
+}
+
+function normalizeContributors(contributors?: RawContributor[]) {
+  return contributors?.filter(hasContributorProfile).map((contributor) => ({
+    login: contributor.login,
+    avatarUrl: contributor.avatar_url,
+    url: contributor.html_url,
+    contributions: contributor.contributions,
+  }));
+}
+
+function normalizeRelease(release?: RawRelease) {
+  return release
+    ? {
+        tagName: release.tag_name,
+        name: release.name || undefined,
+        publishedAt: release.published_at || undefined,
+        url: release.html_url,
+      }
+    : undefined;
 }
 
 function normalizeLanguages(languages?: RawLanguages) {
@@ -164,4 +209,4 @@ export type {
   RawRelease,
   RawRepository,
 };
-export { normalizeProject };
+export { mergeProjectData, normalizeProject };

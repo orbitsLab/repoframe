@@ -4,7 +4,11 @@ import emptyRepo from '@/lib/github/__fixtures__/emptyRepo.json';
 import noRelease from '@/lib/github/__fixtures__/noRelease.json';
 import singlePr from '@/lib/github/__fixtures__/singlePr.json';
 import vuejsCore from '@/lib/github/__fixtures__/vuejsCore.json';
-import { type NormalizeInput, normalizeProject } from '@/lib/github/normalizer';
+import {
+  mergeProjectData,
+  type NormalizeInput,
+  normalizeProject,
+} from '@/lib/github/normalizer';
 
 function normalizeFixture(fixture: unknown) {
   return normalizeProject(fixture as NormalizeInput);
@@ -57,5 +61,14 @@ describe('normalizeProject', () => {
 
     expect(project.metrics.pullRequests).toBeUndefined();
     expect(project.metrics.issues).toBeUndefined();
+  });
+
+  it('merges a deferred pull request probe without mutating cached data', () => {
+    const cached = normalizeFixture(emptyRepo);
+    const merged = mergeProjectData(cached, { pullRequests: 3 }, 10);
+
+    expect(merged.metrics).toMatchObject({ issues: 7, pullRequests: 3 });
+    expect(cached.metrics.issues).toBeUndefined();
+    expect(cached.metrics.pullRequests).toBeUndefined();
   });
 });

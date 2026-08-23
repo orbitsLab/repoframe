@@ -4,8 +4,7 @@ import { Moon, Sun } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
-
-const themeStorageKey = 'repoframe-theme';
+import { writeTheme } from '@/lib/storage/prefs';
 
 function getIsDark() {
   return document.documentElement.classList.contains('dark');
@@ -22,7 +21,7 @@ function ThemeToggle() {
     const nextIsDark = !getIsDark();
     document.documentElement.classList.toggle('dark', nextIsDark);
     document.documentElement.style.colorScheme = nextIsDark ? 'dark' : 'light';
-    localStorage.setItem(themeStorageKey, nextIsDark ? 'dark' : 'light');
+    writeTheme(nextIsDark ? 'dark' : 'light');
     setIsDark(nextIsDark);
   }
 

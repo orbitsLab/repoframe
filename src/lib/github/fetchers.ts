@@ -10,16 +10,37 @@ import {
   readLinkLast,
 } from '@/lib/github/rest';
 
+/**
+ * Fetches the repository metadata used by the project data model.
+ *
+ * @param owner - GitHub repository owner.
+ * @param repo - GitHub repository name.
+ * @returns Repository metadata or a typed GitHub error.
+ */
 function fetchRepository(owner: string, repo: string) {
   return githubRequest<RawRepository>(repositoryPath(owner, repo));
 }
 
+/**
+ * Fetches repository language totals in bytes.
+ *
+ * @param owner - GitHub repository owner.
+ * @param repo - GitHub repository name.
+ * @returns Language totals or a typed GitHub error.
+ */
 function fetchLanguages(owner: string, repo: string) {
   return githubRequest<RawLanguages>(
     `${repositoryPath(owner, repo)}/languages`,
   );
 }
 
+/**
+ * Fetches up to ten repository contributors.
+ *
+ * @param owner - GitHub repository owner.
+ * @param repo - GitHub repository name.
+ * @returns Contributors or a typed GitHub error.
+ */
 async function fetchContributors(
   owner: string,
   repo: string,
@@ -30,6 +51,13 @@ async function fetchContributors(
   );
 }
 
+/**
+ * Fetches the total number of open pull requests.
+ *
+ * @param owner - GitHub repository owner.
+ * @param repo - GitHub repository name.
+ * @returns The open pull request count or a typed GitHub error.
+ */
 function fetchOpenPullRequests(owner: string, repo: string) {
   return githubRequest<number>(
     `${repositoryPath(owner, repo)}/pulls?state=open&per_page=1`,
@@ -41,6 +69,13 @@ function fetchOpenPullRequests(owner: string, repo: string) {
   );
 }
 
+/**
+ * Fetches the latest published release when one exists.
+ *
+ * @param owner - GitHub repository owner.
+ * @param repo - GitHub repository name.
+ * @returns The latest release, no release, or a typed GitHub error.
+ */
 async function fetchLatestRelease(
   owner: string,
   repo: string,

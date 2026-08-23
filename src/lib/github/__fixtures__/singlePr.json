@@ -1,0 +1,37 @@
+{
+  "repository": {
+    "name": "authlogic",
+    "full_name": "josei/authlogic",
+    "html_url": "https://github.com/josei/authlogic",
+    "description": "A simple model based ruby authentication solution.",
+    "homepage": "http://rdoc.info/projects/binarylogic/authlogic",
+    "default_branch": "master",
+    "created_at": "2010-08-22T17:37:05Z",
+    "updated_at": "2014-10-30T20:57:31Z",
+    "pushed_at": "2010-08-28T21:55:41Z",
+    "fork": true,
+    "archived": false,
+    "parent": {
+      "full_name": "binarylogic/authlogic"
+    },
+    "license": {
+      "key": "mit",
+      "name": "MIT License",
+      "spdx_id": "MIT"
+    },
+    "owner": {
+      "login": "josei",
+      "avatar_url": "https://avatars.githubusercontent.com/u/355613?v=4",
+      "html_url": "https://github.com/josei",
+      "type": "User"
+    },
+    "stargazers_count": 2,
+    "watchers_count": 2,
+    "forks_count": 2,
+    "subscribers_count": 1,
+    "open_issues_count": 1,
+    "topics": []
+  },
+  "pullRequests": 1,
+  "fetchedAt": "2026-08-23T04:56:00Z"
+}

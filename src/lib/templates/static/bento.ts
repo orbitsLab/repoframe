@@ -1,5 +1,11 @@
-import { formatCount } from '@/lib/templates/shared/format';
-import { type Box, inset, row, stack } from '@/lib/templates/shared/layout';
+import { formatCount, formatDate } from '@/lib/templates/shared/format';
+import {
+  type Box,
+  grid,
+  inset,
+  row,
+  stack,
+} from '@/lib/templates/shared/layout';
 import { textNode } from '@/lib/templates/shared/nodes';
 import {
   booleanSetting,
@@ -8,15 +14,18 @@ import {
   stringArraySetting,
   stringSetting,
 } from '@/lib/templates/shared/settings';
-import { fitFontSize } from '@/lib/templates/shared/text';
+import { fitText } from '@/lib/templates/shared/text';
 import {
   displayFontOptions,
   palettes,
   ratioSizes,
+  resolveTheme,
   spacing,
+  type Theme,
   typeScale,
 } from '@/lib/templates/shared/tokens';
 import type { ProjectDataPath } from '@/types/data/path';
+import type { ProjectData } from '@/types/data/project';
 import type { RectNode, Scene, SceneNode } from '@/types/scene';
 import type { BuildInput, SettingField, Template } from '@/types/template';
 
@@ -25,10 +34,14 @@ const metricOptions = [
   { label: 'Forks', value: 'forks' },
   { label: 'Watchers', value: 'watchers' },
   { label: 'Issues', value: 'issues' },
-  { label: 'Pull requests', value: 'pullRequests' },
+  { label: 'PRs', value: 'pullRequests' },
 ];
 
 const languageColors = ['#6c5ce7', '#00b894', '#0984e3', '#fdcb6e'];
+
+/** Fixed slot counts so node ids stay stable as data changes. */
+const languageSlots = 4;
+const contributorSlots = 30;
 
 const settingsSchema: SettingField[] = [
   {
@@ -98,7 +111,7 @@ const settingsSchema: SettingField[] = [
 ];
 
 const defaultSettings: Record<string, unknown> = {
-  metrics: ['stars', 'forks', 'issues', 'pullRequests'],
+  metrics: ['stars', 'forks', 'issues'],
   showLanguages: true,
   showContributors: true,
   showRelease: true,
@@ -142,10 +155,14 @@ function build(input: BuildInput): Scene {
   const { width, height } = ratioSizes[input.ratio];
   const outer = inset({ x: 0, y: 0, width, height }, spacing.lg);
   const isWide = input.ratio === '16:9';
+  const theme = resolveTheme(
+    stringSetting(settings, 'backgroundColor'),
+    stringSetting(settings, 'accentColor'),
+  );
   const header = isWide
     ? { ...outer, width: Math.min(430, outer.width * 0.38) }
     : { ...outer, height: input.ratio === '9:16' ? 420 : 310 };
-  const grid = isWide
+  const gridArea = isWide
     ? {
         x: header.x + header.width + spacing.lg,
         y: outer.y,
@@ -159,39 +176,13 @@ function build(input: BuildInput): Scene {
         height: outer.height - header.height - spacing.md,
       };
   const fontFamily = stringSetting(settings, 'fontFamily');
-  const nameSize = fitFontSize(input.measure, {
-    text: input.data.repository.fullName,
-    fontFamily,
-    fontWeight: 800,
-    maxWidth: header.width,
-    minSize: 34,
-    maxSize: isWide ? 54 : 68,
-  });
-  const description =
-    input.data.repository.description ||
-    `A GitHub project maintained by ${input.data.owner.login}.`;
-  const measuredDescription = input.measure(description, {
-    fontFamily,
-    fontSize: isWide ? 23 : 26,
-    fontWeight: 400,
-    maxWidth: header.width,
-    lineHeight: 1.35,
-    maxLines: isWide ? 6 : 3,
-  });
-  const boxes = cardBoxes(input, settings, grid);
+  const boxes = cardBoxes(input, settings, gridArea);
   const nodes: SceneNode[] = [
-    ...headerNodes(
-      input,
-      fontFamily,
-      header,
-      nameSize,
-      measuredDescription.lines.join('\n'),
-      measuredDescription.height,
-    ),
-    ...statsNodes(input, settings, fontFamily, boxes.stats),
-    ...languageNodes(input, settings, fontFamily, boxes.languages),
-    ...contributorNodes(input, settings, fontFamily, boxes.contributors),
-    ...releaseNodes(input, settings, fontFamily, boxes.release),
+    ...headerNodes(input, fontFamily, theme, header, isWide),
+    ...statsNodes(input, settings, fontFamily, theme, boxes.stats),
+    ...languageNodes(input, settings, fontFamily, theme, boxes.languages),
+    ...contributorNodes(input, settings, fontFamily, theme, boxes.contributors),
+    ...releaseNodes(input, settings, fontFamily, theme, boxes.release),
   ];
 
   return {
@@ -201,8 +192,8 @@ function build(input: BuildInput): Scene {
       kind: 'linear',
       angle: 140,
       stops: [
-        { offset: 0, color: stringSetting(settings, 'backgroundColor') },
-        { offset: 1, color: '#d8f4ff' },
+        { offset: 0, color: theme.background },
+        { offset: 1, color: theme.surface },
       ],
     },
     nodes,
@@ -212,7 +203,7 @@ function build(input: BuildInput): Scene {
 function cardBoxes(
   input: BuildInput,
   settings: Record<string, unknown>,
-  grid: Box,
+  gridArea: Box,
 ) {
   const roles = ['stats'];
   if (booleanSetting(settings, 'showLanguages')) {
@@ -226,20 +217,20 @@ function cardBoxes(
   }
 
   const gap = numberSetting(settings, 'cardGap');
-  const useColumns = input.ratio !== '9:16';
-  const columns = useColumns ? 2 : 1;
+  const columns = input.ratio === '9:16' ? 1 : 2;
   const rows = Math.ceil(roles.length / columns);
-  const rowHeight = (grid.height - gap * (rows - 1)) / rows;
+  const rowHeight = (gridArea.height - gap * (rows - 1)) / rows;
   const rowBoxes = stack(
-    grid,
+    gridArea,
     Array.from({ length: rows }, () => rowHeight),
     gap,
   );
+  // A lone card on the final row spans the full width instead of leaving a hole.
   const activeBoxes = rowBoxes.flatMap((box, rowIndex) => {
     const count = Math.min(columns, roles.length - rowIndex * columns);
     return row(box, count, gap);
   });
-  const hidden = { x: grid.x, y: grid.y, width: 0, height: 0 };
+  const hidden = { x: gridArea.x, y: gridArea.y, width: 0, height: 0 };
   const result: Record<string, Box> = {
     stats: hidden,
     languages: hidden,
@@ -257,12 +248,48 @@ function cardBoxes(
 function headerNodes(
   input: BuildInput,
   fontFamily: string,
+  theme: Theme,
   box: Box,
-  nameSize: number,
-  description: string,
-  descriptionHeight: number,
+  isWide: boolean,
 ): SceneNode[] {
   const avatarSize = 88;
+  const name = fitText(input.measure, {
+    text: input.data.repository.fullName,
+    fontFamily,
+    fontWeight: 800,
+    maxWidth: box.width,
+    minSize: 32,
+    maxSize: isWide ? 52 : 68,
+    maxLines: 2,
+    lineHeight: 1.1,
+  });
+  const bodySize = box.width < 500 ? 22 : 26;
+  const bodyLineHeight = 1.4;
+  let cursor = box.y + avatarSize + spacing.md;
+  const nameY = cursor;
+  cursor += name.height + spacing.sm;
+  const descriptionY = cursor;
+  const descriptionLines = Math.max(
+    1,
+    Math.min(
+      6,
+      Math.floor(
+        (box.y + box.height - descriptionY) / (bodySize * bodyLineHeight),
+      ),
+    ),
+  );
+  const description = input.measure(
+    input.data.repository.description ||
+      `A GitHub project maintained by ${input.data.owner.login}.`,
+    {
+      fontFamily,
+      fontSize: bodySize,
+      fontWeight: 400,
+      maxWidth: box.width,
+      lineHeight: bodyLineHeight,
+      maxLines: descriptionLines,
+    },
+  );
 
   return [
     {
@@ -285,7 +312,7 @@ function headerNodes(
       fontFamily,
       fontSize: 22,
       fontWeight: 700,
-      color: palettes.bento.foreground,
+      color: theme.foreground,
     }),
     textNode('repository-label', {
       x: box.x + avatarSize + spacing.sm,
@@ -294,34 +321,37 @@ function headerNodes(
       height: 24,
       text: 'GITHUB REPOSITORY',
       fontFamily,
-      fontSize: 16,
+      fontSize: 15,
       fontWeight: 700,
-      color: palettes.bento.muted,
+      color: theme.muted,
       letterSpacing: 1.5,
     }),
     textNode('repo-name', {
       x: box.x,
-      y: box.y + 120,
+      y: nameY,
       width: box.width,
-      height: nameSize * 1.15,
-      text: input.data.repository.fullName,
+      height: name.height,
+      text: name.lines.join('\n'),
       fontFamily,
-      fontSize: nameSize,
+      fontSize: name.fontSize,
       fontWeight: 800,
-      color: palettes.bento.foreground,
+      color: theme.foreground,
+      lineHeight: name.lineHeight,
+      maxLines: 2,
+      letterSpacing: -0.5,
     }),
     textNode('repo-description', {
       x: box.x,
-      y: box.y + 140 + nameSize,
+      y: descriptionY,
       width: box.width,
-      height: descriptionHeight,
-      text: description,
+      height: description.height,
+      text: description.lines.join('\n'),
       fontFamily,
-      fontSize: box.width < 500 ? 23 : 26,
+      fontSize: bodySize,
       fontWeight: 400,
-      color: palettes.bento.muted,
-      lineHeight: 1.35,
-      maxLines: 6,
+      color: theme.muted,
+      lineHeight: bodyLineHeight,
+      maxLines: descriptionLines,
     }),
   ];
 }
@@ -330,6 +360,7 @@ function statsNodes(
   input: BuildInput,
   settings: Record<string, unknown>,
   fontFamily: string,
+  theme: Theme,
   box: Box,
 ) {
   const visibleMetrics = stringArraySetting(settings, 'metrics');
@@ -341,38 +372,44 @@ function statsNodes(
     pullRequests: input.data.metrics.pullRequests,
   };
   const content = inset(box, spacing.md);
-  const visibleBoxes = row(
-    content,
-    Math.max(1, visibleMetrics.length),
-    spacing.sm,
-  );
-  const nodes: SceneNode[] = [cardNode('stats-card', box, settings, true)];
+  // Past two metrics the tile splits into rows so labels keep their full width.
+  const columns =
+    visibleMetrics.length > 2 ? 2 : Math.max(1, visibleMetrics.length);
+  const rows = Math.max(1, Math.ceil(visibleMetrics.length / columns));
+  const cells = grid(content, columns, rows, spacing.sm);
+  const valueSize = Math.min(56, content.width / columns / 2.4);
+  const nodes: SceneNode[] = [
+    cardNode('stats-card', box, settings, theme, true),
+  ];
 
   metricOptions.forEach((metric) => {
     const visibleIndex = visibleMetrics.indexOf(metric.value);
-    const metricBox = visibleBoxes[Math.max(0, visibleIndex)];
+    const cell = cells[Math.max(0, visibleIndex)] ?? cells[0];
     const opacity = visibleIndex >= 0 ? 1 : 0;
     nodes.push(
       textNode(`metric-${metric.value}-value`, {
-        ...metricBox,
-        y: metricBox.y + 12,
-        height: 56,
+        x: cell.x,
+        y: cell.y,
+        width: cell.width,
+        height: valueSize * 1.15,
         text: formatCount(values[metric.value]),
         fontFamily,
-        fontSize: Math.min(typeScale.metric, metricBox.width * 0.42),
+        fontSize: valueSize,
         fontWeight: 800,
-        color: stringSetting(settings, 'accentColor'),
+        color: theme.accent,
+        letterSpacing: -1,
         opacity,
       }),
       textNode(`metric-${metric.value}-label`, {
-        ...metricBox,
-        y: metricBox.y + 76,
-        height: 30,
+        x: cell.x,
+        y: cell.y + valueSize * 1.15 + 4,
+        width: cell.width,
+        height: 26,
         text: metric.label,
         fontFamily,
         fontSize: 17,
         fontWeight: 600,
-        color: palettes.bento.muted,
+        color: theme.muted,
         opacity,
       }),
     );
@@ -385,12 +422,21 @@ function languageNodes(
   input: BuildInput,
   settings: Record<string, unknown>,
   fontFamily: string,
+  theme: Theme,
   box: Box,
 ) {
   const visible = booleanSetting(settings, 'showLanguages');
   const content = inset(box, spacing.md);
+  // Only languages that actually exist get a row, so no empty skeleton bars.
+  const languages = input.data.languages
+    .filter((language) => language.percentage >= 0.5)
+    .slice(0, languageSlots);
+  const pitch = Math.min(
+    72,
+    (content.height - 52) / Math.max(1, languages.length),
+  );
   const nodes: SceneNode[] = [
-    cardNode('languages-card', box, settings, visible),
+    cardNode('languages-card', box, settings, theme, visible),
     textNode('languages-title', {
       x: content.x,
       y: content.y,
@@ -400,69 +446,141 @@ function languageNodes(
       fontFamily,
       fontSize: typeScale.label,
       fontWeight: 700,
-      color: palettes.bento.foreground,
+      color: theme.foreground,
       opacity: visible ? 1 : 0,
     }),
   ];
 
-  for (let index = 0; index < 4; index += 1) {
-    const language = input.data.languages[index];
-    const y = content.y + 52 + index * 38;
+  for (let index = 0; index < languageSlots; index += 1) {
     nodes.push(
-      textNode(`language-label-${index + 1}`, {
-        x: content.x,
-        y,
-        width: content.width * 0.45,
-        height: 28,
-        text: language?.name ?? '',
+      ...languageRow(
+        index,
+        content,
+        languages[index],
+        pitch,
         fontFamily,
-        fontSize: 18,
-        fontWeight: 600,
-        color: palettes.bento.foreground,
-        opacity: visible ? 1 : 0,
-      }),
-      {
-        id: `language-track-${index + 1}`,
-        type: 'rect',
-        x: content.x + content.width * 0.48,
-        y: y + 5,
-        width: content.width * 0.52,
-        height: 14,
-        fill: { kind: 'solid', color: '#eceaf6' },
-        cornerRadius: 7,
-        opacity: visible ? 1 : 0,
-      },
-      {
-        id: `language-fill-${index + 1}`,
-        type: 'rect',
-        x: content.x + content.width * 0.48,
-        y: y + 5,
-        width: language
-          ? content.width * 0.52 * (language.percentage / 100)
-          : 0,
-        height: 14,
-        fill: { kind: 'solid', color: languageColors[index] },
-        cornerRadius: 7,
-        opacity: visible ? 1 : 0,
-      },
+        theme,
+        visible && Boolean(languages[index]),
+      ),
     );
   }
 
   return nodes;
 }
 
+/** Builds one language row: name and share above a proportional bar. */
+function languageRow(
+  index: number,
+  content: Box,
+  language: ProjectData['languages'][number] | undefined,
+  pitch: number,
+  fontFamily: string,
+  theme: Theme,
+  shown: boolean,
+): SceneNode[] {
+  const y = content.y + 52 + index * pitch;
+  const barY = y + 28;
+
+  return [
+    textNode(`language-label-${index + 1}`, {
+      x: content.x,
+      y,
+      width: content.width * 0.7,
+      height: 26,
+      text: language ? language.name : '',
+      fontFamily,
+      fontSize: 18,
+      fontWeight: 600,
+      color: theme.foreground,
+      opacity: shown ? 1 : 0,
+    }),
+    textNode(`language-percent-${index + 1}`, {
+      x: content.x + content.width * 0.7,
+      y,
+      width: content.width * 0.3,
+      height: 26,
+      text: language ? `${language.percentage.toFixed(1)}%` : '',
+      fontFamily,
+      fontSize: 16,
+      fontWeight: 600,
+      color: theme.muted,
+      align: 'right',
+      opacity: shown ? 1 : 0,
+    }),
+    {
+      id: `language-track-${index + 1}`,
+      type: 'rect',
+      x: content.x,
+      y: barY,
+      width: content.width,
+      height: 12,
+      fill: { kind: 'solid', color: theme.border },
+      cornerRadius: 6,
+      opacity: shown ? 1 : 0,
+    },
+    {
+      id: `language-fill-${index + 1}`,
+      type: 'rect',
+      x: content.x,
+      y: barY,
+      width: language
+        ? Math.max(12, content.width * (language.percentage / 100))
+        : 0,
+      height: 12,
+      fill: { kind: 'solid', color: languageColors[index] },
+      cornerRadius: 6,
+      opacity: shown ? 1 : 0,
+    },
+  ];
+}
+
 function contributorNodes(
   input: BuildInput,
   settings: Record<string, unknown>,
   fontFamily: string,
+  theme: Theme,
   box: Box,
 ) {
   const visible = booleanSetting(settings, 'showContributors');
   const content = inset(box, spacing.md);
-  const contributors = input.data.contributors ?? [];
-  const avatarSize = Math.min(72, (content.width - spacing.sm * 3) / 4);
+  const contributors = (input.data.contributors ?? []).slice(
+    0,
+    contributorSlots,
+  );
+  const headingHeight = 52;
+  const gridTop = content.y + headingHeight;
+  const gridHeight = content.height - headingHeight;
+  const gap = 10;
+  // Faces alone read faster than a list, so size the grid to the contributors
+  // actually present and let them be as large as the tile allows.
+  const count = Math.max(1, contributors.length);
+  const options = Array.from({ length: count }, (_, index) => {
+    const candidate = index + 1;
+    const rows = Math.ceil(count / candidate);
+
+    return {
+      columns: candidate,
+      rows,
+      size: Math.min(
+        (content.width - gap * (candidate - 1)) / candidate,
+        (gridHeight - gap * (rows - 1)) / rows,
+        120,
+      ),
+    };
+  });
+  const largest = Math.max(...options.map((option) => option.size));
+  // Among grids that fit nearly as well, the flattest one reads best.
+  const chosen =
+    options
+      .filter((option) => option.size >= largest * 0.85)
+      .sort((first, second) => first.rows - second.rows)[0] ?? options[0];
+  const columns = chosen.columns;
+  // A hidden card has no box to measure, so the grid collapses instead of
+  // producing negative geometry.
+  const avatarSize = Math.max(0, chosen.size);
+
   const nodes: SceneNode[] = [
-    cardNode('contributors-card', box, settings, visible),
+    cardNode('contributors-card', box, settings, theme, visible),
     textNode('contributors-title', {
       x: content.x,
       y: content.y,
@@ -472,44 +590,28 @@ function contributorNodes(
       fontFamily,
       fontSize: typeScale.label,
       fontWeight: 700,
-      color: palettes.bento.foreground,
+      color: theme.foreground,
       opacity: visible ? 1 : 0,
     }),
   ];
 
-  for (let index = 0; index < 4; index += 1) {
+  for (let index = 0; index < contributorSlots; index += 1) {
     const contributor = contributors[index];
+    const shown = visible && Boolean(contributor);
+
     nodes.push({
       id: `contributor-avatar-${index + 1}`,
       type: 'image',
-      x: content.x + index * (avatarSize + spacing.sm),
-      y: content.y + 58,
+      x: content.x + (index % columns) * (avatarSize + gap),
+      y: gridTop + Math.floor(index / columns) * (avatarSize + gap),
       width: avatarSize,
       height: avatarSize,
       src: contributor?.avatarUrl ?? input.data.owner.avatarUrl,
       fit: 'cover',
       cornerRadius: avatarSize / 2,
-      opacity: visible && contributor ? 1 : 0,
+      opacity: shown ? 1 : 0,
     });
   }
-
-  nodes.push(
-    textNode('contributors-names', {
-      x: content.x,
-      y: content.y + 58 + avatarSize + 16,
-      width: content.width,
-      height: 30,
-      text: contributors
-        .slice(0, 4)
-        .map((contributor) => `@${contributor.login}`)
-        .join('  '),
-      fontFamily,
-      fontSize: 16,
-      fontWeight: 500,
-      color: palettes.bento.muted,
-      opacity: visible ? 1 : 0,
-    }),
-  );
 
   return nodes;
 }
@@ -518,15 +620,20 @@ function releaseNodes(
   input: BuildInput,
   settings: Record<string, unknown>,
   fontFamily: string,
+  theme: Theme,
   box: Box,
 ) {
-  const visible =
-    booleanSetting(settings, 'showRelease') &&
-    Boolean(input.data.latestRelease);
+  const release = input.data.latestRelease;
+  const visible = booleanSetting(settings, 'showRelease') && Boolean(release);
   const content = inset(box, spacing.md);
+  // GitHub often repeats the tag as the release name; show the date instead.
+  const subtitle =
+    release?.name && release.name !== release.tagName
+      ? release.name
+      : formatDate(release?.publishedAt);
 
   return [
-    cardNode('release-card', box, settings, visible),
+    cardNode('release-card', box, settings, theme, visible),
     textNode('release-title', {
       x: content.x,
       y: content.y,
@@ -536,31 +643,32 @@ function releaseNodes(
       fontFamily,
       fontSize: typeScale.label,
       fontWeight: 700,
-      color: palettes.bento.foreground,
+      color: theme.foreground,
       opacity: visible ? 1 : 0,
     }),
     textNode('release-tag', {
       x: content.x,
       y: content.y + 54,
       width: content.width,
-      height: 54,
-      text: input.data.latestRelease?.tagName ?? '',
+      height: 58,
+      text: release?.tagName ?? '',
       fontFamily,
-      fontSize: 38,
+      fontSize: 44,
       fontWeight: 800,
-      color: stringSetting(settings, 'accentColor'),
+      color: theme.accent,
+      letterSpacing: -1,
       opacity: visible ? 1 : 0,
     }),
     textNode('release-name', {
       x: content.x,
-      y: content.y + 112,
+      y: content.y + 118,
       width: content.width,
-      height: 62,
-      text: input.data.latestRelease?.name ?? 'Stable release',
+      height: 56,
+      text: subtitle,
       fontFamily,
       fontSize: 19,
       fontWeight: 500,
-      color: palettes.bento.muted,
+      color: theme.muted,
       maxLines: 2,
       lineHeight: 1.3,
       opacity: visible ? 1 : 0,
@@ -572,15 +680,16 @@ function cardNode(
   id: string,
   box: Box,
   settings: Record<string, unknown>,
+  theme: Theme,
   visible: boolean,
 ): RectNode {
   return {
     id,
     type: 'rect',
     ...box,
-    fill: { kind: 'solid', color: palettes.bento.surface },
+    fill: { kind: 'solid', color: theme.surface },
     cornerRadius: numberSetting(settings, 'cardRadius'),
-    stroke: { color: palettes.bento.border, width: 1 },
+    stroke: { color: theme.border, width: 1 },
     shadow: {
       color: '#514b7d',
       blur: 22,

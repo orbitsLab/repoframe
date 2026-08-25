@@ -35,7 +35,7 @@ function fetchLanguages(owner: string, repo: string) {
 }
 
 /**
- * Fetches up to ten repository contributors.
+ * Fetches up to thirty repository contributors, ranked by commit count.
  *
  * @param owner - GitHub repository owner.
  * @param repo - GitHub repository name.
@@ -46,7 +46,7 @@ async function fetchContributors(
   repo: string,
 ): Promise<GitHubResult<RawContributor[]>> {
   return githubRequest<RawContributor[]>(
-    `${repositoryPath(owner, repo)}/contributors?per_page=10`,
+    `${repositoryPath(owner, repo)}/contributors?per_page=30`,
     async (response) => (response.status === 204 ? [] : response.json()),
   );
 }

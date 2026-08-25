@@ -521,7 +521,7 @@ function MobileSheet({
       </Dialog.Trigger>
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 z-40 bg-black/50" />
-        <Dialog.Content className="fixed inset-0 z-50 flex flex-col bg-background outline-none sm:left-auto sm:w-96 sm:border-l">
+        <Dialog.Content className="fixed inset-0 z-50 flex flex-col overflow-hidden bg-background outline-none sm:left-auto sm:w-96 sm:border-l">
           <Dialog.Title className="sr-only">{label} settings</Dialog.Title>
           <Dialog.Close asChild>
             <Button

@@ -35,7 +35,7 @@ function TemplatePicker({
 }: TemplatePickerProps) {
   return (
     <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
-      <div className="flex h-12 items-center gap-2 border-b px-3">
+      <div className="flex h-12 shrink-0 items-center gap-2 border-b px-3">
         <Button
           type="button"
           variant="ghost"
@@ -50,7 +50,7 @@ function TemplatePicker({
         </h2>
       </div>
       <div
-        className="min-h-0 min-w-0 flex-1 space-y-3 overflow-y-auto p-3"
+        className="relative min-h-0 min-w-0 flex-1 space-y-3 overflow-y-auto overscroll-contain p-3"
         role="radiogroup"
         aria-label="Card template"
       >
@@ -69,7 +69,7 @@ function TemplatePicker({
             <label
               key={template.id}
               className={cn(
-                'block w-full min-w-0 cursor-pointer overflow-hidden rounded-lg border bg-background p-2 shadow-xs outline-none transition-colors has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring',
+                'relative block w-full min-w-0 cursor-pointer overflow-hidden rounded-lg border bg-background p-2 shadow-xs outline-none transition-colors has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring',
                 selected
                   ? 'border-foreground bg-accent'
                   : 'hover:border-muted-foreground/50',

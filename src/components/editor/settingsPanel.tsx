@@ -73,7 +73,7 @@ function SettingsPanel({
   return (
     <div className="flex min-h-0 flex-1 flex-col">
       {placement === 'design' && sections.length > 1 ? (
-        <div className="border-b p-3">
+        <div className="shrink-0 border-b p-3">
           <div
             className="grid grid-flow-col auto-cols-fr gap-0.5 rounded-md border bg-foreground/[0.04] p-0.5"
             role="tablist"
@@ -89,14 +89,16 @@ function SettingsPanel({
                   role="tab"
                   aria-selected={currentSection === section}
                   className={cn(
-                    'flex h-8 min-w-0 items-center justify-center gap-1 rounded-[5px] px-1 text-[9px] font-medium outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ring',
+                    'flex h-9 min-w-0 items-center justify-center gap-1.5 rounded-[5px] px-1.5 text-[11px] font-medium outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ring',
                     currentSection === section
                       ? 'bg-foreground/[0.1] text-foreground shadow-xs ring-1 ring-foreground/5'
                       : 'text-muted-foreground hover:text-foreground',
                   )}
                   onClick={() => setActiveSection(section)}
                 >
-                  <Icon className="size-3.5 shrink-0" aria-hidden="true" />
+                  {sections.length < 3 ? (
+                    <Icon className="size-3.5 shrink-0" aria-hidden="true" />
+                  ) : null}
                   <span className="truncate">{sectionLabels[section]}</span>
                 </button>
               );
@@ -105,7 +107,7 @@ function SettingsPanel({
         </div>
       ) : null}
 
-      <div className="min-h-0 flex-1 overflow-y-auto p-4">
+      <div className="relative min-h-0 flex-1 overflow-y-auto overscroll-contain p-4">
         {fields.map((field) => (
           <div
             key={field.key}

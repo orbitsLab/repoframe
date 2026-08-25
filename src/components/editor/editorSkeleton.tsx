@@ -1,7 +1,10 @@
 /** Renders the editor layout placeholder while the client bundle loads. */
 function EditorSkeleton() {
   return (
-    <main className="flex h-dvh flex-col bg-background" aria-busy="true">
+    <main
+      className="flex h-dvh flex-col overflow-hidden bg-background"
+      aria-busy="true"
+    >
       <div className="h-16 animate-pulse border-b bg-muted/50" />
       <div className="grid min-h-0 flex-1 grid-cols-1 lg:grid-cols-[16.25rem_minmax(0,1fr)_16.25rem]">
         <div className="hidden border-r bg-sidebar lg:block" />

@@ -1,7 +1,9 @@
 'use client';
 
 import { Check } from 'lucide-react';
-import { useEffect, useState } from 'react';
+
+import { ColorPicker } from '@/components/ui/color-picker';
+import { cn } from '@/lib/utils';
 
 import type { SettingField } from '@/types/template';
 
@@ -162,49 +164,68 @@ function SettingControl({ field, value, onChange }: SettingControlProps) {
   );
 }
 
+/** Preset colours drawn from the palettes the templates already ship with. */
+const swatches: Record<string, string[]> = {
+  backgroundColor: [
+    '#f6f3ec',
+    '#ffffff',
+    '#ebe9ff',
+    '#0b0d10',
+    '#0d1117',
+    '#101014',
+  ],
+  accentColor: [
+    '#5b5bd6',
+    '#6c5ce7',
+    '#7ee787',
+    '#58a6ff',
+    '#f97316',
+    '#38bdf8',
+  ],
+};
+
+/**
+ * Renders a color picker and any presets registered for the setting.
+ *
+ * @param props - Color setting schema, current value, and change callback.
+ */
 function ColorControl({ field, value, onChange }: SettingControlProps) {
   const id = `setting-${field.key}`;
   const color =
     typeof value === 'string' && /^#[0-9a-f]{6}$/i.test(value)
-      ? value
+      ? value.toLowerCase()
       : '#000000';
-  const [draft, setDraft] = useState(color);
-
-  useEffect(() => {
-    setDraft(color);
-  }, [color]);
-
-  function updateDraft(nextValue: string) {
-    setDraft(nextValue);
-    if (/^#[0-9a-f]{6}$/i.test(nextValue)) {
-      onChange(nextValue);
-    }
-  }
+  const presets = swatches[field.key] ?? [];
 
   return (
     <div className="space-y-2">
-      <label className="text-xs font-medium" htmlFor={`${id}-text`}>
+      <span className="text-xs font-medium" id={`${id}-label`}>
         {field.label}
-      </label>
-      <div className="flex gap-2">
-        <input
-          id={`${id}-color`}
-          type="color"
-          className="h-9 w-12 cursor-pointer rounded-md border bg-background p-1"
-          value={color}
-          onChange={(event) => updateDraft(event.target.value)}
-          aria-label={`${field.label} colour picker`}
-        />
-        <input
-          id={`${id}-text`}
-          className="h-9 min-w-0 flex-1 rounded-md border bg-background px-3 font-mono text-xs uppercase shadow-xs outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          value={draft}
-          onChange={(event) => updateDraft(event.target.value)}
-          maxLength={7}
-          pattern="#[0-9a-fA-F]{6}"
-          aria-invalid={!/^#[0-9a-f]{6}$/i.test(draft)}
-        />
-      </div>
+      </span>
+      <ColorPicker
+        color={color}
+        onChange={onChange}
+        labelledBy={`${id}-label`}
+      />
+      {presets.length > 0 ? (
+        <div className="flex flex-wrap gap-1.5 pt-0.5">
+          {presets.map((preset) => (
+            <button
+              key={preset}
+              type="button"
+              className={cn(
+                'size-6 rounded-full border shadow-xs outline-none transition-transform hover:scale-110 focus-visible:ring-2 focus-visible:ring-ring',
+                preset === color &&
+                  'ring-2 ring-foreground ring-offset-2 ring-offset-sidebar',
+              )}
+              style={{ backgroundColor: preset }}
+              onClick={() => onChange(preset)}
+              aria-label={`Use ${preset}`}
+              aria-pressed={preset === color}
+            />
+          ))}
+        </div>
+      ) : null}
     </div>
   );
 }

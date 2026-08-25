@@ -1,4 +1,4 @@
-import type { MeasureText } from '@/types/template';
+import type { MeasuredText, MeasureText } from '@/types/template';
 
 type FitTextInput = {
   text: string;
@@ -7,38 +7,56 @@ type FitTextInput = {
   maxWidth: number;
   minSize: number;
   maxSize: number;
+  maxLines?: number;
+  lineHeight?: number;
+  letterSpacing?: number;
+};
+
+/** A fitted block of text and the bounds it occupies. */
+type FittedText = MeasuredText & {
+  fontSize: number;
+  lineHeight: number;
 };
 
 /**
- * Finds the largest whole-pixel font size that fits on one line.
+ * Finds the largest whole-pixel font size that fits within a line budget.
+ *
+ * Measures without a line cap so wrapping is counted rather than truncated,
+ * then returns the wrapped lines and their bounds at the chosen size.
  *
  * @param measure - Renderer text measurement function.
  * @param input - Text, font, width, and size constraints.
- * @returns The fitted font size within the requested range.
+ * @returns The fitted size, wrapped lines, and measured bounds.
  */
-function fitFontSize(measure: MeasureText, input: FitTextInput) {
-  let low = input.minSize;
-  let high = input.maxSize;
+function fitText(measure: MeasureText, input: FitTextInput): FittedText {
+  const maxLines = input.maxLines ?? 1;
+  const lineHeight = input.lineHeight ?? 1;
+  const style = (fontSize: number) => ({
+    fontFamily: input.fontFamily,
+    fontSize,
+    fontWeight: input.fontWeight,
+    maxWidth: input.maxWidth,
+    lineHeight,
+    letterSpacing: input.letterSpacing,
+  });
+  // Bounds are whole pixels so the midpoint always advances and the search ends.
+  let low = Math.floor(input.minSize);
+  let high = Math.max(low, Math.floor(input.maxSize));
 
   while (high - low > 1) {
     const size = Math.floor((low + high) / 2);
-    const measured = measure(input.text, {
-      fontFamily: input.fontFamily,
-      fontSize: size,
-      fontWeight: input.fontWeight,
-      maxWidth: input.maxWidth,
-      lineHeight: 1,
-      maxLines: 1,
-    });
 
-    if (measured.lines.length === 1 && measured.width <= input.maxWidth) {
+    if (measure(input.text, style(size)).lines.length <= maxLines) {
       low = size;
     } else {
       high = size;
     }
   }
 
-  return low;
+  const measured = measure(input.text, { ...style(low), maxLines });
+
+  return { ...measured, fontSize: low, lineHeight };
 }
 
-export { fitFontSize };
+export type { FittedText };
+export { fitText };

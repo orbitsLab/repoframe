@@ -20,12 +20,12 @@ const spacing = {
 
 /** Shared type scale for static templates. */
 const typeScale = {
-  eyebrow: 22,
-  body: 30,
+  eyebrow: 20,
   label: 24,
+  body: 30,
+  metric: 72,
   heading: 64,
-  display: 88,
-  metric: 54,
+  display: 96,
 } as const;
 
 /** Proportional font options available to template settings. */
@@ -48,7 +48,7 @@ const monoFontOptions: SettingOption[] = [
   { label: 'Inconsolata', value: 'Inconsolata Variable' },
 ];
 
-/** Named color palettes shared by bundled templates. */
+/** Named color palettes used as template setting defaults. */
 const palettes = {
   ink: {
     background: '#f6f3ec',
@@ -76,11 +76,102 @@ const palettes = {
   },
 } as const;
 
+/** Resolved surface and text colors derived from a background. */
+type Theme = {
+  background: string;
+  surface: string;
+  foreground: string;
+  muted: string;
+  border: string;
+  accent: string;
+};
+
+/**
+ * Derives readable text and surface colors from a chosen background.
+ *
+ * Keeps templates legible when a user picks a background the bundled
+ * palette never anticipated.
+ *
+ * @param background - Background color chosen in template settings.
+ * @param accent - Accent color chosen in template settings.
+ * @returns Theme colors tinted toward the background hue.
+ */
+function resolveTheme(background: string, accent: string): Theme {
+  const isDark = luminance(background) < 0.45;
+  const contrast = isDark ? '#ffffff' : '#0b0b0f';
+
+  return {
+    background,
+    // Surfaces always lift away from the background, in either direction.
+    surface: mix(background, '#ffffff', isDark ? 0.08 : 0.72),
+    foreground: mix(background, contrast, 0.92),
+    muted: mix(background, contrast, 0.55),
+    border: mix(background, contrast, isDark ? 0.2 : 0.16),
+    accent,
+  };
+}
+
+/**
+ * Computes the perceived lightness of a hex color.
+ *
+ * @param color - Hex color string.
+ * @returns Relative luminance between 0 and 1.
+ */
+function luminance(color: string) {
+  const [red, green, blue] = channels(color).map((channel) => {
+    const value = channel / 255;
+    return value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4;
+  });
+
+  return 0.2126 * red + 0.7152 * green + 0.0722 * blue;
+}
+
+/**
+ * Blends two hex colors in sRGB space.
+ *
+ * @param from - Starting hex color.
+ * @param to - Target hex color.
+ * @param amount - Share of the target color, from 0 to 1.
+ * @returns The blended hex color.
+ */
+function mix(from: string, to: string, amount: number) {
+  const start = channels(from);
+  const end = channels(to);
+  const blended = start.map((channel, index) =>
+    Math.round(channel + (end[index] - channel) * amount),
+  );
+
+  return `#${blended.map((channel) => channel.toString(16).padStart(2, '0')).join('')}`;
+}
+
+/**
+ * Reads the red, green, and blue channels of a hex color.
+ *
+ * @param color - Hex color in three- or six-digit form.
+ * @returns Channel values between 0 and 255.
+ */
+function channels(color: string) {
+  const hex = color.replace('#', '');
+  const full =
+    hex.length === 3
+      ? hex
+          .split('')
+          .map((character) => character + character)
+          .join('')
+      : hex.padEnd(6, '0').slice(0, 6);
+
+  return [0, 2, 4].map((offset) =>
+    Number.parseInt(full.slice(offset, offset + 2), 16),
+  );
+}
+
+export type { Theme };
 export {
   displayFontOptions,
   monoFontOptions,
   palettes,
   ratioSizes,
+  resolveTheme,
   spacing,
   typeScale,
 };

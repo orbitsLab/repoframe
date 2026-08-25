@@ -103,7 +103,49 @@ function splitLongWord(
   const parts: string[] = [];
   let part = '';
 
-  for (const character of Array.from(word)) {
+  // Prefer breaking after a slash or hyphen so owner/repo names stay readable.
+  for (const chunk of word.split(/(?<=[/-])/)) {
+    if (part && widthOf(part + chunk) > maxWidth) {
+      parts.push(part);
+      part = '';
+    }
+
+    if (widthOf(chunk) > maxWidth) {
+      const characters = splitCharacters(chunk, maxWidth, widthOf, part);
+      parts.push(...characters.slice(0, -1));
+      part = characters.at(-1) ?? '';
+      continue;
+    }
+
+    part += chunk;
+  }
+
+  if (part) {
+    parts.push(part);
+  }
+
+  return parts;
+}
+
+/**
+ * Splits a text chunk at character boundaries while preserving any prefix.
+ *
+ * @param chunk - Text that cannot fit as a complete semantic chunk.
+ * @param maxWidth - Maximum width available to each part.
+ * @param widthOf - Function that measures a candidate part.
+ * @param prefix - Text already accumulated for the first part.
+ * @returns Text split at the narrowest available character boundaries.
+ */
+function splitCharacters(
+  chunk: string,
+  maxWidth: number,
+  widthOf: (value: string) => number,
+  prefix: string,
+) {
+  const parts: string[] = [];
+  let part = prefix;
+
+  for (const character of Array.from(chunk)) {
     if (part && widthOf(part + character) > maxWidth) {
       parts.push(part);
       part = character;
@@ -112,11 +154,7 @@ function splitLongWord(
     }
   }
 
-  if (part) {
-    parts.push(part);
-  }
-
-  return parts;
+  return [...parts, part];
 }
 
 function truncateLines(

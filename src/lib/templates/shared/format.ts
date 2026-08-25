@@ -15,4 +15,26 @@ function formatCount(value?: number) {
   }).format(value);
 }
 
-export { formatCount };
+/**
+ * Formats an ISO timestamp as a short human-readable date.
+ *
+ * @param value - ISO timestamp, when the endpoint supplied one.
+ * @returns A short date, or an empty string when unavailable.
+ */
+function formatDate(value?: string) {
+  if (!value) {
+    return '';
+  }
+
+  const date = new Date(value);
+
+  return Number.isNaN(date.getTime())
+    ? ''
+    : new Intl.DateTimeFormat('en', {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric',
+      }).format(date);
+}
+
+export { formatCount, formatDate };

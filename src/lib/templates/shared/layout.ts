@@ -54,5 +54,24 @@ function stack(box: Box, heights: number[], gap: number): Box[] {
   });
 }
 
+/**
+ * Splits a box into equal cells across columns and rows.
+ *
+ * @param box - Bounds containing the grid.
+ * @param columns - Number of cells per row.
+ * @param rows - Number of rows.
+ * @param gap - Space between adjacent cells.
+ * @returns Cell bounds ordered left to right, then top to bottom.
+ */
+function grid(box: Box, columns: number, rows: number, gap: number): Box[] {
+  const height = (box.height - gap * (rows - 1)) / rows;
+
+  return stack(
+    box,
+    Array.from({ length: rows }, () => height),
+    gap,
+  ).flatMap((rowBox) => row(rowBox, columns, gap));
+}
+
 export type { Box };
-export { inset, row, stack };
+export { grid, inset, row, stack };

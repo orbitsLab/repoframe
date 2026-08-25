@@ -1,9 +1,19 @@
+import { badgeTemplate } from '@/lib/templates/static/badge';
 import { bentoTemplate } from '@/lib/templates/static/bento';
 import { minimalTemplate } from '@/lib/templates/static/minimal';
+import { releaseTemplate } from '@/lib/templates/static/release';
+import { showcaseTemplate } from '@/lib/templates/static/showcase';
 import { terminalTemplate } from '@/lib/templates/static/terminal';
 
 /** Templates available in the current build. */
-const templates = [minimalTemplate, terminalTemplate, bentoTemplate];
+const templates = [
+  minimalTemplate,
+  terminalTemplate,
+  bentoTemplate,
+  badgeTemplate,
+  showcaseTemplate,
+  releaseTemplate,
+];
 const templateById = new Map(
   templates.map((template) => [template.id, template]),
 );

@@ -3,9 +3,13 @@ import type { AspectRatio } from '@/types/template';
 const themeStorageKey = 'repoframe-theme';
 const ratioStorageKey = 'repoframe-ratio';
 const howItWorksStorageKey = 'repoframe-how-it-works-dismissed';
+const panelWidthsStorageKey = 'repoframe-panel-widths';
 
 /** Color themes persisted by RepoFrame. */
 type Theme = 'light' | 'dark';
+
+/** Widths in pixels of the two editor side panels. */
+type PanelWidths = { left: number; right: number };
 
 /** @returns The saved theme, or undefined when no valid preference exists. */
 function readTheme(): Theme | undefined {
@@ -34,6 +38,36 @@ function writeLastRatio(ratio: AspectRatio): void {
   writeValue(ratioStorageKey, ratio);
 }
 
+/** @returns The saved panel widths, or undefined when no valid preference exists. */
+function readPanelWidths(): PanelWidths | undefined {
+  const value = readValue(panelWidthsStorageKey);
+  if (!value) {
+    return undefined;
+  }
+
+  try {
+    const parsed: unknown = JSON.parse(value);
+    if (
+      typeof parsed === 'object' &&
+      parsed !== null &&
+      Number.isFinite((parsed as PanelWidths).left) &&
+      Number.isFinite((parsed as PanelWidths).right)
+    ) {
+      return {
+        left: (parsed as PanelWidths).left,
+        right: (parsed as PanelWidths).right,
+      };
+    }
+  } catch {}
+
+  return undefined;
+}
+
+/** @param widths - Panel widths to persist for future visits. */
+function writePanelWidths(widths: PanelWidths): void {
+  writeValue(panelWidthsStorageKey, JSON.stringify(widths));
+}
+
 /** @returns Whether the introductory explanation has been dismissed. */
 function readHowItWorksDismissed(): boolean {
   return readValue(howItWorksStorageKey) === 'true';
@@ -58,13 +92,15 @@ function writeValue(key: string, value: string): void {
   } catch {}
 }
 
-export type { Theme };
+export type { PanelWidths, Theme };
 export {
   readHowItWorksDismissed,
   readLastRatio,
+  readPanelWidths,
   readTheme,
   themeStorageKey,
   writeHowItWorksDismissed,
   writeLastRatio,
+  writePanelWidths,
   writeTheme,
 };

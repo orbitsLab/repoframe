@@ -9,7 +9,10 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 
-import { SettingControl } from '@/components/editor/settingControl';
+import {
+  SettingControl,
+  VisibleContentControl,
+} from '@/components/editor/settingControl';
 import { cn } from '@/lib/utils';
 import type { SettingField, SettingSection, Template } from '@/types/template';
 
@@ -69,6 +72,12 @@ function SettingsPanel({
   const fields = template.settingsSchema.filter(
     (field) => field.section === currentSection,
   );
+  const inclusionFields = fields.filter(
+    (field) => field.type === 'multi-select' || field.type === 'toggle',
+  );
+  const remainingFields = fields.filter(
+    (field) => field.type !== 'multi-select' && field.type !== 'toggle',
+  );
 
   return (
     <div className="flex min-h-0 flex-1 flex-col">
@@ -89,7 +98,7 @@ function SettingsPanel({
                   role="tab"
                   aria-selected={currentSection === section}
                   className={cn(
-                    'flex h-9 min-w-0 items-center justify-center gap-1.5 rounded-[5px] px-1.5 text-[11px] font-medium outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ring',
+                    'flex h-9 min-w-0 items-center justify-center gap-1.5 rounded-[5px] px-1 text-[11px] font-medium outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ring',
                     currentSection === section
                       ? 'bg-foreground/[0.1] text-foreground shadow-xs ring-1 ring-foreground/5'
                       : 'text-muted-foreground hover:text-foreground',
@@ -107,12 +116,16 @@ function SettingsPanel({
         </div>
       ) : null}
 
-      <div className="relative min-h-0 flex-1 overflow-y-auto overscroll-contain p-4">
-        {fields.map((field) => (
-          <div
-            key={field.key}
-            className="border-b py-4 first:pt-0 last:border-0 last:pb-0"
-          >
+      <div className="relative min-h-0 flex-1 space-y-5 overflow-y-auto overscroll-contain p-4">
+        {inclusionFields.length > 0 ? (
+          <VisibleContentControl
+            fields={inclusionFields}
+            settings={settings}
+            onChange={onChange}
+          />
+        ) : null}
+        {remainingFields.map((field) => (
+          <div key={field.key}>
             <SettingControl
               field={field as SettingField}
               value={settings[field.key]}

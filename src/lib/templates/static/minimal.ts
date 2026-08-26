@@ -35,7 +35,7 @@ const metricBandHeight = 124;
 const settingsSchema: SettingField[] = [
   {
     key: 'metrics',
-    label: 'Visible metrics',
+    label: 'Visible content',
     section: 'content',
     type: 'multi-select',
     options: metricOptions,

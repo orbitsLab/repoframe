@@ -38,20 +38,20 @@ const languageSlots = 5;
 const settingsSchema: SettingField[] = [
   {
     key: 'metrics',
-    label: 'Visible metrics',
+    label: 'Visible content',
     section: 'content',
     type: 'multi-select',
     options: metricOptions,
   },
   {
     key: 'showTopics',
-    label: 'Show topics',
+    label: 'Topics',
     section: 'content',
     type: 'toggle',
   },
   {
     key: 'showLanguages',
-    label: 'Show languages',
+    label: 'Languages',
     section: 'content',
     type: 'toggle',
   },

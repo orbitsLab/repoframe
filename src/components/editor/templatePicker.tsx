@@ -1,6 +1,7 @@
 'use client';
 
 import { Check, ChevronLeft } from 'lucide-react';
+import { useMemo } from 'react';
 
 import { Preview } from '@/components/editor/preview';
 import { Button } from '@/components/ui/button';
@@ -33,6 +34,21 @@ function TemplatePicker({
   onBack,
   onSelect,
 }: TemplatePickerProps) {
+  const previews = useMemo(
+    () =>
+      templates.map((template) => ({
+        template,
+        scene: buildEditorScene(
+          data,
+          template.id,
+          thumbnailRatio,
+          settingsForTemplate(template, settings),
+          measureText,
+        ),
+      })),
+    [data, settings],
+  );
+
   return (
     <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
       <div className="flex h-12 shrink-0 items-center gap-2 border-b px-3">
@@ -45,25 +61,15 @@ function TemplatePicker({
         >
           <ChevronLeft aria-hidden="true" />
         </Button>
-        <h2 className="font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-          Templates
-        </h2>
+        <h2 className="editor-eyebrow text-muted-foreground">Templates</h2>
       </div>
       <div
         className="relative min-h-0 min-w-0 flex-1 space-y-3 overflow-y-auto overscroll-contain p-3"
         role="radiogroup"
         aria-label="Card template"
       >
-        {templates.map((template) => {
+        {previews.map(({ template, scene }) => {
           const selected = template.id === selectedId;
-          const previewSettings = settingsForTemplate(template, settings);
-          const scene = buildEditorScene(
-            data,
-            template.id,
-            thumbnailRatio,
-            previewSettings,
-            measureText,
-          );
 
           return (
             <label

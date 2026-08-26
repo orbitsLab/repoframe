@@ -10,7 +10,16 @@ function getIsDark() {
   return document.documentElement.classList.contains('dark');
 }
 
-function ThemeToggle() {
+type ThemeToggleProps = {
+  size?: 'icon' | 'icon-sm';
+};
+
+/**
+ * Renders a button that switches between the light and dark themes.
+ *
+ * @param props - Optional button size matching the surrounding header density.
+ */
+function ThemeToggle({ size = 'icon' }: ThemeToggleProps) {
   const [isDark, setIsDark] = useState(false);
 
   useEffect(() => {
@@ -29,7 +38,7 @@ function ThemeToggle() {
     <Button
       type="button"
       variant="outline"
-      size="icon"
+      size={size}
       onClick={toggleTheme}
       aria-label={`Switch to ${isDark ? 'light' : 'dark'} mode`}
       title={`Switch to ${isDark ? 'light' : 'dark'} mode`}

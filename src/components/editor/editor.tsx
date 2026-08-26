@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { Dialog, Popover } from 'radix-ui';
 import {
+  type CSSProperties,
   type FormEvent,
   type ReactNode,
   useEffect,
@@ -19,16 +20,22 @@ import {
 } from 'react';
 
 import { ExportPopover } from '@/components/editor/exportPopover';
+import {
+  clampPanelWidth,
+  PanelResizer,
+} from '@/components/editor/panelResizer';
 import { Preview } from '@/components/editor/preview';
 import { SettingsPanel } from '@/components/editor/settingsPanel';
 import { TemplatePicker } from '@/components/editor/templatePicker';
 import { Logo } from '@/components/logo';
 import { Button } from '@/components/ui/button';
+import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { buildEditorScene, getActiveTemplate } from '@/editor/scene';
 import { type EditorState, useEditorStore } from '@/editor/store';
 import type { LoadProjectError } from '@/lib/github/load';
 import { parseGitHubUrl } from '@/lib/github/url';
 import { fontsReady, measureText } from '@/lib/renderer/measure';
+import { readPanelWidths, writePanelWidths } from '@/lib/storage/prefs';
 import { cn } from '@/lib/utils';
 import type { ProjectData } from '@/types/data/project';
 import type { AspectRatio } from '@/types/template';
@@ -51,6 +58,7 @@ function Editor({ repo, templateId }: EditorProps) {
   const [repoInput, setRepoInput] = useState(repo ?? '');
   const [fontsLoaded, setFontsLoaded] = useState(false);
   const [showTemplates, setShowTemplates] = useState(false);
+  const [panelWidths, setPanelWidths] = useState(restorePanelWidths);
   const template = getActiveTemplate(state.templateId);
 
   useEffect(() => {
@@ -65,6 +73,11 @@ function Editor({ repo, templateId }: EditorProps) {
   useEffect(() => {
     void fontsReady.then(() => setFontsLoaded(true));
   }, []);
+
+  useEffect(() => {
+    const timer = setTimeout(() => writePanelWidths(panelWidths), 300);
+    return () => clearTimeout(timer);
+  }, [panelWidths]);
 
   useEffect(() => {
     if (state.source) {
@@ -141,7 +154,7 @@ function Editor({ repo, templateId }: EditorProps) {
             </span>
             <span className="block truncate font-medium">{template.name}</span>
           </span>
-          <span className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground group-hover:text-foreground">
+          <span className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground transition-colors group-hover:text-foreground">
             Change
           </span>
         </button>
@@ -210,32 +223,34 @@ function Editor({ repo, templateId }: EditorProps) {
               </>
             )}
           </Button>
+          <Button
+            type="button"
+            variant="outline"
+            size="icon-sm"
+            onClick={state.refreshRepository}
+            disabled={!state.source || state.status === 'loading'}
+            aria-label="Refresh repository data"
+            title="Refresh repository data"
+          >
+            <RefreshCw
+              className={cn(state.status === 'loading' && 'animate-spin')}
+              aria-hidden="true"
+            />
+          </Button>
         </form>
 
-        <div className="hidden flex-1 lg:block" />
-        <Button
-          type="button"
-          variant="outline"
-          size="icon-sm"
-          onClick={state.refreshRepository}
-          disabled={!state.source || state.status === 'loading'}
-          aria-label="Refresh repository data"
-          title="Refresh repository data"
-        >
-          <RefreshCw
-            className={cn(state.status === 'loading' && 'animate-spin')}
-            aria-hidden="true"
+        <div className="ml-auto flex items-center gap-2">
+          <ThemeToggle size="icon-sm" />
+          <RatioPicker value={state.ratio} onChange={state.setRatio} />
+          <MobileRatioPicker value={state.ratio} onChange={state.setRatio} />
+          <ExportPopover
+            scene={scene}
+            source={state.source}
+            fullName={state.projectData.repository.fullName}
+            templateId={state.templateId}
+            ratio={state.ratio}
           />
-        </Button>
-        <RatioPicker value={state.ratio} onChange={state.setRatio} />
-        <MobileRatioPicker value={state.ratio} onChange={state.setRatio} />
-        <ExportPopover
-          scene={scene}
-          source={state.source}
-          fullName={state.projectData.repository.fullName}
-          templateId={state.templateId}
-          ratio={state.ratio}
-        />
+        </div>
       </header>
 
       <p
@@ -249,15 +264,31 @@ function Editor({ repo, templateId }: EditorProps) {
         {inputError}
       </p>
 
-      <div className="grid min-h-0 flex-1 grid-cols-1 lg:grid-cols-[16.25rem_minmax(0,1fr)_16.25rem]">
-        <aside className="hidden min-h-0 border-r bg-sidebar lg:flex">
+      <div
+        className="grid min-h-0 flex-1 grid-cols-1 lg:grid-cols-[var(--panel-left)_minmax(0,1fr)_var(--panel-right)]"
+        style={
+          {
+            '--panel-left': `${panelWidths.left}px`,
+            '--panel-right': `${panelWidths.right}px`,
+          } as CSSProperties
+        }
+      >
+        <aside className="relative hidden min-h-0 border-r bg-sidebar lg:flex">
           {contentPanel}
+          <PanelResizer
+            value={panelWidths.left}
+            side="left"
+            label="Resize content panel"
+            onChange={(left) =>
+              setPanelWidths((widths) => ({ ...widths, left }))
+            }
+          />
         </aside>
 
         <section className="flex min-h-0 flex-col bg-muted/45">
           <div className="relative grid min-h-0 flex-1 place-items-center overflow-hidden p-3 sm:p-6 lg:p-10">
             <div
-              className="pointer-events-none absolute inset-0 opacity-40 [background-image:radial-gradient(circle,var(--border)_1px,transparent_1px)] [background-size:20px_20px]"
+              className="pointer-events-none absolute inset-0 [background-image:radial-gradient(circle,var(--muted-foreground)_1px,transparent_1px)] [background-size:22px_22px] opacity-[0.18]"
               aria-hidden="true"
             />
             {scene ? (
@@ -295,7 +326,15 @@ function Editor({ repo, templateId }: EditorProps) {
           />
         </section>
 
-        <aside className="hidden min-h-0 border-l bg-sidebar lg:flex">
+        <aside className="relative hidden min-h-0 border-l bg-sidebar lg:flex">
+          <PanelResizer
+            value={panelWidths.right}
+            side="right"
+            label="Resize design panel"
+            onChange={(right) =>
+              setPanelWidths((widths) => ({ ...widths, right }))
+            }
+          />
           {designPanel}
         </aside>
       </div>
@@ -310,6 +349,19 @@ function Editor({ repo, templateId }: EditorProps) {
       </div>
     </main>
   );
+}
+
+/** @returns Saved panel widths clamped to the resizer bounds, or the defaults. */
+function restorePanelWidths(): { left: number; right: number } {
+  const saved = readPanelWidths();
+  if (!saved) {
+    return { left: 260, right: 260 };
+  }
+
+  return {
+    left: clampPanelWidth(saved.left),
+    right: clampPanelWidth(saved.right),
+  };
 }
 
 function MobileRatioPicker({
@@ -339,7 +391,7 @@ function MobileRatioPicker({
               <label
                 key={ratio}
                 className={cn(
-                  'grid h-8 cursor-pointer place-items-center rounded px-3 text-xs font-medium has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring',
+                  'grid h-8 cursor-pointer place-items-center rounded px-3 text-xs font-medium transition-colors has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring',
                   value === ratio
                     ? 'bg-foreground text-background'
                     : 'text-muted-foreground hover:bg-accent hover:text-foreground',
@@ -366,9 +418,7 @@ function MobileRatioPicker({
 function PanelHeading({ title }: { title: string }) {
   return (
     <div className="flex h-12 shrink-0 items-center border-b px-4">
-      <h2 className="font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-        {title}
-      </h2>
+      <h2 className="editor-eyebrow text-muted-foreground">{title}</h2>
     </div>
   );
 }
@@ -387,9 +437,9 @@ function RatioPicker({
         <label
           key={ratio}
           className={cn(
-            'grid h-7 cursor-pointer place-items-center rounded px-2 text-xs font-medium has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring',
+            'grid h-7 cursor-pointer place-items-center rounded px-2 text-xs font-medium transition-colors has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring',
             value === ratio
-              ? 'bg-foreground text-background'
+              ? 'bg-foreground text-background shadow-xs'
               : 'text-muted-foreground hover:text-foreground',
           )}
         >

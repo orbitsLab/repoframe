@@ -42,14 +42,14 @@ const minMetricRowHeight = 30;
 const settingsSchema: SettingField[] = [
   {
     key: 'metrics',
-    label: 'Visible metrics',
+    label: 'Visible content',
     section: 'content',
     type: 'multi-select',
     options: metricOptions,
   },
   {
     key: 'showLanguages',
-    label: 'Show languages',
+    label: 'Languages',
     section: 'content',
     type: 'toggle',
   },

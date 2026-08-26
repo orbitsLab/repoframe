@@ -1,6 +1,7 @@
 'use client';
 
 import { Check } from 'lucide-react';
+import type { CSSProperties, ReactNode } from 'react';
 
 import { ColorPicker } from '@/components/ui/color-picker';
 import { cn } from '@/lib/utils';
@@ -12,6 +13,10 @@ type SettingControlProps = {
   value: unknown;
   onChange(value: unknown): void;
 };
+
+/** Shared classes for a selectable chip in an option group. */
+const chip =
+  'flex min-h-9 cursor-pointer items-center justify-center gap-2 rounded-md border bg-background px-3 text-xs font-medium shadow-xs transition-colors hover:bg-accent/50 has-checked:border-foreground/20 has-checked:bg-accent has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring';
 
 /**
  * Renders the control declared by a template setting field.
@@ -28,14 +33,11 @@ function SettingControl({ field, value, onChange }: SettingControlProps) {
   if (field.type === 'select') {
     if (field.options.length <= 4) {
       return (
-        <fieldset className="space-y-2.5">
-          <legend className="text-xs font-medium">{field.label}</legend>
-          <div className="grid grid-cols-2 gap-2">
+        <fieldset>
+          <ControlLabel as="legend">{field.label}</ControlLabel>
+          <div className="flex flex-wrap gap-2">
             {field.options.map((option) => (
-              <label
-                key={option.value}
-                className="grid h-10 cursor-pointer place-items-center rounded-md border bg-background px-2 text-xs font-medium shadow-xs transition-colors hover:bg-accent/50 has-checked:border-foreground/20 has-checked:bg-accent"
-              >
+              <label key={option.value} className={cn(chip, 'flex-1 basis-24')}>
                 <input
                   type="radio"
                   name={id}
@@ -53,11 +55,11 @@ function SettingControl({ field, value, onChange }: SettingControlProps) {
     }
 
     return (
-      <label className="block space-y-2 text-xs font-medium" htmlFor={id}>
-        <span>{field.label}</span>
+      <div>
+        <ControlLabel htmlFor={id}>{field.label}</ControlLabel>
         <select
           id={id}
-          className="h-9 w-full rounded-md border bg-background px-3 text-sm font-normal shadow-xs outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="h-9 w-full rounded-md border bg-background px-3 text-sm text-foreground shadow-xs outline-none transition-colors hover:bg-accent/50 focus-visible:ring-2 focus-visible:ring-ring"
           value={typeof value === 'string' ? value : ''}
           onChange={(event) => onChange(event.target.value)}
         >
@@ -67,14 +69,14 @@ function SettingControl({ field, value, onChange }: SettingControlProps) {
             </option>
           ))}
         </select>
-      </label>
+      </div>
     );
   }
 
   if (field.type === 'toggle') {
     return (
-      <label className="flex min-h-10 cursor-pointer items-center justify-between gap-4 text-xs font-medium">
-        <span>{field.label}</span>
+      <label className="flex min-h-9 cursor-pointer items-center justify-between gap-4">
+        <span className="editor-label">{field.label}</span>
         <input
           id={id}
           type="checkbox"
@@ -82,49 +84,52 @@ function SettingControl({ field, value, onChange }: SettingControlProps) {
           checked={value === true}
           onChange={(event) => onChange(event.target.checked)}
         />
-        <span className="relative h-5 w-9 rounded-full border bg-muted shadow-inner transition-colors after:absolute after:left-0.5 after:top-0.5 after:size-3.5 after:rounded-full after:bg-background after:shadow-xs after:transition-transform peer-checked:border-foreground peer-checked:bg-foreground peer-checked:after:translate-x-4 peer-focus-visible:ring-2 peer-focus-visible:ring-ring" />
+        <span className="relative h-5 w-9 shrink-0 rounded-full border border-transparent bg-muted-foreground/75 transition-colors after:absolute after:left-0.5 after:top-0.5 after:size-3.5 after:rounded-full after:bg-background after:shadow-sm after:transition-transform peer-checked:border-foreground peer-checked:bg-foreground peer-checked:after:translate-x-4 peer-focus-visible:ring-2 peer-focus-visible:ring-ring" />
       </label>
     );
   }
 
   if (field.type === 'text') {
     return (
-      <label className="block space-y-2 text-xs font-medium" htmlFor={id}>
-        <span>{field.label}</span>
+      <div>
+        <ControlLabel htmlFor={id}>{field.label}</ControlLabel>
         <input
           id={id}
-          className="h-9 w-full rounded-md border bg-background px-3 text-sm font-normal shadow-xs outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="h-9 w-full rounded-md border bg-background px-3 text-sm shadow-xs outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ring"
           value={typeof value === 'string' ? value : ''}
           onChange={(event) => onChange(event.target.value)}
           placeholder={field.placeholder}
           maxLength={field.maxLength}
         />
-      </label>
+      </div>
     );
   }
 
   if (field.type === 'range') {
     const number = typeof value === 'number' ? value : field.min;
+    const fill = ((number - field.min) / (field.max - field.min)) * 100;
+
     return (
-      <label className="block space-y-2 text-xs font-medium" htmlFor={id}>
-        <span className="flex items-center justify-between gap-3">
+      <div>
+        <ControlLabel htmlFor={id}>
           {field.label}
-          <output className="font-mono text-xs text-muted-foreground">
+          <output className="editor-value">
             {number}
             {field.unit}
           </output>
-        </span>
+        </ControlLabel>
         <input
           id={id}
           type="range"
           className="editor-range w-full"
+          style={{ '--fill': `${fill}%` } as CSSProperties}
           min={field.min}
           max={field.max}
           step={field.step}
           value={number}
           onChange={(event) => onChange(Number(event.target.value))}
         />
-      </label>
+      </div>
     );
   }
 
@@ -133,34 +138,156 @@ function SettingControl({ field, value, onChange }: SettingControlProps) {
     : [];
 
   return (
-    <fieldset className="space-y-2">
-      <legend className="text-xs font-medium">{field.label}</legend>
-      <div className="grid grid-cols-2 gap-2">
+    <fieldset>
+      <ControlLabel as="legend">{field.label}</ControlLabel>
+      <div className="grid grid-cols-[repeat(auto-fit,minmax(8rem,1fr))] gap-2">
         {field.options.map((option) => (
-          <label
+          <CheckChip
             key={option.value}
-            className="flex min-h-10 cursor-pointer items-center gap-2 rounded-md border bg-background px-3 text-xs font-medium shadow-xs transition-colors hover:bg-accent/50 has-checked:border-foreground/20 has-checked:bg-accent"
-          >
-            <input
-              type="checkbox"
-              className="peer sr-only"
-              checked={selected.includes(option.value)}
-              onChange={(event) =>
-                onChange(
-                  event.target.checked
-                    ? [...selected, option.value]
-                    : selected.filter((item) => item !== option.value),
-                )
-              }
-            />
-            <span className="grid size-4 shrink-0 place-items-center rounded border bg-background text-background peer-checked:border-foreground peer-checked:bg-foreground peer-focus-visible:ring-2 peer-focus-visible:ring-ring">
-              <Check className="size-3" aria-hidden="true" />
-            </span>
-            {option.label}
-          </label>
+            label={option.label}
+            checked={selected.includes(option.value)}
+            onChange={(checked) =>
+              onChange(
+                checked
+                  ? [...selected, option.value]
+                  : selected.filter((item) => item !== option.value),
+              )
+            }
+          />
         ))}
       </div>
     </fieldset>
+  );
+}
+
+/**
+ * Renders a labelled checkbox styled as a chip.
+ *
+ * @param props - Chip text, checked state, and change callback.
+ */
+function CheckChip({
+  label,
+  checked,
+  onChange,
+}: {
+  label: string;
+  checked: boolean;
+  onChange(checked: boolean): void;
+}) {
+  return (
+    <label className={cn(chip, 'justify-start')}>
+      <input
+        type="checkbox"
+        className="peer sr-only"
+        checked={checked}
+        onChange={(event) => onChange(event.target.checked)}
+      />
+      <span className="grid size-4 shrink-0 place-items-center rounded border border-muted-foreground/75 bg-background text-background peer-checked:border-foreground peer-checked:bg-foreground peer-focus-visible:ring-2 peer-focus-visible:ring-ring">
+        <Check className="size-3" aria-hidden="true" />
+      </span>
+      <span className="min-w-0 truncate">{label}</span>
+    </label>
+  );
+}
+
+/**
+ * Control copy for metric values, kept apart from the text each template
+ * draws on the card so lowercase card styling stays out of the panel.
+ */
+const metricLabels: Record<string, string> = {
+  stars: 'Stars',
+  forks: 'Forks',
+  watchers: 'Watchers',
+  issues: 'Issues',
+  pullRequests: 'PRs',
+};
+
+/**
+ * Renders every content inclusion the template offers as one chip group.
+ *
+ * Merges the multi-select options with the section's booleans so switching
+ * template grows or shrinks a single group instead of two control styles.
+ *
+ * @param props - Content fields, current settings, and change callback.
+ */
+function VisibleContentControl({
+  fields,
+  settings,
+  onChange,
+}: {
+  fields: SettingField[];
+  settings: Record<string, unknown>;
+  onChange(key: string, value: unknown): void;
+}) {
+  const multiSelect = fields.find((field) => field.type === 'multi-select');
+  const toggles = fields.filter((field) => field.type === 'toggle');
+  const selected = Array.isArray(settings[multiSelect?.key ?? ''])
+    ? (settings[multiSelect?.key ?? ''] as unknown[]).filter(
+        (item): item is string => typeof item === 'string',
+      )
+    : [];
+
+  return (
+    <fieldset>
+      <ControlLabel as="legend">
+        {multiSelect?.label ?? 'Visible content'}
+      </ControlLabel>
+      <div className="grid grid-cols-[repeat(auto-fit,minmax(8rem,1fr))] gap-2">
+        {multiSelect?.type === 'multi-select'
+          ? multiSelect.options.map((option) => (
+              <CheckChip
+                key={option.value}
+                label={metricLabels[option.value] ?? option.label}
+                checked={selected.includes(option.value)}
+                onChange={(checked) =>
+                  onChange(
+                    multiSelect.key,
+                    checked
+                      ? [...selected, option.value]
+                      : selected.filter((item) => item !== option.value),
+                  )
+                }
+              />
+            ))
+          : null}
+        {toggles.map((field) => (
+          <CheckChip
+            key={field.key}
+            label={field.label}
+            checked={settings[field.key] === true}
+            onChange={(checked) => onChange(field.key, checked)}
+          />
+        ))}
+      </div>
+    </fieldset>
+  );
+}
+
+/**
+ * Renders the label line above a control, with any trailing readout.
+ *
+ * @param props - Label content, and either the controlled id or legend usage.
+ */
+function ControlLabel({
+  as,
+  htmlFor,
+  children,
+}: {
+  as?: 'legend';
+  htmlFor?: string;
+  children: ReactNode;
+}) {
+  const className =
+    'editor-label mb-2 flex items-center justify-between gap-3 text-foreground';
+
+  if (as === 'legend') {
+    return <legend className={className}>{children}</legend>;
+  }
+
+  return (
+    <label className={className} htmlFor={htmlFor}>
+      {children}
+    </label>
   );
 }
 
@@ -198,8 +325,11 @@ function ColorControl({ field, value, onChange }: SettingControlProps) {
   const presets = swatches[field.key] ?? [];
 
   return (
-    <div className="space-y-2">
-      <span className="text-xs font-medium" id={`${id}-label`}>
+    <div>
+      <span
+        className="editor-label mb-2 block text-foreground"
+        id={`${id}-label`}
+      >
         {field.label}
       </span>
       <ColorPicker
@@ -208,15 +338,15 @@ function ColorControl({ field, value, onChange }: SettingControlProps) {
         labelledBy={`${id}-label`}
       />
       {presets.length > 0 ? (
-        <div className="flex flex-wrap gap-1.5 pt-0.5">
+        <div className="mt-2.5 flex flex-wrap gap-2">
           {presets.map((preset) => (
             <button
               key={preset}
               type="button"
               className={cn(
-                'size-6 rounded-full border shadow-xs outline-none transition-transform hover:scale-110 focus-visible:ring-2 focus-visible:ring-ring',
+                'size-6 rounded-full border border-muted-foreground/40 shadow-xs outline-none transition-transform hover:scale-110 focus-visible:ring-2 focus-visible:ring-ring',
                 preset === color &&
-                  'ring-2 ring-foreground ring-offset-2 ring-offset-sidebar',
+                  'ring-1 ring-foreground ring-offset-2 ring-offset-sidebar',
               )}
               style={{ backgroundColor: preset }}
               onClick={() => onChange(preset)}
@@ -230,4 +360,4 @@ function ColorControl({ field, value, onChange }: SettingControlProps) {
   );
 }
 
-export { SettingControl };
+export { SettingControl, VisibleContentControl };

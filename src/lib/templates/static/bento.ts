@@ -46,26 +46,26 @@ const contributorSlots = 30;
 const settingsSchema: SettingField[] = [
   {
     key: 'metrics',
-    label: 'Visible metrics',
+    label: 'Visible content',
     section: 'content',
     type: 'multi-select',
     options: metricOptions,
   },
   {
     key: 'showLanguages',
-    label: 'Show languages',
+    label: 'Languages',
     section: 'content',
     type: 'toggle',
   },
   {
     key: 'showContributors',
-    label: 'Show contributors',
+    label: 'Contributors',
     section: 'content',
     type: 'toggle',
   },
   {
     key: 'showRelease',
-    label: 'Show latest release',
+    label: 'Latest release',
     section: 'content',
     type: 'toggle',
   },

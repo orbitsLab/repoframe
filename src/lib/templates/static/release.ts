@@ -31,20 +31,20 @@ const metricOptions = [
 const settingsSchema: SettingField[] = [
   {
     key: 'metrics',
-    label: 'Visible metrics',
+    label: 'Visible content',
     section: 'content',
     type: 'multi-select',
     options: metricOptions,
   },
   {
     key: 'showRelease',
-    label: 'Show release',
+    label: 'Release',
     section: 'content',
     type: 'toggle',
   },
   {
     key: 'showLicense',
-    label: 'Show license',
+    label: 'License',
     section: 'content',
     type: 'toggle',
   },

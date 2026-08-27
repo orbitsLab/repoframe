@@ -1,4 +1,4 @@
-import { deleteStore, readStore, writeStore } from '@/lib/storage/db';
+import { readStore, writeStore } from '@/lib/storage/db';
 import type { AspectRatio } from '@/types/template';
 
 /** Persisted state required to restore the active project. */
@@ -61,11 +61,6 @@ async function writeProject(project: StoredProject): Promise<void> {
   await writeStore('project', projectKey, project);
 }
 
-/** Removes the active project from persistent storage. */
-async function clearProject(): Promise<void> {
-  await deleteStore('project', projectKey);
-}
-
 function isStoredProject(value: StoredProject) {
   return (
     value.version === 1 &&
@@ -81,4 +76,4 @@ function isStoredProject(value: StoredProject) {
 }
 
 export type { ProjectDefaults, RestoredProject, StoredProject };
-export { clearProject, readProject, writeProject };
+export { readProject, writeProject };

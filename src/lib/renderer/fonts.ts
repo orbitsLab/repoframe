@@ -37,4 +37,4 @@ function areFontsReady() {
   return fontsLoaded;
 }
 
-export { areFontsReady, fontFamilies, fontsReady, fontWeights };
+export { areFontsReady, fontsReady };

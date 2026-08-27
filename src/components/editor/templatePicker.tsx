@@ -1,7 +1,7 @@
 'use client';
 
 import { Check, ChevronLeft } from 'lucide-react';
-import { useMemo } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 
 import { Preview } from '@/components/editor/preview';
 import { Button } from '@/components/ui/button';
@@ -34,6 +34,8 @@ function TemplatePicker({
   onBack,
   onSelect,
 }: TemplatePickerProps) {
+  const listRef = useRef<HTMLDivElement>(null);
+  const selectedRef = useRef<HTMLLabelElement>(null);
   const previews = useMemo(
     () =>
       templates.map((template) => ({
@@ -48,6 +50,20 @@ function TemplatePicker({
       })),
     [data, settings],
   );
+
+  // Opening the picker centres the current template in the list, so a
+  // selection far down the registry is not left below the fold.
+  useEffect(() => {
+    const list = listRef.current;
+    const selected = selectedRef.current;
+
+    if (!list || !selected) {
+      return;
+    }
+
+    list.scrollTop =
+      selected.offsetTop - (list.clientHeight - selected.offsetHeight) / 2;
+  }, []);
 
   return (
     <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
@@ -64,6 +80,7 @@ function TemplatePicker({
         <h2 className="editor-eyebrow text-muted-foreground">Templates</h2>
       </div>
       <div
+        ref={listRef}
         className="relative min-h-0 min-w-0 flex-1 space-y-3 overflow-y-auto overscroll-contain p-3"
         role="radiogroup"
         aria-label="Card template"
@@ -74,6 +91,7 @@ function TemplatePicker({
           return (
             <label
               key={template.id}
+              ref={selected ? selectedRef : undefined}
               className={cn(
                 'relative block w-full min-w-0 cursor-pointer overflow-hidden rounded-lg border bg-background p-2 shadow-xs outline-none transition-colors has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring',
                 selected

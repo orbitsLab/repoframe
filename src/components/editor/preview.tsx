@@ -50,6 +50,12 @@ function Preview({ scene, label, compact = false }: PreviewProps) {
           return;
         }
 
+        // A host that is hidden or on its way out of the tree measures zero,
+        // and sizing the stage to nothing fails the draw that follows.
+        if (hostElement.clientWidth === 0 || hostElement.clientHeight === 0) {
+          return;
+        }
+
         const scale = Math.min(
           hostElement.clientWidth / scene.width,
           hostElement.clientHeight / scene.height,

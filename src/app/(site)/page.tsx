@@ -29,7 +29,7 @@ export default function HomePage() {
       <section className="border-b">
         <div className="mx-auto grid max-w-6xl gap-14 px-6 py-20 lg:grid-cols-[0.9fr_1.1fr] lg:items-center lg:py-28">
           <div>
-            <p className="mb-5 font-mono text-xs font-medium uppercase tracking-widest text-muted-foreground">
+            <p className="site-eyebrow mb-5 text-muted-foreground">
               Open-source GitHub card generator
             </p>
             <h1 className="max-w-xl text-5xl font-semibold tracking-[-0.045em] sm:text-6xl">
@@ -72,9 +72,7 @@ export default function HomePage() {
 
       <section className="mx-auto max-w-6xl px-6 py-20">
         <div className="max-w-xl">
-          <p className="font-mono text-xs font-medium uppercase tracking-widest text-muted-foreground">
-            How it works
-          </p>
+          <p className="site-eyebrow text-muted-foreground">How it works</p>
           <h2 className="mt-3 text-3xl font-semibold tracking-tight">
             From repository to image in three steps.
           </h2>
@@ -98,9 +96,7 @@ export default function HomePage() {
         <div className="mx-auto max-w-6xl px-6 py-20">
           <div className="flex items-end justify-between gap-6">
             <div>
-              <p className="font-mono text-xs font-medium uppercase tracking-widest text-muted-foreground">
-                Templates
-              </p>
+              <p className="site-eyebrow text-muted-foreground">Templates</p>
               <h2 className="mt-3 text-3xl font-semibold tracking-tight">
                 Start with a composition that works.
               </h2>
@@ -137,9 +133,7 @@ export default function HomePage() {
 
       <section className="mx-auto grid max-w-6xl gap-12 px-6 py-20 lg:grid-cols-2 lg:items-center">
         <div>
-          <p className="font-mono text-xs font-medium uppercase tracking-widest text-muted-foreground">
-            Customization
-          </p>
+          <p className="site-eyebrow text-muted-foreground">Customization</p>
           <h2 className="mt-3 text-3xl font-semibold tracking-tight">
             Flexible enough to feel yours. Curated enough to stay good.
           </h2>
@@ -168,9 +162,7 @@ export default function HomePage() {
 
       <section className="border-y bg-foreground text-background">
         <div className="mx-auto grid max-w-6xl gap-10 px-6 py-16 md:grid-cols-[0.8fr_1.2fr] md:items-center">
-          <p className="font-mono text-xs font-medium uppercase tracking-widest opacity-65">
-            Local-first by design
-          </p>
+          <p className="site-eyebrow opacity-65">Local-first by design</p>
           <p className="text-xl leading-8 tracking-tight sm:text-2xl">
             Your project stays in your browser. RepoFrame has no accounts, no
             server, and no database. Repository data is fetched from GitHub

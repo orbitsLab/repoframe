@@ -118,6 +118,16 @@
 }
 
 @layer components {
+  /* Uppercase mono label introducing a section on the public pages. */
+  .site-eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 500;
+    line-height: 1rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
   /* Uppercase mono heading used by panel and section headers. */
   .editor-eyebrow {
     font-family: var(--font-mono);

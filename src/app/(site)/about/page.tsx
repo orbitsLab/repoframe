@@ -12,9 +12,7 @@ export const metadata: Metadata = {
 export default function AboutPage() {
   return (
     <main className="mx-auto max-w-4xl px-6 py-16 sm:py-24">
-      <p className="font-mono text-xs font-medium uppercase tracking-widest text-muted-foreground">
-        About RepoFrame
-      </p>
+      <p className="site-eyebrow text-muted-foreground">About RepoFrame</p>
       <h1 className="mt-4 max-w-3xl text-4xl font-semibold tracking-tight sm:text-5xl">
         A focused tool for presenting open-source work clearly.
       </h1>

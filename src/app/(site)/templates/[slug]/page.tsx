@@ -42,7 +42,7 @@ export default async function TemplatePage({ params }: TemplatePageProps) {
       <div className="grid gap-12 lg:grid-cols-[1.25fr_0.75fr] lg:items-start">
         <SampleCard templateId={template.id} className="shadow-lg" />
         <div>
-          <p className="font-mono text-xs font-medium uppercase tracking-widest text-muted-foreground">
+          <p className="site-eyebrow text-muted-foreground">
             {template.category} template
           </p>
           <h1 className="mt-4 text-4xl font-semibold tracking-tight">

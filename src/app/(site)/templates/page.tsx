@@ -14,9 +14,7 @@ export default function TemplatesPage() {
   return (
     <main className="mx-auto max-w-6xl px-6 py-16 sm:py-24">
       <div className="max-w-2xl">
-        <p className="font-mono text-xs font-medium uppercase tracking-widest text-muted-foreground">
-          Template gallery
-        </p>
+        <p className="site-eyebrow text-muted-foreground">Template gallery</p>
         <h1 className="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl">
           A strong starting point for every repository.
         </h1>

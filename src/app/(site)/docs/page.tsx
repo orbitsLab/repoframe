@@ -24,9 +24,7 @@ export default function DocsPage() {
 
       <div className="min-w-0 max-w-3xl">
         <section id="using-repoframe" className="scroll-mt-8">
-          <p className="font-mono text-xs font-medium uppercase tracking-widest text-muted-foreground">
-            Using RepoFrame
-          </p>
+          <p className="site-eyebrow text-muted-foreground">Using RepoFrame</p>
           <h1 className="mt-4 text-4xl font-semibold tracking-tight">
             Create and export a repository card.
           </h1>
@@ -57,7 +55,7 @@ export default function DocsPage() {
           id="authoring-a-template"
           className="mt-20 scroll-mt-8 border-t pt-16"
         >
-          <p className="font-mono text-xs font-medium uppercase tracking-widest text-muted-foreground">
+          <p className="site-eyebrow text-muted-foreground">
             Authoring a template
           </p>
           <h2 className="mt-4 text-4xl font-semibold tracking-tight">

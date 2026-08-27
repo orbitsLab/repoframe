@@ -29,6 +29,9 @@ async function renderScene(scene: Scene, container: HTMLDivElement) {
     height: scene.height,
   });
   const layer = new Konva.Layer();
+  // A preview is drawn below the scene size, so the layer keeps at least a
+  // doubled backing store to stop images softening on low-density screens.
+  layer.getCanvas().setPixelRatio(Math.max(2, window.devicePixelRatio || 1));
   layer.add(
     new Konva.Rect({
       id: 'scene-background',

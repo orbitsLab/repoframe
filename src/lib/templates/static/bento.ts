@@ -6,6 +6,11 @@ import {
   row,
   stack,
 } from '@/lib/templates/shared/layout';
+import {
+  metricOptions,
+  metricPaths,
+  metricValues,
+} from '@/lib/templates/shared/metrics';
 import { textNode } from '@/lib/templates/shared/nodes';
 import {
   booleanSetting,
@@ -28,14 +33,6 @@ import type { ProjectDataPath } from '@/types/data/path';
 import type { ProjectData } from '@/types/data/project';
 import type { RectNode, Scene, SceneNode } from '@/types/scene';
 import type { BuildInput, SettingField, Template } from '@/types/template';
-
-const metricOptions = [
-  { label: 'Stars', value: 'stars' },
-  { label: 'Forks', value: 'forks' },
-  { label: 'Watchers', value: 'watchers' },
-  { label: 'Issues', value: 'issues' },
-  { label: 'PRs', value: 'pullRequests' },
-];
 
 const languageColors = ['#6c5ce7', '#00b894', '#0984e3', '#fdcb6e'];
 
@@ -139,13 +136,7 @@ function requiredData(settings: Record<string, unknown>) {
     paths.push('latestRelease');
   }
 
-  if (metrics.includes('issues')) {
-    paths.push('metrics.issues');
-  }
-
-  if (metrics.includes('pullRequests')) {
-    paths.push('metrics.pullRequests');
-  }
+  paths.push(...metricPaths(metrics));
 
   return paths;
 }
@@ -364,13 +355,7 @@ function statsNodes(
   box: Box,
 ) {
   const visibleMetrics = stringArraySetting(settings, 'metrics');
-  const values: Record<string, number | undefined> = {
-    stars: input.data.metrics.stars,
-    forks: input.data.metrics.forks,
-    watchers: input.data.metrics.watchers,
-    issues: input.data.metrics.issues,
-    pullRequests: input.data.metrics.pullRequests,
-  };
+  const values = metricValues(input.data);
   const content = inset(box, spacing.md);
   // Past two metrics the tile splits into rows so labels keep their full width.
   const columns =

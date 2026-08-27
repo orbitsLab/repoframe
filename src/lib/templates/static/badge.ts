@@ -1,5 +1,10 @@
 import { formatCount } from '@/lib/templates/shared/format';
 import { type Box, grid, inset } from '@/lib/templates/shared/layout';
+import {
+  metricOptions,
+  metricPaths,
+  metricValues,
+} from '@/lib/templates/shared/metrics';
 import { textNode } from '@/lib/templates/shared/nodes';
 import {
   mergeSettings,
@@ -18,14 +23,6 @@ import {
 import type { ProjectDataPath } from '@/types/data/path';
 import type { Scene, SceneNode } from '@/types/scene';
 import type { BuildInput, SettingField, Template } from '@/types/template';
-
-const metricOptions = [
-  { label: 'stars', value: 'stars' },
-  { label: 'forks', value: 'forks' },
-  { label: 'watchers', value: 'watchers' },
-  { label: 'issues', value: 'issues' },
-  { label: 'PRs', value: 'pullRequests' },
-];
 
 const settingsSchema: SettingField[] = [
   {
@@ -79,13 +76,7 @@ function requiredData(settings: Record<string, unknown>) {
   const metrics = stringArraySetting(resolved, 'metrics');
   const paths: ProjectDataPath[] = ['repository'];
 
-  if (metrics.includes('issues')) {
-    paths.push('metrics.issues');
-  }
-
-  if (metrics.includes('pullRequests')) {
-    paths.push('metrics.pullRequests');
-  }
+  paths.push(...metricPaths(metrics));
 
   return paths;
 }
@@ -296,13 +287,7 @@ function metricPills(
   rows: number,
   area: Box,
 ) {
-  const values: Record<string, number | undefined> = {
-    stars: input.data.metrics.stars,
-    forks: input.data.metrics.forks,
-    watchers: input.data.metrics.watchers,
-    issues: input.data.metrics.issues,
-    pullRequests: input.data.metrics.pullRequests,
-  };
+  const values = metricValues(input.data);
   const cells = grid(area, columns, rows, spacing.sm);
   const pillHeight = cells[0]?.height ?? area.height;
 
@@ -338,7 +323,7 @@ function metricPills(
         y: cell.y + (pillHeight - 34) / 2,
         width: cell.width - spacing.sm * 2,
         height: 34,
-        text: metric.label,
+        text: metric.label.toLowerCase(),
         fontFamily,
         fontSize: 20,
         fontWeight: 500,

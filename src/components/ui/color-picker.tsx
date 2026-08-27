@@ -7,6 +7,7 @@ import {
   useState,
 } from 'react';
 
+import { hexToRgb, rgbToHex } from '@/lib/color';
 import { cn } from '@/lib/utils';
 
 type ColorPickerProps = {
@@ -63,30 +64,6 @@ function rgbToHsv([red, green, blue]: [number, number, number]) {
   }
 
   return [hue, max === 0 ? 0 : span / max, max / 255] as const;
-}
-
-/**
- * Splits a six-digit hex color into 8-bit channels.
- *
- * @param hex - Six-digit hex color including the leading hash.
- * @returns Red, green, and blue channels.
- */
-function hexToRgb(hex: string): [number, number, number] {
-  return [
-    Number.parseInt(hex.slice(1, 3), 16),
-    Number.parseInt(hex.slice(3, 5), 16),
-    Number.parseInt(hex.slice(5, 7), 16),
-  ];
-}
-
-/**
- * Joins 8-bit channels into a six-digit hex color.
- *
- * @param channels - Red, green, and blue channels.
- * @returns Lowercase hex color including the leading hash.
- */
-function rgbToHex(channels: [number, number, number]) {
-  return `#${channels.map((channel) => channel.toString(16).padStart(2, '0')).join('')}`;
 }
 
 /**

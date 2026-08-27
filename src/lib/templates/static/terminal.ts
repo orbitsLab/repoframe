@@ -1,5 +1,10 @@
 import { formatCount } from '@/lib/templates/shared/format';
 import { type Box, inset } from '@/lib/templates/shared/layout';
+import {
+  metricOptions,
+  metricPaths,
+  metricValues,
+} from '@/lib/templates/shared/metrics';
 import { textNode } from '@/lib/templates/shared/nodes';
 import {
   booleanSetting,
@@ -21,14 +26,6 @@ import type { ProjectDataPath } from '@/types/data/path';
 import type { ProjectData } from '@/types/data/project';
 import type { Scene, SceneNode } from '@/types/scene';
 import type { BuildInput, SettingField, Template } from '@/types/template';
-
-const metricOptions = [
-  { label: 'stars', value: 'stars' },
-  { label: 'forks', value: 'forks' },
-  { label: 'watchers', value: 'watchers' },
-  { label: 'issues', value: 'issues' },
-  { label: 'pull requests', value: 'pullRequests' },
-];
 
 const languageColors = ['#7ee787', '#58a6ff', '#d2a8ff', '#ffa657', '#f778ba'];
 
@@ -110,13 +107,7 @@ function requiredData(settings: Record<string, unknown>) {
     paths.push('languages');
   }
 
-  if (metrics.includes('issues')) {
-    paths.push('metrics.issues');
-  }
-
-  if (metrics.includes('pullRequests')) {
-    paths.push('metrics.pullRequests');
-  }
+  paths.push(...metricPaths(metrics));
 
   return paths;
 }
@@ -364,13 +355,7 @@ function metricNodes(
   columns: number,
   area: Box,
 ) {
-  const values: Record<string, number | undefined> = {
-    stars: input.data.metrics.stars,
-    forks: input.data.metrics.forks,
-    watchers: input.data.metrics.watchers,
-    issues: input.data.metrics.issues,
-    pullRequests: input.data.metrics.pullRequests,
-  };
+  const values = metricValues(input.data);
 
   const gap = spacing.md;
   const cellWidth = (area.width - gap * (columns - 1)) / columns;
@@ -389,7 +374,7 @@ function metricNodes(
         y,
         width: cellWidth * 0.62,
         height: 34,
-        text: metric.label,
+        text: metric.label.toLowerCase(),
         fontFamily,
         fontSize,
         fontWeight: 500,

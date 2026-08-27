@@ -1,5 +1,10 @@
 import { formatCount, formatDate } from '@/lib/templates/shared/format';
 import { type Box, inset, row } from '@/lib/templates/shared/layout';
+import {
+  metricOptions,
+  metricPaths,
+  metricValues,
+} from '@/lib/templates/shared/metrics';
 import { textNode } from '@/lib/templates/shared/nodes';
 import {
   booleanSetting,
@@ -19,14 +24,6 @@ import {
 import type { ProjectDataPath } from '@/types/data/path';
 import type { Scene, SceneNode } from '@/types/scene';
 import type { BuildInput, SettingField, Template } from '@/types/template';
-
-const metricOptions = [
-  { label: 'Stars', value: 'stars' },
-  { label: 'Forks', value: 'forks' },
-  { label: 'Watchers', value: 'watchers' },
-  { label: 'Issues', value: 'issues' },
-  { label: 'PRs', value: 'pullRequests' },
-];
 
 const settingsSchema: SettingField[] = [
   {
@@ -106,13 +103,7 @@ function requiredData(settings: Record<string, unknown>) {
     paths.push('latestRelease');
   }
 
-  if (metrics.includes('issues')) {
-    paths.push('metrics.issues');
-  }
-
-  if (metrics.includes('pullRequests')) {
-    paths.push('metrics.pullRequests');
-  }
+  paths.push(...metricPaths(metrics));
 
   return paths;
 }
@@ -276,13 +267,7 @@ function metricNodes(
   theme: Theme,
   area: Box,
 ) {
-  const values: Record<string, number | undefined> = {
-    stars: input.data.metrics.stars,
-    forks: input.data.metrics.forks,
-    watchers: input.data.metrics.watchers,
-    issues: input.data.metrics.issues,
-    pullRequests: input.data.metrics.pullRequests,
-  };
+  const values = metricValues(input.data);
   const columns = Math.max(1, visibleMetrics.length);
   const cells = row(area, columns, spacing.lg);
 

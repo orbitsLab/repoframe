@@ -78,6 +78,47 @@ const stacks: Record<string, string[]> = {
   badge: ['owner-login', 'repo-name', 'repo-description', 'metric-stars-pill'],
   showcase: ['repo-name', 'owner-login', 'repo-description', 'topic-pill-1'],
   release: ['eyebrow', 'release-tag', 'release-subtitle', 'footer-rule'],
+  signal: [
+    'eyebrow',
+    'repo-name',
+    'repo-description',
+    'hero-value',
+    'hero-label',
+    'metrics-rule',
+  ],
+  // Blueprint moves the spec table into a side column on a wide canvas, so
+  // only the blocks that stay stacked at every ratio are listed here.
+  blueprint: ['eyebrow', 'repo-name', 'repo-description', 'metrics-rule'],
+  poster: [
+    'eyebrow',
+    'repo-name',
+    'repo-description',
+    'metrics-rule',
+    'topic-marquee',
+  ],
+  stack: [
+    'repo-name',
+    'repo-description',
+    'languages-heading',
+    'language-label-1',
+    'language-track-1',
+    'contributors-heading',
+    'metrics-rule',
+  ],
+  story: ['eyebrow', 'repo-name', 'repo-description', 'footer-panel'],
+  split: ['eyebrow', 'repo-description', 'repo-name-top', 'repo-name-bottom'],
+  // Grid places its blocks in fixed cells rather than a flow, so only the
+  // bands that always follow one another are listed here.
+  grid: ['repo-name', 'repo-description'],
+  marquee: ['marquee-line-1', 'footer-rule', 'repo-description'],
+  spectrum: ['eyebrow', 'repo-name', 'repo-description', 'metrics-rule'],
+  // Sidebar stands its name on a quarter turn, so the rotated node is left
+  // out of a check that assumes upright boxes.
+  sidebar: ['eyebrow', 'repo-description', 'footer-rule'],
+  cover: ['eyebrow', 'cover-panel', 'repo-description', 'metrics-rule'],
+  almanac: ['eyebrow', 'repo-name', 'repo-description', 'mosaic-rule-h-1'],
+  contents: ['eyebrow', 'repo-name', 'repo-description', 'entry-1'],
+  crew: ['eyebrow', 'repo-name', 'repo-description', 'metrics-rule'],
 };
 
 const ratios: AspectRatio[] = ['1:1', '4:5', '16:9', '9:16'];

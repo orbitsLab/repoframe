@@ -33,6 +33,7 @@ import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { buildEditorScene, getActiveTemplate } from '@/editor/scene';
 import { type EditorState, useEditorStore } from '@/editor/store';
 import type { LoadProjectError } from '@/lib/github/load';
+import type { RateLimit } from '@/lib/github/rest';
 import { parseGitHubUrl } from '@/lib/github/url';
 import { fontsReady, measureText } from '@/lib/renderer/measure';
 import { readPanelWidths, writePanelWidths } from '@/lib/storage/prefs';
@@ -470,7 +471,10 @@ function PreviewStatus({
   onTryExample(): void;
 }) {
   const error = state.error ? errorMessage(state.error) : undefined;
-  const cache = formatCacheAge(state.cacheAge);
+  const status = [
+    state.source ? '' : 'Example project',
+    formatRateLimit(state.rateLimit),
+  ].filter(Boolean);
 
   return (
     <div className="flex min-h-11 flex-wrap items-center justify-between gap-x-4 gap-y-1 border-t bg-background/95 px-4 py-2 text-[11px] text-muted-foreground">
@@ -486,10 +490,7 @@ function PreviewStatus({
         {!error && state.notice ? <span>{state.notice}</span> : null}
         {!error && !state.notice ? (
           <span>
-            {state.source ? cache : 'Example project'}
-            {state.rateLimit.remaining !== undefined
-              ? ` · ${state.rateLimit.remaining} / 60 requests left`
-              : ''}
+            {status.join(' · ')}
             {!state.source ? (
               <>
                 {' · '}
@@ -612,13 +613,37 @@ function buildPreviewLabel(
   return `${data.repository.fullName}. ${data.repository.description ?? 'No description.'}${visibleMetrics ? ` ${visibleMetrics}.` : ''}`;
 }
 
-function formatCacheAge(cacheAge?: number) {
-  if (cacheAge === undefined) {
-    return 'Fresh repository data';
+/**
+ * Formats GitHub quota details for the preview status bar.
+ *
+ * @param rateLimit - Remaining request count and optional reset time.
+ * @returns A quota summary, or an empty string when quota data is unavailable.
+ */
+function formatRateLimit(rateLimit: RateLimit) {
+  if (rateLimit.remaining === undefined) {
+    return '';
   }
 
-  const minutes = Math.max(1, Math.floor(cacheAge / 60_000));
-  return `Cached ${minutes} minute${minutes === 1 ? '' : 's'} ago`;
+  const left = `${rateLimit.remaining} / 60 requests left`;
+
+  return rateLimit.resetAt
+    ? `${left} · resets in ${formatMinutes(rateLimit.resetAt)}`
+    : left;
+}
+
+/**
+ * Formats the wait until a GitHub rate-limit reset in whole minutes.
+ *
+ * @param resetAt - Time when GitHub restores the request quota.
+ * @returns A duration rounded up to at least one minute.
+ */
+function formatMinutes(resetAt: Date) {
+  const minutes = Math.max(
+    1,
+    Math.ceil((resetAt.getTime() - Date.now()) / 60_000),
+  );
+
+  return `${minutes} minute${minutes === 1 ? '' : 's'}`;
 }
 
 function errorMessage(error: LoadProjectError) {
@@ -632,11 +657,7 @@ function errorMessage(error: LoadProjectError) {
     return "Can't reach GitHub. Check your connection and try again.";
   }
   if (error.kind === 'rate-limited') {
-    const minutes = Math.max(
-      1,
-      Math.ceil((error.resetAt.getTime() - Date.now()) / 60_000),
-    );
-    return `You've used your 60 GitHub requests for this hour. Resets in ${minutes} minute${minutes === 1 ? '' : 's'}. You can keep editing the current card.`;
+    return `You've used your 60 GitHub requests for this hour. Resets in ${formatMinutes(error.resetAt)}. You can keep editing the current card.`;
   }
   if (error.kind === 'unavailable') {
     return 'This repository is unavailable from GitHub.';

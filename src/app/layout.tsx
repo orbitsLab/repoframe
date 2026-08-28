@@ -22,15 +22,15 @@ import './globals.css';
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: 'RepoFrame — GitHub social card generator',
-    template: '%s — RepoFrame',
+    default: 'Repo Frame — GitHub social card generator',
+    template: '%s — Repo Frame',
   },
   description: 'Generate polished social cards for GitHub repositories.',
   openGraph: {
-    title: 'RepoFrame — GitHub social card generator',
+    title: 'Repo Frame — GitHub social card generator',
     description: 'Generate polished social cards for GitHub repositories.',
     type: 'website',
-    siteName: 'RepoFrame',
+    siteName: 'Repo Frame',
   },
 };
 
@@ -42,7 +42,9 @@ export default function RootLayout({ children }: LayoutProps<'/'>) {
           {themeScript}
         </Script>
       </head>
-      <body>{children}</body>
+      {/* Extensions such as Grammarly stamp attributes onto the body before
+          React hydrates, which React reports as a mismatch. */}
+      <body suppressHydrationWarning>{children}</body>
     </html>
   );
 }

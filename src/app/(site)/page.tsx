@@ -9,7 +9,7 @@ const steps = [
   {
     number: '01',
     title: 'Paste a repository',
-    copy: 'RepoFrame loads public project details directly from GitHub.',
+    copy: 'Repo Frame loads public project details directly from GitHub.',
   },
   {
     number: '02',
@@ -164,7 +164,7 @@ export default function HomePage() {
         <div className="mx-auto grid max-w-6xl gap-10 px-6 py-16 md:grid-cols-[0.8fr_1.2fr] md:items-center">
           <p className="site-eyebrow opacity-65">Local-first by design</p>
           <p className="text-xl leading-8 tracking-tight sm:text-2xl">
-            Your project stays in your browser. RepoFrame has no accounts, no
+            Your project stays in your browser. Repo Frame has no accounts, no
             server, and no database. Repository data is fetched from GitHub
             directly by your browser, and your designs never leave your device.
           </p>

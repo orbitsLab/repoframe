@@ -21,14 +21,43 @@ function Logo({ compact = false, className, href = '/' }: LogoProps) {
         'inline-flex shrink-0 items-center gap-2 font-semibold tracking-tight outline-none focus-visible:ring-2 focus-visible:ring-ring',
         className,
       )}
-      aria-label="RepoFrame home"
+      aria-label="Repo Frame home"
     >
-      <span className="grid size-7 place-items-center rounded-md bg-foreground text-background shadow-xs">
-        <span className="relative block size-3.5 rounded-[2px] border border-current">
-          <span className="absolute -right-1 -top-1 size-3.5 rounded-[2px] border border-current bg-foreground" />
-        </span>
-      </span>
-      {compact ? null : <span>RepoFrame</span>}
+      {/* The letterform takes the text colour; the crop marks sit on the page
+          ground, so the mark inverts with the theme. */}
+      <svg
+        className="size-7 shrink-0"
+        viewBox="0 0 1000 1000"
+        aria-hidden="true"
+      >
+        <g transform="translate(500 500)">
+          <path
+            fill="currentColor"
+            d="M-398.74-395.539L250.48-395.547 398.14-248.482 398.13 91.948 262.7 226.941 398.2 397.04 367.75 396.96 196.2 396.69C182.33 378.18 165.72 358.14 151.26 339.92L65.29 231.92-236.28 231.85-236.28 396.95-399.08 396.89-398.74-395.539Z"
+          />
+          <path
+            fill="var(--background)"
+            d="M175.36-283.767C178.44-283.83 181.73-284.328 184.26-282.791 185.9-264.742 184.63-224.969 184.59-205.33L103.64-205.347 103.61-192.532 184.64-192.512 184.61-115.384 197.35-115.365 197.31-192.523 235.2-192.497 235.18 32.23 280.6 32.255 280.58 44.785C268.05 44.783 248.43 45.86 236.61 44.463 233.53 41.81 236.94 42.411 234.19 38.004 227.2 36.65 205.54 37.42 197.38 37.498L197.38-40.618 184.57-40.679 184.54 37.465 103.56 37.457 103.54 49.83 184.54 49.883 184.5 79.466-176.39 79.46-176.45 126.404C-179.5 126.423-181.13 126.291-184.18 125.959-186.88 123.206-185.71 58.908-185.69 49.868L-104.81 49.858-104.7 37.469-185.67 37.476-185.67-40.652-198.37-40.645-198.37 37.466-236.2 37.461-236.3-188.366C-245.52-188.335-273.4-187.66-280.58-188.944-281.91-191.918-281.51-196.579-281.51-200.03-268.6-199.924-251.6-200.811-238.48-199.774-234.86-199.488-237.89-197.047-235.1-193.028-229.21-191.715-205.51-192.469-198.37-192.524L-198.36-115.407-185.66-115.391-185.68-192.529-104.58-192.535-104.62-205.331-185.69-205.366-185.68-235.559 175.36-235.519 175.36-283.767Z"
+          />
+          <path
+            fill="var(--background)"
+            d="M-236.3-235.575L-198.31-235.516-198.36-205.328-236.26-205.387-236.3-235.575Z"
+          />
+          <path
+            fill="var(--background)"
+            d="M197.33-235.539L235.15-235.517 235.15-205.424C223.28-205.027 209.38-205.359 197.34-205.335L197.33-235.539Z"
+          />
+          <path
+            fill="var(--background)"
+            d="M197.38 49.893L235.22 49.906 235.2 79.438 197.26 79.485 197.38 49.893Z"
+          />
+          <path
+            fill="var(--background)"
+            d="M-236.18 49.896L-198.37 49.883-198.38 79.467-236.17 79.455-236.18 49.896Z"
+          />
+        </g>
+      </svg>
+      {compact ? null : <span>Repo Frame</span>}
     </Link>
   );
 }

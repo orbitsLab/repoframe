@@ -7,7 +7,7 @@ import { templates } from '@/lib/templates/registry';
 
 export const metadata: Metadata = {
   title: 'Templates',
-  description: 'Browse RepoFrame templates for GitHub social cards.',
+  description: 'Browse Repo Frame templates for GitHub social cards.',
 };
 
 export default function TemplatesPage() {

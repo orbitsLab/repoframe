@@ -13,7 +13,7 @@ function EditorSkeleton() {
         </div>
         <div className="hidden border-l bg-sidebar lg:block" />
       </div>
-      <span className="sr-only">Loading RepoFrame editor</span>
+      <span className="sr-only">Loading Repo Frame editor</span>
     </main>
   );
 }

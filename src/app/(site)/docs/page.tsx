@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 
 export const metadata: Metadata = {
   title: 'Documentation',
-  description: 'Learn how to use RepoFrame and author a template.',
+  description: 'Learn how to use Repo Frame and author a template.',
 };
 
 export default function DocsPage() {
@@ -17,21 +17,21 @@ export default function DocsPage() {
       >
         <p className="text-sm font-semibold">Documentation</p>
         <div className="mt-4 grid gap-2 text-sm text-muted-foreground">
-          <a href="#using-repoframe">Using RepoFrame</a>
+          <a href="#using-repoframe">Using Repo Frame</a>
           <a href="#authoring-a-template">Authoring a template</a>
         </div>
       </nav>
 
       <div className="min-w-0 max-w-3xl">
         <section id="using-repoframe" className="scroll-mt-8">
-          <p className="site-eyebrow text-muted-foreground">Using RepoFrame</p>
+          <p className="site-eyebrow text-muted-foreground">Using Repo Frame</p>
           <h1 className="mt-4 text-4xl font-semibold tracking-tight">
             Create and export a repository card.
           </h1>
           <div className="mt-8 space-y-6 leading-7 text-muted-foreground">
             <p>
               Open the editor, paste a public GitHub URL or owner/repository
-              shorthand, then select Import. RepoFrame loads only the data the
+              shorthand, then select Import. Repo Frame loads only the data the
               active template needs.
             </p>
             <p>

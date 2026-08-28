@@ -1,6 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 36" role="img" aria-labelledby="title">
-  <title id="title">RepoFrame</title>
-  <rect width="36" height="36" rx="8" fill="#7c3aed"/>
-  <path d="M9 9h18v4H13v5h12v4H13v7H9V9Z" fill="white"/>
-  <text x="46" y="25" fill="#7c3aed" font-family="Inter, system-ui, sans-serif" font-size="20" font-weight="650">RepoFrame</text>
-</svg>

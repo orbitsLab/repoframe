@@ -8,12 +8,16 @@ import { Button } from '@/components/ui/button';
 import type { RepositorySource } from '@/editor/store';
 import {
   exportScene,
+  fileExtension,
   type RasterFormat,
   type RasterScale,
   supportedFormats,
 } from '@/lib/renderer/raster';
 import type { Scene } from '@/types/scene';
 import type { AspectRatio } from '@/types/template';
+
+/** Pixel-density multipliers offered by the export panel. */
+const scales: RasterScale[] = [0.5, 1, 2, 3, 4];
 
 type ExportPopoverProps = {
   scene?: Scene;
@@ -43,7 +47,7 @@ function ExportPopover({
   const [owner, repo] = source
     ? [source.owner, source.repo]
     : fullName.split('/');
-  const filename = `${owner ?? 'repository'}-${repo ?? 'card'}-${templateId}-${ratio.replace(':', 'x')}.${format}`;
+  const filename = `${owner ?? 'repository'}-${repo ?? 'card'}-${templateId}-${ratio.replace(':', 'x')}.${fileExtension(format)}`;
 
   useEffect(() => {
     setFormats(supportedFormats());
@@ -77,7 +81,7 @@ function ExportPopover({
   return (
     <Popover.Root>
       <Popover.Trigger asChild>
-        <Button type="button" size="sm" disabled={!scene}>
+        <Button type="button" size="sm" className="h-9" disabled={!scene}>
           <Download aria-hidden="true" />
           <span className="hidden sm:inline">Export</span>
         </Button>
@@ -96,7 +100,7 @@ function ExportPopover({
           </div>
           <fieldset className="space-y-2">
             <legend className="text-xs font-medium">Format</legend>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-3 gap-2">
               {formats.map((item) => (
                 <label
                   key={item}
@@ -110,7 +114,7 @@ function ExportPopover({
                     checked={format === item}
                     onChange={() => setFormat(item)}
                   />
-                  {item.toUpperCase()}
+                  {fileExtension(item).toUpperCase()}
                 </label>
               ))}
             </div>
@@ -118,11 +122,11 @@ function ExportPopover({
 
           <fieldset className="mt-4 space-y-2">
             <legend className="text-xs font-medium">Size</legend>
-            <div className="grid grid-cols-2 gap-2">
-              {([1, 2] as RasterScale[]).map((item) => (
+            <div className="grid grid-cols-5 gap-1.5">
+              {scales.map((item) => (
                 <label
                   key={item}
-                  className="grid h-9 cursor-pointer place-items-center rounded-md border text-xs font-medium has-[:checked]:border-foreground has-[:checked]:bg-foreground has-[:checked]:text-background"
+                  className="grid h-9 cursor-pointer place-items-center rounded-md border text-[11px] font-medium has-[:checked]:border-foreground has-[:checked]:bg-foreground has-[:checked]:text-background"
                 >
                   <input
                     className="sr-only"
@@ -132,11 +136,15 @@ function ExportPopover({
                     checked={scale === item}
                     onChange={() => setScale(item)}
                   />
-                  {item}× ·{' '}
-                  {scene ? `${scene.width * item}×${scene.height * item}` : '—'}
+                  {item}×
                 </label>
               ))}
             </div>
+            <p className="font-mono text-[10px] text-muted-foreground">
+              {scene
+                ? `${scene.width * scale} × ${scene.height * scale} px`
+                : '—'}
+            </p>
           </fieldset>
 
           {error ? (
@@ -151,7 +159,9 @@ function ExportPopover({
             onClick={handleExport}
             disabled={isExporting || !scene}
           >
-            {isExporting ? 'Exporting…' : `Download ${format.toUpperCase()}`}
+            {isExporting
+              ? 'Exporting…'
+              : `Download ${fileExtension(format).toUpperCase()}`}
           </Button>
           <Popover.Arrow className="fill-border" />
         </Popover.Content>

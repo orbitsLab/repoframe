@@ -2,10 +2,17 @@ import { renderScene } from '@/lib/renderer/stage';
 import type { Scene, SceneNode } from '@/types/scene';
 
 /** Image formats supported by raster export. */
-type RasterFormat = 'png' | 'webp';
+type RasterFormat = 'png' | 'webp' | 'jpeg';
 
 /** Pixel-density multipliers supported by raster export. */
-type RasterScale = 1 | 2;
+type RasterScale = 0.5 | 1 | 2 | 3 | 4;
+
+/** File extensions used when saving each raster format. */
+const extensions: Record<RasterFormat, string> = {
+  png: 'png',
+  webp: 'webp',
+  jpeg: 'jpg',
+};
 
 let formats: RasterFormat[] | undefined;
 
@@ -18,11 +25,23 @@ function supportedFormats(): RasterFormat[] {
   const canvas = document.createElement('canvas');
   canvas.width = 1;
   canvas.height = 1;
-  const webpSupported = canvas
-    .toDataURL('image/webp')
-    .startsWith('data:image/webp');
-  formats = webpSupported ? ['png', 'webp'] : ['png'];
+  // PNG is guaranteed, so only the lossy formats are probed.
+  formats = (['png', 'webp', 'jpeg'] as const).filter(
+    (format) =>
+      format === 'png' ||
+      canvas.toDataURL(`image/${format}`).startsWith(`data:image/${format}`),
+  );
   return formats;
+}
+
+/**
+ * Returns the file extension used to save a raster format.
+ *
+ * @param format - Raster format being saved.
+ * @returns File extension used for the format.
+ */
+function fileExtension(format: RasterFormat) {
+  return extensions[format];
 }
 
 /**
@@ -70,13 +89,13 @@ function canvasToBlob(
           } else {
             reject(
               new Error(
-                `Could not encode the card as ${format.toUpperCase()}.`,
+                `Could not encode the card as ${format.toUpperCase()} at ${canvas.width}×${canvas.height}. Try a smaller size.`,
               ),
             );
           }
         },
         `image/${format}`,
-        format === 'webp' ? 0.92 : undefined,
+        format === 'png' ? undefined : 0.92,
       );
     } catch (error) {
       if (error instanceof DOMException && error.name === 'SecurityError') {
@@ -104,4 +123,4 @@ function collectImageSources(nodes: SceneNode[]): string[] {
 }
 
 export type { RasterFormat, RasterScale };
-export { exportScene, supportedFormats };
+export { exportScene, fileExtension, supportedFormats };

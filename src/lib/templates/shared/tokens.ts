@@ -46,6 +46,12 @@ const typeScale = {
 /** Opacity that stands in for a muted tone against a flat colour field. */
 const mutedInk = 0.7;
 
+/** Text colour setting value that keeps the ink derived from the background. */
+const autoColor = 'auto';
+
+/** Matches a six-digit hex colour. */
+const hexPattern = /^#[0-9a-f]{6}$/i;
+
 /** Proportional font options available to template settings. */
 const displayFontOptions: SettingOption[] = [
   { label: 'Manrope', value: 'Manrope Variable' },
@@ -132,25 +138,46 @@ type Theme = {
  * Derives readable text and surface colors from a chosen background.
  *
  * Keeps templates legible when a user picks a background the bundled
- * palette never anticipated.
+ * palette never anticipated. A chosen text color replaces the derived ink
+ * and its muted tone, while surfaces and borders stay tied to the
+ * background so a bright ink never drags the hairlines with it.
  *
  * @param background - Background color chosen in template settings.
  * @param accent - Accent color chosen in template settings.
+ * @param textColor - Text color chosen in template settings, or auto.
  * @returns Theme colors tinted toward the background hue.
  */
-function resolveTheme(background: string, accent: string): Theme {
+function resolveTheme(
+  background: string,
+  accent: string,
+  textColor?: string,
+): Theme {
   const isDark = luminance(background) < 0.45;
   const contrast = isDark ? '#ffffff' : '#0b0b0f';
+  const ink = resolveInk(textColor, '');
 
   return {
     background,
     // Surfaces always lift away from the background, in either direction.
     surface: mix(background, '#ffffff', isDark ? 0.08 : 0.72),
-    foreground: mix(background, contrast, 0.92),
-    muted: mix(background, contrast, 0.55),
+    foreground: ink || mix(background, contrast, 0.92),
+    muted: ink ? mix(background, ink, 0.6) : mix(background, contrast, 0.55),
     border: mix(background, contrast, isDark ? 0.2 : 0.16),
     accent,
   };
+}
+
+/**
+ * Reads a chosen text color, treating auto and malformed values as unset.
+ *
+ * @param textColor - Text color chosen in template settings.
+ * @param fallback - Color used when no text color is chosen.
+ * @returns The hex color, or the fallback when the ink stays derived.
+ */
+function resolveInk(textColor: string | undefined, fallback: string) {
+  return textColor && hexPattern.test(textColor)
+    ? textColor.toLowerCase()
+    : fallback;
 }
 
 /**
@@ -188,12 +215,14 @@ function mix(from: string, to: string, amount: number) {
 
 export type { Theme };
 export {
+  autoColor,
   bandScale,
   displayFontOptions,
   monoFontOptions,
   mutedInk,
   palettes,
   ratioSizes,
+  resolveInk,
   resolveTheme,
   spacing,
   typeScale,

@@ -15,6 +15,7 @@ import {
 } from '@/lib/templates/shared/settings';
 import { fitText } from '@/lib/templates/shared/text';
 import {
+  autoColor,
   monoFontOptions,
   palettes,
   ratioSizes,
@@ -70,6 +71,13 @@ const settingsSchema: SettingField[] = [
     type: 'color',
   },
   {
+    key: 'textColor',
+    label: 'Text colour',
+    section: 'theme',
+    type: 'color',
+    allowAuto: true,
+  },
+  {
     key: 'fontFamily',
     label: 'Typeface',
     section: 'typography',
@@ -94,6 +102,7 @@ const defaultSettings: Record<string, unknown> = {
   prompt: '$ gh repo view',
   backgroundColor: palettes.terminal.background,
   accentColor: palettes.terminal.accent,
+  textColor: autoColor,
   fontFamily: 'JetBrains Mono Variable',
   windowRadius: 24,
 };
@@ -129,6 +138,7 @@ function build(input: BuildInput): Scene {
   const theme = resolveTheme(
     stringSetting(settings, 'backgroundColor'),
     stringSetting(settings, 'accentColor'),
+    stringSetting(settings, 'textColor'),
   );
   const fontFamily = stringSetting(settings, 'fontFamily');
   const radius = numberSetting(settings, 'windowRadius');

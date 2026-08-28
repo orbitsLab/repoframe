@@ -14,6 +14,7 @@ import {
 } from '@/lib/templates/shared/settings';
 import { fitText } from '@/lib/templates/shared/text';
 import {
+  autoColor,
   displayFontOptions,
   ratioSizes,
   resolveTheme,
@@ -45,6 +46,13 @@ const settingsSchema: SettingField[] = [
     type: 'color',
   },
   {
+    key: 'textColor',
+    label: 'Text colour',
+    section: 'theme',
+    type: 'color',
+    allowAuto: true,
+  },
+  {
     key: 'fontFamily',
     label: 'Typeface',
     section: 'typography',
@@ -67,6 +75,7 @@ const defaultSettings: Record<string, unknown> = {
   metrics: ['stars', 'forks', 'issues'],
   backgroundColor: '#0d1117',
   accentColor: '#58a6ff',
+  textColor: autoColor,
   fontFamily: 'Space Grotesk Variable',
   cardRadius: 24,
 };
@@ -114,6 +123,7 @@ function build(input: BuildInput): Scene {
   const theme = resolveTheme(
     stringSetting(settings, 'backgroundColor'),
     stringSetting(settings, 'accentColor'),
+    stringSetting(settings, 'textColor'),
   );
   const fontFamily = stringSetting(settings, 'fontFamily');
   const radius = numberSetting(settings, 'cardRadius');

@@ -21,6 +21,7 @@ import {
 } from '@/lib/templates/shared/settings';
 import { fitText } from '@/lib/templates/shared/text';
 import {
+  autoColor,
   displayFontOptions,
   palettes,
   ratioSizes,
@@ -79,6 +80,13 @@ const settingsSchema: SettingField[] = [
     type: 'color',
   },
   {
+    key: 'textColor',
+    label: 'Text colour',
+    section: 'theme',
+    type: 'color',
+    allowAuto: true,
+  },
+  {
     key: 'fontFamily',
     label: 'Typeface',
     section: 'typography',
@@ -114,6 +122,7 @@ const defaultSettings: Record<string, unknown> = {
   showRelease: true,
   backgroundColor: palettes.bento.background,
   accentColor: palettes.bento.accent,
+  textColor: autoColor,
   fontFamily: 'Manrope Variable',
   cardRadius: 28,
   cardGap: 24,
@@ -149,6 +158,7 @@ function build(input: BuildInput): Scene {
   const theme = resolveTheme(
     stringSetting(settings, 'backgroundColor'),
     stringSetting(settings, 'accentColor'),
+    stringSetting(settings, 'textColor'),
   );
   const header = isWide
     ? { ...outer, width: Math.min(430, outer.width * 0.38) }
@@ -179,14 +189,7 @@ function build(input: BuildInput): Scene {
   return {
     width,
     height,
-    background: {
-      kind: 'linear',
-      angle: 140,
-      stops: [
-        { offset: 0, color: theme.background },
-        { offset: 1, color: theme.surface },
-      ],
-    },
+    background: { kind: 'solid', color: theme.background },
     nodes,
   };
 }

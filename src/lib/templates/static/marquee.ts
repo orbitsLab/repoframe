@@ -13,10 +13,12 @@ import {
 } from '@/lib/templates/shared/settings';
 import { fitText } from '@/lib/templates/shared/text';
 import {
+  autoColor,
   bandScale,
   displayFontOptions,
   mutedInk,
   ratioSizes,
+  resolveInk,
   spacing,
 } from '@/lib/templates/shared/tokens';
 import type { ProjectDataPath } from '@/types/data/path';
@@ -64,6 +66,13 @@ const settingsSchema: SettingField[] = [
     type: 'color',
   },
   {
+    key: 'textColor',
+    label: 'Text colour',
+    section: 'theme',
+    type: 'color',
+    allowAuto: true,
+  },
+  {
     key: 'fontFamily',
     label: 'Typeface',
     section: 'typography',
@@ -86,6 +95,7 @@ const defaultSettings: Record<string, unknown> = {
   align: 'left',
   backgroundColor: '#12100e',
   accentColor: '#f2f0eb',
+  textColor: autoColor,
   fontFamily: 'Archivo Variable',
   highlightLine: 3,
 };
@@ -107,6 +117,8 @@ function build(input: BuildInput): Scene {
   // A marquee commits to two flat colours; one repeat is knocked back out.
   const field = stringSetting(settings, 'backgroundColor');
   const ink = stringSetting(settings, 'accentColor');
+  // A chosen text colour drives the type; the footer rule stays on the ink.
+  const type = resolveInk(stringSetting(settings, 'textColor'), ink);
   const fontFamily = stringSetting(settings, 'fontFamily');
   const align = stringSetting(settings, 'align') as 'left' | 'center' | 'right';
   const frame = inset({ x: 0, y: 0, width, height }, isWide ? 48 : 64);
@@ -147,7 +159,7 @@ function build(input: BuildInput): Scene {
         fontFamily,
         fontSize: repeats.fontSize,
         fontWeight: 800,
-        color: ink,
+        color: type,
         align,
         lineHeight: marqueeLineHeight,
         overflow: 'clip',
@@ -176,7 +188,7 @@ function build(input: BuildInput): Scene {
       fontFamily,
       fontSize: bodySize,
       fontWeight: 500,
-      color: ink,
+      color: type,
       lineHeight: bodyLineHeight,
       maxLines: descriptionLines,
       opacity: mutedInk,
@@ -185,7 +197,7 @@ function build(input: BuildInput): Scene {
       input,
       stringArraySetting(settings, 'metrics'),
       fontFamily,
-      ink,
+      type,
       {
         x: frame.x,
         y:

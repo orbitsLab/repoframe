@@ -14,6 +14,7 @@ import {
 } from '@/lib/templates/shared/settings';
 import { fitText } from '@/lib/templates/shared/text';
 import {
+  autoColor,
   displayFontOptions,
   palettes,
   ratioSizes,
@@ -23,7 +24,7 @@ import {
   typeScale,
 } from '@/lib/templates/shared/tokens';
 import type { ProjectDataPath } from '@/types/data/path';
-import type { SceneNode } from '@/types/scene';
+import type { Scene, SceneNode } from '@/types/scene';
 import type { BuildInput, SettingField, Template } from '@/types/template';
 
 /** Height reserved for the metric band pinned to the bottom edge. */
@@ -45,16 +46,6 @@ const settingsSchema: SettingField[] = [
     maxLength: 40,
   },
   {
-    key: 'backgroundStyle',
-    label: 'Background',
-    section: 'theme',
-    type: 'select',
-    options: [
-      { label: 'Solid', value: 'solid' },
-      { label: 'Gradient', value: 'gradient' },
-    ],
-  },
-  {
     key: 'backgroundColor',
     label: 'Background colour',
     section: 'theme',
@@ -65,6 +56,13 @@ const settingsSchema: SettingField[] = [
     label: 'Accent colour',
     section: 'theme',
     type: 'color',
+  },
+  {
+    key: 'textColor',
+    label: 'Text colour',
+    section: 'theme',
+    type: 'color',
+    allowAuto: true,
   },
   {
     key: 'fontFamily',
@@ -88,9 +86,9 @@ const settingsSchema: SettingField[] = [
 const defaultSettings: Record<string, unknown> = {
   metrics: ['stars', 'forks', 'issues'],
   eyebrow: 'OPEN SOURCE PROJECT',
-  backgroundStyle: 'gradient',
   backgroundColor: palettes.ink.background,
   accentColor: palettes.ink.accent,
+  textColor: autoColor,
   fontFamily: 'Manrope Variable',
   cardRadius: 32,
 };
@@ -105,7 +103,7 @@ function requiredData(settings: Record<string, unknown>) {
   return paths;
 }
 
-function build(input: BuildInput) {
+function build(input: BuildInput): Scene {
   const settings = mergeSettings(defaultSettings, input.settings);
   const { width, height } = ratioSizes[input.ratio];
   const isWide = width / height > 1.35;
@@ -113,6 +111,7 @@ function build(input: BuildInput) {
   const theme = resolveTheme(
     stringSetting(settings, 'backgroundColor'),
     stringSetting(settings, 'accentColor'),
+    stringSetting(settings, 'textColor'),
   );
   const fontFamily = stringSetting(settings, 'fontFamily');
   const avatarSize = isWide ? 132 : 156;
@@ -288,17 +287,7 @@ function build(input: BuildInput) {
   return {
     width,
     height,
-    background:
-      stringSetting(settings, 'backgroundStyle') === 'gradient'
-        ? {
-            kind: 'linear' as const,
-            angle: 135,
-            stops: [
-              { offset: 0, color: theme.background },
-              { offset: 1, color: theme.surface },
-            ],
-          }
-        : { kind: 'solid' as const, color: theme.background },
+    background: { kind: 'solid', color: theme.background },
     nodes,
   };
 }

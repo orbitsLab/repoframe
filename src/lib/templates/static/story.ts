@@ -15,6 +15,7 @@ import {
 } from '@/lib/templates/shared/settings';
 import { fitText } from '@/lib/templates/shared/text';
 import {
+  autoColor,
   bandScale,
   displayFontOptions,
   ratioSizes,
@@ -49,16 +50,6 @@ const settingsSchema: SettingField[] = [
     maxLength: 40,
   },
   {
-    key: 'backgroundStyle',
-    label: 'Background',
-    section: 'theme',
-    type: 'select',
-    options: [
-      { label: 'Gradient', value: 'gradient' },
-      { label: 'Solid', value: 'solid' },
-    ],
-  },
-  {
     key: 'backgroundColor',
     label: 'Background colour',
     section: 'theme',
@@ -69,6 +60,13 @@ const settingsSchema: SettingField[] = [
     label: 'Accent colour',
     section: 'theme',
     type: 'color',
+  },
+  {
+    key: 'textColor',
+    label: 'Text colour',
+    section: 'theme',
+    type: 'color',
+    allowAuto: true,
   },
   {
     key: 'fontFamily',
@@ -103,9 +101,9 @@ const defaultSettings: Record<string, unknown> = {
   metrics: ['stars', 'forks', 'issues'],
   showAvatar: true,
   eyebrow: 'NOW ON GITHUB',
-  backgroundStyle: 'gradient',
   backgroundColor: '#141026',
   accentColor: '#a78bfa',
+  textColor: autoColor,
   fontFamily: 'Sora Variable',
   cardRadius: 28,
   avatarRadius: 72,
@@ -128,6 +126,7 @@ function build(input: BuildInput): Scene {
   const theme = resolveTheme(
     stringSetting(settings, 'backgroundColor'),
     stringSetting(settings, 'accentColor'),
+    stringSetting(settings, 'textColor'),
   );
   const fontFamily = stringSetting(settings, 'fontFamily');
   // Story margins are proportional so the card keeps clear of the chrome
@@ -294,17 +293,7 @@ function build(input: BuildInput): Scene {
   return {
     width,
     height,
-    background:
-      stringSetting(settings, 'backgroundStyle') === 'solid'
-        ? { kind: 'solid', color: theme.background }
-        : {
-            kind: 'linear',
-            angle: 150,
-            stops: [
-              { offset: 0, color: theme.background },
-              { offset: 1, color: theme.surface },
-            ],
-          },
+    background: { kind: 'solid', color: theme.background },
     nodes,
   };
 }

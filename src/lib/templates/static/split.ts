@@ -13,10 +13,12 @@ import {
 } from '@/lib/templates/shared/settings';
 import { fitText } from '@/lib/templates/shared/text';
 import {
+  autoColor,
   bandScale,
   displayFontOptions,
   mutedInk,
   ratioSizes,
+  resolveInk,
   spacing,
   typeScale,
 } from '@/lib/templates/shared/tokens';
@@ -52,6 +54,13 @@ const settingsSchema: SettingField[] = [
     type: 'color',
   },
   {
+    key: 'textColor',
+    label: 'Text colour',
+    section: 'theme',
+    type: 'color',
+    allowAuto: true,
+  },
+  {
     key: 'fontFamily',
     label: 'Typeface',
     section: 'typography',
@@ -75,6 +84,7 @@ const defaultSettings: Record<string, unknown> = {
   eyebrow: 'OPEN SOURCE',
   backgroundColor: '#f0ece3',
   accentColor: '#e0432a',
+  textColor: autoColor,
   fontFamily: 'Archivo Variable',
   seamPosition: 55,
 };
@@ -96,6 +106,9 @@ function build(input: BuildInput): Scene {
   // A split poster commits to two flat colours that trade places at the seam.
   const field = stringSetting(settings, 'backgroundColor');
   const ink = stringSetting(settings, 'accentColor');
+  // A chosen text colour drives the type on the field; type crossing onto the
+  // ink panel stays on the field colour so the seam keeps its contrast.
+  const type = resolveInk(stringSetting(settings, 'textColor'), ink);
   const fontFamily = stringSetting(settings, 'fontFamily');
   const frame = inset({ x: 0, y: 0, width, height }, isWide ? 56 : 76);
   // Bands grow with the canvas so a tall card does not pool its extra height
@@ -104,7 +117,7 @@ function build(input: BuildInput): Scene {
   const gutter = (isWide ? spacing.md : spacing.lg) * scale;
   const seamY = height * (numberSetting(settings, 'seamPosition') / 100);
   /** Reads the legible text colour for a block on either side of the seam. */
-  const inkAt = (y: number) => (y < seamY ? ink : field);
+  const inkAt = (y: number) => (y < seamY ? type : field);
 
   const eyebrowHeight = 28 * scale;
   const contentTop = frame.y + eyebrowHeight + gutter;
@@ -215,7 +228,7 @@ function build(input: BuildInput): Scene {
     ...nameNodes(
       name,
       seamY,
-      { field, ink, fontFamily },
+      { field, ink: type, fontFamily },
       {
         x: frame.x,
         y: nameTop,

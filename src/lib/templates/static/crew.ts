@@ -15,6 +15,7 @@ import {
 } from '@/lib/templates/shared/settings';
 import { fitText } from '@/lib/templates/shared/text';
 import {
+  autoColor,
   bandScale,
   displayFontOptions,
   mutedInk,
@@ -66,6 +67,13 @@ const settingsSchema: SettingField[] = [
     type: 'color',
   },
   {
+    key: 'textColor',
+    label: 'Text colour',
+    section: 'theme',
+    type: 'color',
+    allowAuto: true,
+  },
+  {
     key: 'fontFamily',
     label: 'Typeface',
     section: 'typography',
@@ -90,6 +98,7 @@ const defaultSettings: Record<string, unknown> = {
   eyebrow: 'BUILT BY',
   backgroundColor: '#141414',
   accentColor: '#ff5a3c',
+  textColor: autoColor,
   fontFamily: 'Space Grotesk Variable',
   avatarRadius: 0,
 };
@@ -115,6 +124,7 @@ function build(input: BuildInput): Scene {
   const theme = resolveTheme(
     stringSetting(settings, 'backgroundColor'),
     stringSetting(settings, 'accentColor'),
+    stringSetting(settings, 'textColor'),
   );
   // The hero plate carries type over the accent, not over the page.
   const overAccent = resolveTheme(theme.accent, theme.accent).foreground;

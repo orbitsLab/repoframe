@@ -15,6 +15,7 @@ import {
 } from '@/lib/templates/shared/settings';
 import { fitText } from '@/lib/templates/shared/text';
 import {
+  autoColor,
   bandScale,
   displayFontOptions,
   monoFontOptions,
@@ -39,15 +40,6 @@ const barColors = ['#ff5a3c', '#ffb02e', '#3ddc97', '#4cc9f0', '#a86bff'];
 
 /** Fixed slot count so node ids stay stable as data changes. */
 const languageSlots = 5;
-
-/**
- * Smallest share that earns a band.
- *
- * A one-percent language would render as a sliver at the edge of the card,
- * which reads as a rendering fault rather than a design. Anything under this
- * is dropped and the remaining bands are normalised over the full width.
- */
-const minimumShare = 5;
 
 /** Share of the fade that holds full colour before it starts to settle. */
 const colorHold = 0.5;
@@ -86,6 +78,13 @@ const settingsSchema: SettingField[] = [
     type: 'color',
   },
   {
+    key: 'textColor',
+    label: 'Text colour',
+    section: 'theme',
+    type: 'color',
+    allowAuto: true,
+  },
+  {
     key: 'fontFamily',
     label: 'Typeface',
     section: 'typography',
@@ -117,6 +116,7 @@ const defaultSettings: Record<string, unknown> = {
   eyebrow: 'BUILT WITH',
   backgroundColor: palettes.terminal.background,
   accentColor: '#ff5a3c',
+  textColor: autoColor,
   fontFamily: 'Sora Variable',
   monoFamily: 'JetBrains Mono Variable',
   settlePoint: 50,
@@ -143,6 +143,7 @@ function build(input: BuildInput): Scene {
   const theme = resolveTheme(
     stringSetting(settings, 'backgroundColor'),
     stringSetting(settings, 'accentColor'),
+    stringSetting(settings, 'textColor'),
   );
   const fontFamily = stringSetting(settings, 'fontFamily');
   const monoFamily = stringSetting(settings, 'monoFamily');
@@ -298,15 +299,16 @@ function build(input: BuildInput): Scene {
 }
 
 /**
- * Reads the languages that hold a large enough share to earn a bar.
+ * Reads the highest-ranked languages a repository reports.
+ *
+ * Every language that fits a slot earns a bar whatever its share, so a
+ * long tail shows as a set of thin bands rather than being dropped.
  *
  * @param input - Project data and measurement tools.
  * @returns Ranked languages, capped at the available slots.
  */
 function rankedLanguages(input: BuildInput) {
-  return input.data.languages
-    .filter((language) => language.percentage >= minimumShare)
-    .slice(0, languageSlots);
+  return input.data.languages.slice(0, languageSlots);
 }
 
 /**

@@ -13,6 +13,7 @@ import {
 } from '@/lib/templates/shared/settings';
 import { fitText } from '@/lib/templates/shared/text';
 import {
+  autoColor,
   bandScale,
   displayFontOptions,
   mutedInk,
@@ -53,6 +54,13 @@ const settingsSchema: SettingField[] = [
     type: 'color',
   },
   {
+    key: 'textColor',
+    label: 'Text colour',
+    section: 'theme',
+    type: 'color',
+    allowAuto: true,
+  },
+  {
     key: 'fontFamily',
     label: 'Typeface',
     section: 'typography',
@@ -86,6 +94,7 @@ const defaultSettings: Record<string, unknown> = {
   eyebrow: 'OPEN SOURCE',
   backgroundColor: '#0e0e10',
   accentColor: '#2b31e8',
+  textColor: autoColor,
   fontFamily: 'Archivo Variable',
   washStrength: 70,
   avatarRadius: 0,
@@ -108,6 +117,7 @@ function build(input: BuildInput): Scene {
   const theme = resolveTheme(
     stringSetting(settings, 'backgroundColor'),
     stringSetting(settings, 'accentColor'),
+    stringSetting(settings, 'textColor'),
   );
   // Type set over the wash has to answer to the accent rather than the page,
   // so its colour is derived as though the accent were the background.

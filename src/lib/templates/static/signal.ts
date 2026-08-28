@@ -15,6 +15,7 @@ import {
 } from '@/lib/templates/shared/settings';
 import { fitText } from '@/lib/templates/shared/text';
 import {
+  autoColor,
   bandScale,
   displayFontOptions,
   palettes,
@@ -57,16 +58,6 @@ const settingsSchema: SettingField[] = [
     maxLength: 40,
   },
   {
-    key: 'backgroundStyle',
-    label: 'Background',
-    section: 'theme',
-    type: 'select',
-    options: [
-      { label: 'Solid', value: 'solid' },
-      { label: 'Gradient', value: 'gradient' },
-    ],
-  },
-  {
     key: 'backgroundColor',
     label: 'Background colour',
     section: 'theme',
@@ -77,6 +68,13 @@ const settingsSchema: SettingField[] = [
     label: 'Accent colour',
     section: 'theme',
     type: 'color',
+  },
+  {
+    key: 'textColor',
+    label: 'Text colour',
+    section: 'theme',
+    type: 'color',
+    allowAuto: true,
   },
   {
     key: 'fontFamily',
@@ -102,9 +100,9 @@ const defaultSettings: Record<string, unknown> = {
   metrics: ['forks', 'watchers', 'issues'],
   showAvatar: true,
   eyebrow: 'GITHUB REPOSITORY',
-  backgroundStyle: 'solid',
   backgroundColor: palettes.paper.background,
   accentColor: palettes.paper.accent,
+  textColor: autoColor,
   fontFamily: 'Outfit Variable',
   avatarRadius: 40,
 };
@@ -131,6 +129,7 @@ function build(input: BuildInput): Scene {
   const theme = resolveTheme(
     stringSetting(settings, 'backgroundColor'),
     stringSetting(settings, 'accentColor'),
+    stringSetting(settings, 'textColor'),
   );
   const fontFamily = stringSetting(settings, 'fontFamily');
   const frame = inset({ x: 0, y: 0, width, height }, isWide ? 72 : 96);
@@ -313,17 +312,7 @@ function build(input: BuildInput): Scene {
   return {
     width,
     height,
-    background:
-      stringSetting(settings, 'backgroundStyle') === 'gradient'
-        ? {
-            kind: 'linear',
-            angle: 150,
-            stops: [
-              { offset: 0, color: theme.background },
-              { offset: 1, color: theme.surface },
-            ],
-          }
-        : { kind: 'solid', color: theme.background },
+    background: { kind: 'solid', color: theme.background },
     nodes,
   };
 }

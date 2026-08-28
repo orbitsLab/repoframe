@@ -14,11 +14,13 @@ import {
 } from '@/lib/templates/shared/settings';
 import { fitText } from '@/lib/templates/shared/text';
 import {
+  autoColor,
   bandScale,
   displayFontOptions,
   mutedInk,
   palettes,
   ratioSizes,
+  resolveInk,
   spacing,
   typeScale,
 } from '@/lib/templates/shared/tokens';
@@ -60,6 +62,13 @@ const settingsSchema: SettingField[] = [
     type: 'color',
   },
   {
+    key: 'textColor',
+    label: 'Text colour',
+    section: 'theme',
+    type: 'color',
+    allowAuto: true,
+  },
+  {
     key: 'fontFamily',
     label: 'Typeface',
     section: 'typography',
@@ -84,6 +93,7 @@ const defaultSettings: Record<string, unknown> = {
   eyebrow: 'OPEN SOURCE',
   backgroundColor: palettes.poster.background,
   accentColor: palettes.poster.foreground,
+  textColor: autoColor,
   fontFamily: 'Archivo Variable',
   borderWidth: 8,
 };
@@ -109,6 +119,8 @@ function build(input: BuildInput): Scene {
   // A poster commits to two flat colours rather than a derived surface ramp.
   const field = stringSetting(settings, 'backgroundColor');
   const ink = stringSetting(settings, 'accentColor');
+  // A chosen text colour drives the type; keylines and bars stay on the ink.
+  const type = resolveInk(stringSetting(settings, 'textColor'), ink);
   const fontFamily = stringSetting(settings, 'fontFamily');
   const border = numberSetting(settings, 'borderWidth');
   const outer = inset({ x: 0, y: 0, width, height }, isWide ? 40 : 56);
@@ -196,7 +208,7 @@ function build(input: BuildInput): Scene {
       fontFamily,
       fontSize: typeScale.eyebrow,
       fontWeight: 700,
-      color: ink,
+      color: type,
       letterSpacing: 3,
     }),
     textNode('owner-login', {
@@ -208,7 +220,7 @@ function build(input: BuildInput): Scene {
       fontFamily,
       fontSize: typeScale.eyebrow,
       fontWeight: 700,
-      color: ink,
+      color: type,
       align: 'right',
       letterSpacing: 1.4,
     }),
@@ -221,7 +233,7 @@ function build(input: BuildInput): Scene {
       fontFamily,
       fontSize: name.fontSize,
       fontWeight: 800,
-      color: ink,
+      color: type,
       lineHeight: name.lineHeight,
       maxLines: 3,
       letterSpacing: -3,
@@ -235,7 +247,7 @@ function build(input: BuildInput): Scene {
       fontFamily,
       fontSize: bodySize,
       fontWeight: 500,
-      color: ink,
+      color: type,
       lineHeight: bodyLineHeight,
       maxLines: descriptionLines,
       opacity: mutedInk,
@@ -253,7 +265,7 @@ function build(input: BuildInput): Scene {
       input,
       stringArraySetting(settings, 'metrics'),
       fontFamily,
-      ink,
+      type,
       {
         x: frame.x,
         y: metricsTop + spacing.sm * scale,

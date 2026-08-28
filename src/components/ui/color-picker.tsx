@@ -14,6 +14,8 @@ type ColorPickerProps = {
   color: string;
   onChange(color: string): void;
   labelledBy: string;
+  /** Reports the colour as derived, so the trigger reads as automatic. */
+  auto?: boolean;
   className?: string;
 };
 
@@ -107,6 +109,7 @@ function ColorPicker({
   color,
   onChange,
   labelledBy,
+  auto,
   className,
 }: ColorPickerProps) {
   const hex = hexPattern.test(color) ? color.toLowerCase() : '#000000';
@@ -153,9 +156,15 @@ function ColorPicker({
         >
           <span
             className="size-5 shrink-0 rounded border"
-            style={{ backgroundColor: hex }}
+            style={{
+              background: auto
+                ? 'linear-gradient(135deg, #ffffff 50%, #0b0b0f 50%)'
+                : hex,
+            }}
           />
-          <span className="font-mono text-xs uppercase">{hex}</span>
+          <span className="font-mono text-xs uppercase">
+            {auto ? 'Auto' : hex}
+          </span>
         </button>
       </Popover.Trigger>
       <Popover.Portal>

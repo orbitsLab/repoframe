@@ -15,6 +15,7 @@ import {
 } from '@/lib/templates/shared/settings';
 import { fitText } from '@/lib/templates/shared/text';
 import {
+  autoColor,
   displayFontOptions,
   ratioSizes,
   resolveTheme,
@@ -65,6 +66,13 @@ const settingsSchema: SettingField[] = [
     type: 'color',
   },
   {
+    key: 'textColor',
+    label: 'Text colour',
+    section: 'theme',
+    type: 'color',
+    allowAuto: true,
+  },
+  {
     key: 'fontFamily',
     label: 'Typeface',
     section: 'typography',
@@ -90,6 +98,7 @@ const defaultSettings: Record<string, unknown> = {
   eyebrow: 'NEW RELEASE',
   backgroundColor: '#0f172a',
   accentColor: '#38bdf8',
+  textColor: autoColor,
   fontFamily: 'Archivo Variable',
   cardRadius: 28,
 };
@@ -115,6 +124,7 @@ function build(input: BuildInput): Scene {
   const theme = resolveTheme(
     stringSetting(settings, 'backgroundColor'),
     stringSetting(settings, 'accentColor'),
+    stringSetting(settings, 'textColor'),
   );
   const fontFamily = stringSetting(settings, 'fontFamily');
   const content = inset({ x: 0, y: 0, width, height }, isWide ? 72 : 88);
@@ -248,14 +258,7 @@ function build(input: BuildInput): Scene {
   return {
     width,
     height,
-    background: {
-      kind: 'linear',
-      angle: 150,
-      stops: [
-        { offset: 0, color: theme.background },
-        { offset: 1, color: theme.surface },
-      ],
-    },
+    background: { kind: 'solid', color: theme.background },
     nodes,
   };
 }

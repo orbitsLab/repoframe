@@ -31,8 +31,11 @@ const sampleProject: ProjectData = {
     pullRequests: 2,
   },
   languages: [
-    { name: 'TypeScript', bytes: 226_495, percentage: 99.8 },
-    { name: 'Dockerfile', bytes: 440, percentage: 0.2 },
+    { name: 'TypeScript', bytes: 141_608, percentage: 62.4 },
+    { name: 'JavaScript', bytes: 44_933, percentage: 19.8 },
+    { name: 'Shell', bytes: 21_786, percentage: 9.6 },
+    { name: 'Dockerfile', bytes: 12_028, percentage: 5.3 },
+    { name: 'HTML', bytes: 6_580, percentage: 2.9 },
   ],
   topics: ['api', 'leetcode-api', 'typescript', 'rest-api'],
   contributors: [

@@ -23,8 +23,13 @@ type SettingFieldBase = {
 
 /** Closed setting union used to generate template controls. */
 type SettingField =
-  | (SettingFieldBase & { type: 'color' })
-  | (SettingFieldBase & { type: 'select'; options: SettingOption[] })
+  | (SettingFieldBase & { type: 'color'; allowAuto?: boolean })
+  | (SettingFieldBase & {
+      type: 'select';
+      options: SettingOption[];
+      /** Multi-select key whose chosen values narrow these options. */
+      optionsFrom?: string;
+    })
   | (SettingFieldBase & { type: 'toggle' })
   | (SettingFieldBase & {
       type: 'text';

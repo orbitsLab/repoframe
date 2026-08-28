@@ -15,6 +15,7 @@ import {
 } from '@/lib/templates/shared/settings';
 import { fitText } from '@/lib/templates/shared/text';
 import {
+  autoColor,
   bandScale,
   displayFontOptions,
   monoFontOptions,
@@ -75,6 +76,13 @@ const settingsSchema: SettingField[] = [
     type: 'color',
   },
   {
+    key: 'textColor',
+    label: 'Text colour',
+    section: 'theme',
+    type: 'color',
+    allowAuto: true,
+  },
+  {
     key: 'fontFamily',
     label: 'Typeface',
     section: 'typography',
@@ -116,6 +124,7 @@ const defaultSettings: Record<string, unknown> = {
   showContributors: true,
   backgroundColor: palettes.terminal.background,
   accentColor: '#f97316',
+  textColor: autoColor,
   fontFamily: 'DM Sans Variable',
   monoFamily: 'Roboto Mono Variable',
   barRadius: 6,
@@ -147,6 +156,7 @@ function build(input: BuildInput): Scene {
   const theme = resolveTheme(
     stringSetting(settings, 'backgroundColor'),
     stringSetting(settings, 'accentColor'),
+    stringSetting(settings, 'textColor'),
   );
   const fontFamily = stringSetting(settings, 'fontFamily');
   const monoFamily = stringSetting(settings, 'monoFamily');
@@ -345,14 +355,7 @@ function build(input: BuildInput): Scene {
   return {
     width,
     height,
-    background: {
-      kind: 'linear',
-      angle: 165,
-      stops: [
-        { offset: 0, color: theme.background },
-        { offset: 1, color: theme.surface },
-      ],
-    },
+    background: { kind: 'solid', color: theme.background },
     nodes,
   };
 }

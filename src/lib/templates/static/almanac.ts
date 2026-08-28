@@ -14,6 +14,7 @@ import {
 } from '@/lib/templates/shared/settings';
 import { fitText } from '@/lib/templates/shared/text';
 import {
+  autoColor,
   bandScale,
   displayFontOptions,
   monoFontOptions,
@@ -87,6 +88,13 @@ const settingsSchema: SettingField[] = [
     type: 'color',
   },
   {
+    key: 'textColor',
+    label: 'Text colour',
+    section: 'theme',
+    type: 'color',
+    allowAuto: true,
+  },
+  {
     key: 'fontFamily',
     label: 'Typeface',
     section: 'typography',
@@ -110,6 +118,7 @@ const defaultSettings: Record<string, unknown> = {
   eyebrow: 'BY THE NUMBERS',
   backgroundColor: palettes.paper.background,
   accentColor: '#c8341c',
+  textColor: autoColor,
   fontFamily: 'Archivo Variable',
   monoFamily: 'JetBrains Mono Variable',
 };
@@ -139,6 +148,7 @@ function build(input: BuildInput): Scene {
   const theme = resolveTheme(
     stringSetting(settings, 'backgroundColor'),
     stringSetting(settings, 'accentColor'),
+    stringSetting(settings, 'textColor'),
   );
   const fontFamily = stringSetting(settings, 'fontFamily');
   const monoFamily = stringSetting(settings, 'monoFamily');

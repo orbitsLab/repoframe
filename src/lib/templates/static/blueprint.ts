@@ -14,6 +14,7 @@ import {
 } from '@/lib/templates/shared/settings';
 import { fitText } from '@/lib/templates/shared/text';
 import {
+  autoColor,
   displayFontOptions,
   monoFontOptions,
   palettes,
@@ -71,6 +72,13 @@ const settingsSchema: SettingField[] = [
     type: 'color',
   },
   {
+    key: 'textColor',
+    label: 'Text colour',
+    section: 'theme',
+    type: 'color',
+    allowAuto: true,
+  },
+  {
     key: 'showGuides',
     label: 'Ruled guides',
     section: 'theme',
@@ -98,6 +106,7 @@ const defaultSettings: Record<string, unknown> = {
   eyebrow: 'REPOSITORY SPECIFICATION',
   backgroundColor: palettes.blueprint.background,
   accentColor: palettes.blueprint.accent,
+  textColor: autoColor,
   showGuides: true,
   fontFamily: 'Archivo Variable',
   monoFamily: 'JetBrains Mono Variable',
@@ -125,6 +134,7 @@ function build(input: BuildInput): Scene {
   const theme = resolveTheme(
     stringSetting(settings, 'backgroundColor'),
     stringSetting(settings, 'accentColor'),
+    stringSetting(settings, 'textColor'),
   );
   const fontFamily = stringSetting(settings, 'fontFamily');
   const monoFamily = stringSetting(settings, 'monoFamily');

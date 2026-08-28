@@ -19,6 +19,7 @@ import {
 } from '@/lib/templates/shared/settings';
 import { fitText } from '@/lib/templates/shared/text';
 import {
+  autoColor,
   displayFontOptions,
   monoFontOptions,
   palettes,
@@ -63,6 +64,13 @@ const settingsSchema: SettingField[] = [
     type: 'color',
   },
   {
+    key: 'textColor',
+    label: 'Text colour',
+    section: 'theme',
+    type: 'color',
+    allowAuto: true,
+  },
+  {
     key: 'fontFamily',
     label: 'Typeface',
     section: 'typography',
@@ -93,6 +101,7 @@ const defaultSettings: Record<string, unknown> = {
   showLanguage: true,
   backgroundColor: palettes.ink.background,
   accentColor: '#e0432a',
+  textColor: autoColor,
   fontFamily: 'Space Grotesk Variable',
   monoFamily: 'JetBrains Mono Variable',
   avatarRadius: 0,
@@ -119,6 +128,7 @@ function build(input: BuildInput): Scene {
   const theme = resolveTheme(
     stringSetting(settings, 'backgroundColor'),
     stringSetting(settings, 'accentColor'),
+    stringSetting(settings, 'textColor'),
   );
   const fontFamily = stringSetting(settings, 'fontFamily');
   const monoFamily = stringSetting(settings, 'monoFamily');

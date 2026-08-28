@@ -1,6 +1,10 @@
 import { formatCount } from '@/lib/templates/shared/format';
 import { type Box, row } from '@/lib/templates/shared/layout';
 import { textNode } from '@/lib/templates/shared/nodes';
+import {
+  stringArraySetting,
+  stringSetting,
+} from '@/lib/templates/shared/settings';
 import { mutedInk, spacing, typeScale } from '@/lib/templates/shared/tokens';
 import type { ProjectDataPath } from '@/types/data/path';
 import type { ProjectData } from '@/types/data/project';
@@ -30,6 +34,28 @@ function metricValues(data: ProjectData): Record<string, number | undefined> {
     issues: data.metrics.issues,
     pullRequests: data.metrics.pullRequests,
   };
+}
+
+/**
+ * Splits the chosen metrics into the headline figure and the smaller readings.
+ *
+ * The headline never repeats among the readings, and moves to the first metric
+ * still chosen when its own option is cleared.
+ *
+ * @param settings - Resolved template settings.
+ * @returns The headline metric and the readings, in the order options are listed.
+ */
+function splitMetrics(settings: Record<string, unknown>) {
+  const chosen = stringArraySetting(settings, 'metrics');
+  const ordered = metricOptions
+    .map((option) => option.value)
+    .filter((value) => chosen.includes(value));
+  const requested = stringSetting(settings, 'heroMetric');
+  const hero = ordered.includes(requested)
+    ? requested
+    : (ordered[0] ?? requested);
+
+  return { hero, readings: ordered.filter((value) => value !== hero) };
 }
 
 /**
@@ -113,4 +139,10 @@ function metricBandNodes(
   });
 }
 
-export { metricBandNodes, metricOptions, metricPaths, metricValues };
+export {
+  metricBandNodes,
+  metricOptions,
+  metricPaths,
+  metricValues,
+  splitMetrics,
+};

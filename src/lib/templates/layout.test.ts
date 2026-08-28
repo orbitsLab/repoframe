@@ -112,6 +112,7 @@ const stacks: Record<string, string[]> = {
   grid: ['repo-name', 'repo-description'],
   marquee: ['marquee-line-1', 'footer-rule', 'repo-description'],
   spectrum: ['eyebrow', 'repo-name', 'repo-description', 'metrics-rule'],
+  horizon: ['eyebrow', 'repo-name', 'repo-description', 'metrics-rule'],
   // Sidebar stands its name on a quarter turn, so the rotated node is left
   // out of a check that assumes upright boxes.
   sidebar: ['eyebrow', 'repo-description', 'footer-rule'],
@@ -119,6 +120,32 @@ const stacks: Record<string, string[]> = {
   almanac: ['eyebrow', 'repo-name', 'repo-description', 'mosaic-rule-h-1'],
   contents: ['eyebrow', 'repo-name', 'repo-description', 'entry-1'],
   crew: ['eyebrow', 'repo-name', 'repo-description', 'metrics-rule'],
+  digest: ['repo-name', 'repo-link', 'repo-description', 'metrics-rule'],
+  readout: [
+    'wordmark',
+    'repo-name',
+    'repo-description',
+    'hero-label',
+    'plot-caption',
+    'footer-rule',
+  ],
+  gauge: ['wordmark', 'hero-label', 'repo-description', 'footer-rule'],
+  printout: [
+    'wordmark',
+    'repo-name',
+    'repo-description',
+    'hero-label',
+    'plot-caption',
+  ],
+  commons: [
+    'eyebrow',
+    'repo-name',
+    'repo-description',
+    'metrics-rule',
+    'contributors-heading',
+    'contributor-row-1',
+    'footer-rule',
+  ],
 };
 
 const ratios: AspectRatio[] = ['1:1', '4:5', '16:9', '9:16'];

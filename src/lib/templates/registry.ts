@@ -2,13 +2,19 @@ import { almanacTemplate } from '@/lib/templates/static/almanac';
 import { badgeTemplate } from '@/lib/templates/static/badge';
 import { bentoTemplate } from '@/lib/templates/static/bento';
 import { blueprintTemplate } from '@/lib/templates/static/blueprint';
+import { commonsTemplate } from '@/lib/templates/static/commons';
 import { contentsTemplate } from '@/lib/templates/static/contents';
 import { coverTemplate } from '@/lib/templates/static/cover';
 import { crewTemplate } from '@/lib/templates/static/crew';
+import { digestTemplate } from '@/lib/templates/static/digest';
+import { gaugeTemplate } from '@/lib/templates/static/gauge';
 import { gridTemplate } from '@/lib/templates/static/grid';
+import { horizonTemplate } from '@/lib/templates/static/horizon';
 import { marqueeTemplate } from '@/lib/templates/static/marquee';
 import { minimalTemplate } from '@/lib/templates/static/minimal';
 import { posterTemplate } from '@/lib/templates/static/poster';
+import { printoutTemplate } from '@/lib/templates/static/printout';
+import { readoutTemplate } from '@/lib/templates/static/readout';
 import { releaseTemplate } from '@/lib/templates/static/release';
 import { showcaseTemplate } from '@/lib/templates/static/showcase';
 import { sidebarTemplate } from '@/lib/templates/static/sidebar';
@@ -38,8 +44,14 @@ const templates = [
   marqueeTemplate,
   sidebarTemplate,
   contentsTemplate,
+  readoutTemplate,
+  gaugeTemplate,
+  printoutTemplate,
   crewTemplate,
+  commonsTemplate,
   spectrumTemplate,
+  horizonTemplate,
+  digestTemplate,
   badgeTemplate,
 ];
 const templateById = new Map(

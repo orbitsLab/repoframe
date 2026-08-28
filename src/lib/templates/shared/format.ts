@@ -1,3 +1,5 @@
+import type { ProjectData } from '@/types/data/project';
+
 /**
  * Formats a repository metric for display in a template.
  *
@@ -37,4 +39,18 @@ function formatDate(value?: string) {
       }).format(date);
 }
 
-export { formatCount, formatDate };
+/**
+ * Describes a repository's state as a single status word.
+ *
+ * @param repository - Repository details the card is built from.
+ * @returns Archived, fork, or active, in instrument case.
+ */
+function formatStatus(repository: ProjectData['repository']) {
+  if (repository.isArchived) {
+    return 'ARCHIVED';
+  }
+
+  return repository.isFork ? 'FORK' : 'ACTIVE';
+}
+
+export { formatCount, formatDate, formatStatus };

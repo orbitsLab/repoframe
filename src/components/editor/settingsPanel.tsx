@@ -124,18 +124,57 @@ function SettingsPanel({
             onChange={onChange}
           />
         ) : null}
-        {remainingFields.map((field) => (
-          <div key={field.key}>
-            <SettingControl
-              field={field as SettingField}
-              value={settings[field.key]}
-              onChange={(value) => onChange(field.key, value)}
-            />
-          </div>
-        ))}
+        {remainingFields.map((field) => {
+          const control = narrowOptions(field, settings);
+
+          return (
+            <div key={field.key}>
+              <SettingControl
+                field={control.field}
+                value={control.value}
+                onChange={(value) => onChange(field.key, value)}
+              />
+            </div>
+          );
+        })}
       </div>
     </div>
   );
+}
+
+/**
+ * Narrows a select to the values chosen in the field it follows.
+ *
+ * Keeps the whole list when nothing is chosen, so the control never empties,
+ * and shows the first remaining option when the stored value has just been
+ * cleared, matching the value the template falls back to.
+ *
+ * @param field - Setting field about to be rendered.
+ * @param settings - Current setting values.
+ * @returns The field and the value its control should display.
+ */
+function narrowOptions(field: SettingField, settings: Record<string, unknown>) {
+  const value = settings[field.key];
+
+  if (field.type !== 'select' || !field.optionsFrom) {
+    return { field, value };
+  }
+
+  const chosen = settings[field.optionsFrom];
+  const options = Array.isArray(chosen)
+    ? field.options.filter((option) => chosen.includes(option.value))
+    : [];
+
+  if (options.length === 0) {
+    return { field, value };
+  }
+
+  return {
+    field: { ...field, options },
+    value: options.some((option) => option.value === value)
+      ? value
+      : options[0].value,
+  };
 }
 
 export { SettingsPanel };

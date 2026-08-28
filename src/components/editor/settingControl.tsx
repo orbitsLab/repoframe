@@ -4,6 +4,14 @@ import { Check } from 'lucide-react';
 import type { CSSProperties, ReactNode } from 'react';
 
 import { ColorPicker } from '@/components/ui/color-picker';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { autoColor } from '@/lib/templates/shared/tokens';
 import { cn } from '@/lib/utils';
 
 import type { SettingField } from '@/types/template';
@@ -31,7 +39,9 @@ function SettingControl({ field, value, onChange }: SettingControlProps) {
   }
 
   if (field.type === 'select') {
-    if (field.options.length <= 4) {
+    // A narrowed select keeps its dropdown as its option list grows and
+    // shrinks, rather than switching between two control styles.
+    if (field.options.length <= 4 && !field.optionsFrom) {
       return (
         <fieldset>
           <ControlLabel as="legend">{field.label}</ControlLabel>
@@ -54,23 +64,7 @@ function SettingControl({ field, value, onChange }: SettingControlProps) {
       );
     }
 
-    return (
-      <div>
-        <ControlLabel htmlFor={id}>{field.label}</ControlLabel>
-        <select
-          id={id}
-          className="h-9 w-full rounded-md border bg-background px-3 text-sm text-foreground shadow-xs outline-none transition-colors hover:bg-accent/50 focus-visible:ring-2 focus-visible:ring-ring"
-          value={typeof value === 'string' ? value : ''}
-          onChange={(event) => onChange(event.target.value)}
-        >
-          {field.options.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </select>
-      </div>
-    );
+    return <SelectControl field={field} value={value} onChange={onChange} />;
   }
 
   if (field.type === 'toggle') {
@@ -309,7 +303,56 @@ const swatches: Record<string, string[]> = {
     '#f97316',
     '#38bdf8',
   ],
+  textColor: ['#0b0b0f', '#ffffff', '#e6edf3', '#b4471f', '#4cc9f0'],
 };
+
+/**
+ * Renders a dropdown for a setting with more options than fit as chips.
+ *
+ * Typography options store a CSS family name, so each one is set in the face
+ * it selects.
+ *
+ * @param props - Select setting schema, current value, and change callback.
+ */
+function SelectControl({ field, value, onChange }: SettingControlProps) {
+  if (field.type !== 'select') {
+    return null;
+  }
+
+  const id = `setting-${field.key}`;
+  const preview = field.section === 'typography';
+  const selected = typeof value === 'string' ? value : '';
+
+  return (
+    <div>
+      <span
+        className="editor-label mb-2 block text-foreground"
+        id={`${id}-label`}
+      >
+        {field.label}
+      </span>
+      <Select value={selected} onValueChange={onChange}>
+        <SelectTrigger
+          aria-labelledby={`${id}-label`}
+          style={preview ? { fontFamily: selected } : undefined}
+        >
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          {field.options.map((option) => (
+            <SelectItem
+              key={option.value}
+              value={option.value}
+              style={preview ? { fontFamily: option.value } : undefined}
+            >
+              {option.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
+  );
+}
 
 /**
  * Renders a color picker and any presets registered for the setting.
@@ -318,10 +361,10 @@ const swatches: Record<string, string[]> = {
  */
 function ColorControl({ field, value, onChange }: SettingControlProps) {
   const id = `setting-${field.key}`;
-  const color =
-    typeof value === 'string' && /^#[0-9a-f]{6}$/i.test(value)
-      ? value.toLowerCase()
-      : '#000000';
+  const isHex = typeof value === 'string' && /^#[0-9a-f]{6}$/i.test(value);
+  const allowAuto = field.type === 'color' && field.allowAuto === true;
+  const isAuto = allowAuto && !isHex;
+  const color = isHex ? (value as string).toLowerCase() : '#000000';
   const presets = swatches[field.key] ?? [];
 
   return (
@@ -336,22 +379,37 @@ function ColorControl({ field, value, onChange }: SettingControlProps) {
         color={color}
         onChange={onChange}
         labelledBy={`${id}-label`}
+        auto={isAuto}
       />
-      {presets.length > 0 ? (
-        <div className="mt-2.5 flex flex-wrap gap-2">
+      {allowAuto || presets.length > 0 ? (
+        <div className="mt-2.5 flex flex-wrap items-center gap-2">
+          {allowAuto ? (
+            <button
+              type="button"
+              className={cn(
+                'flex h-6 items-center rounded-full border border-muted-foreground/40 px-2.5 text-[10px] font-medium shadow-xs outline-none transition-colors hover:bg-accent/50 focus-visible:ring-2 focus-visible:ring-ring',
+                isAuto && 'border-foreground bg-accent',
+              )}
+              onClick={() => onChange(autoColor)}
+              aria-pressed={isAuto}
+            >
+              Auto
+            </button>
+          ) : null}
           {presets.map((preset) => (
             <button
               key={preset}
               type="button"
               className={cn(
                 'size-6 rounded-full border border-muted-foreground/40 shadow-xs outline-none transition-transform hover:scale-110 focus-visible:ring-2 focus-visible:ring-ring',
-                preset === color &&
+                !isAuto &&
+                  preset === color &&
                   'ring-1 ring-foreground ring-offset-2 ring-offset-sidebar',
               )}
               style={{ backgroundColor: preset }}
               onClick={() => onChange(preset)}
               aria-label={`Use ${preset}`}
-              aria-pressed={preset === color}
+              aria-pressed={!isAuto && preset === color}
             />
           ))}
         </div>

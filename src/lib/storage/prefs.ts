@@ -33,6 +33,22 @@ function readLastRatio(): AspectRatio | undefined {
     : undefined;
 }
 
+/**
+ * Reads the ratio a first visit should start on.
+ *
+ * A phone-sized viewport starts portrait, so the card fills the screen it is
+ * previewed on rather than sitting as a letterbox strip.
+ *
+ * @returns The ratio that suits the viewport.
+ */
+function readViewportRatio(): AspectRatio {
+  try {
+    return window.matchMedia('(max-width: 640px)').matches ? '4:5' : '16:9';
+  } catch {
+    return '16:9';
+  }
+}
+
 /** @param ratio - Export ratio to persist for future projects. */
 function writeLastRatio(ratio: AspectRatio): void {
   writeValue(ratioStorageKey, ratio);
@@ -98,6 +114,7 @@ export {
   readLastRatio,
   readPanelWidths,
   readTheme,
+  readViewportRatio,
   themeStorageKey,
   writeHowItWorksDismissed,
   writeLastRatio,

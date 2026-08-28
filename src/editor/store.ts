@@ -5,7 +5,11 @@ import { type LoadProjectError, loadProject } from '@/lib/github/load';
 import type { RateLimit } from '@/lib/github/rest';
 import { parseGitHubUrl } from '@/lib/github/url';
 import { sampleProject } from '@/lib/sampleProject';
-import { readLastRatio, writeLastRatio } from '@/lib/storage/prefs';
+import {
+  readLastRatio,
+  readViewportRatio,
+  writeLastRatio,
+} from '@/lib/storage/prefs';
 import {
   readProject,
   type StoredProject,
@@ -60,7 +64,7 @@ const defaultTemplate = templates[0];
 let persistTimer: ReturnType<typeof setTimeout> | undefined;
 let latestLoad = 0;
 
-/** Zustand store containing the active RepoFrame editor session. */
+/** Zustand store containing the active Repo Frame editor session. */
 const useEditorStore = create<EditorState>((set, get) => ({
   projectData: sampleProject,
   templateId: defaultTemplate.id,
@@ -95,7 +99,7 @@ const useEditorStore = create<EditorState>((set, get) => ({
     );
 
     if (!restored) {
-      const ratio = readLastRatio() ?? get().ratio;
+      const ratio = readLastRatio() ?? readViewportRatio();
       set({
         ratio,
         templateId: requestedTemplate?.id ?? get().templateId,
@@ -111,7 +115,7 @@ const useEditorStore = create<EditorState>((set, get) => ({
       ratio: restored.project.ratio,
       settings: settingsForTemplate(template, restored.project.settings),
       notice: restored.templateWasReset
-        ? 'The saved template is unavailable, so RepoFrame selected Minimal.'
+        ? 'The saved template is unavailable, so Repo Frame selected Minimal.'
         : undefined,
     });
     await loadRepository(

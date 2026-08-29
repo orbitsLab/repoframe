@@ -150,19 +150,19 @@ function ColorPicker({
           type="button"
           aria-labelledby={labelledBy}
           className={cn(
-            'flex h-9 w-full items-center gap-2 rounded-md border bg-background px-2 shadow-xs outline-none transition-colors hover:bg-accent/50 focus-visible:ring-2 focus-visible:ring-ring',
+            'flex h-9 w-full items-center gap-2 border bg-background px-2 outline-none transition-colors hover:bg-accent/50 focus-visible:ring-2 focus-visible:ring-ring',
             className,
           )}
         >
           <span
-            className="size-5 shrink-0 rounded border"
+            className="size-5 shrink-0 border"
             style={{
               background: auto
                 ? 'linear-gradient(135deg, #ffffff 50%, #0b0b0f 50%)'
                 : hex,
             }}
           />
-          <span className="font-mono text-xs uppercase">
+          <span className="font-data text-xs uppercase">
             {auto ? 'Auto' : hex}
           </span>
         </button>
@@ -171,10 +171,10 @@ function ColorPicker({
         <Popover.Content
           align="start"
           sideOffset={8}
-          className="z-50 w-64 space-y-3 rounded-md border bg-popover p-3 text-popover-foreground shadow-md"
+          className="z-50 w-64 space-y-3 border bg-popover p-3 text-popover-foreground shadow-md"
         >
           <div
-            className="relative h-36 w-full cursor-crosshair rounded"
+            className="relative h-36 w-full cursor-crosshair"
             style={{
               background: `linear-gradient(to bottom, transparent, #000), linear-gradient(to right, #fff, ${hueHex})`,
             }}
@@ -192,7 +192,7 @@ function ColorPicker({
             />
           </div>
           <div
-            className="relative h-3 w-full cursor-pointer rounded-full"
+            className="relative h-3 w-full cursor-pointer"
             style={{
               background:
                 'linear-gradient(to right, #f00, #ff0, #0f0, #0ff, #00f, #f0f, #f00)',
@@ -207,7 +207,7 @@ function ColorPicker({
             />
           </div>
           <input
-            className="h-8 w-full rounded-md border bg-background px-2 font-mono text-xs uppercase shadow-xs outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="h-8 w-full border bg-background px-2 font-data text-xs uppercase outline-none focus-visible:ring-2 focus-visible:ring-ring"
             value={draft}
             onChange={(event) => commitDraft(event.target.value)}
             onBlur={() => setDraft(hex)}
@@ -231,7 +231,7 @@ function ColorPicker({
                   onChange={(event) =>
                     commitChannel(index, Number(event.target.value))
                   }
-                  className="h-8 w-full min-w-0 rounded-md border bg-background px-1.5 text-center font-mono text-xs text-foreground shadow-xs outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  className="h-8 w-full min-w-0 border bg-background px-1.5 text-center font-data text-xs text-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 />
               </label>
             ))}

@@ -24,7 +24,7 @@ type SettingControlProps = {
 
 /** Shared classes for a selectable chip in an option group. */
 const chip =
-  'flex min-h-9 cursor-pointer items-center justify-center gap-2 rounded-md border bg-background px-3 text-xs font-medium shadow-xs transition-colors hover:bg-accent/50 has-checked:border-foreground/20 has-checked:bg-accent has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring';
+  'flex min-h-9 cursor-pointer items-center justify-center gap-2 border bg-background px-3 text-xs font-medium transition-colors hover:border-foreground has-checked:border-foreground has-checked:bg-accent has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring';
 
 /**
  * Renders the control declared by a template setting field.
@@ -89,7 +89,7 @@ function SettingControl({ field, value, onChange }: SettingControlProps) {
         <ControlLabel htmlFor={id}>{field.label}</ControlLabel>
         <input
           id={id}
-          className="h-9 w-full rounded-md border bg-background px-3 text-sm shadow-xs outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ring"
+          className="h-9 w-full border bg-background px-3 text-sm outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ring"
           value={typeof value === 'string' ? value : ''}
           onChange={(event) => onChange(event.target.value)}
           placeholder={field.placeholder}
@@ -176,7 +176,7 @@ function CheckChip({
         checked={checked}
         onChange={(event) => onChange(event.target.checked)}
       />
-      <span className="grid size-4 shrink-0 place-items-center rounded border border-muted-foreground/75 bg-background text-background peer-checked:border-foreground peer-checked:bg-foreground peer-focus-visible:ring-2 peer-focus-visible:ring-ring">
+      <span className="grid size-4 shrink-0 place-items-center border border-muted-foreground/75 bg-background text-background peer-checked:border-foreground peer-checked:bg-foreground peer-focus-visible:ring-2 peer-focus-visible:ring-ring">
         <Check className="size-3" aria-hidden="true" />
       </span>
       <span className="min-w-0 truncate">{label}</span>
@@ -387,7 +387,7 @@ function ColorControl({ field, value, onChange }: SettingControlProps) {
             <button
               type="button"
               className={cn(
-                'flex h-6 items-center rounded-full border border-muted-foreground/40 px-2.5 text-[10px] font-medium shadow-xs outline-none transition-colors hover:bg-accent/50 focus-visible:ring-2 focus-visible:ring-ring',
+                'flex h-6 items-center border border-muted-foreground/40 px-2.5 text-[10px] font-medium outline-none transition-colors hover:bg-accent/50 focus-visible:ring-2 focus-visible:ring-ring',
                 isAuto && 'border-foreground bg-accent',
               )}
               onClick={() => onChange(autoColor)}
@@ -401,7 +401,7 @@ function ColorControl({ field, value, onChange }: SettingControlProps) {
               key={preset}
               type="button"
               className={cn(
-                'size-6 rounded-full border border-muted-foreground/40 shadow-xs outline-none transition-transform hover:scale-110 focus-visible:ring-2 focus-visible:ring-ring',
+                'size-6 border border-muted-foreground/40 outline-none transition-colors hover:border-foreground focus-visible:ring-2 focus-visible:ring-ring',
                 !isAuto &&
                   preset === color &&
                   'ring-1 ring-foreground ring-offset-2 ring-offset-sidebar',

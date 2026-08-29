@@ -93,10 +93,10 @@ function TemplatePicker({
               key={template.id}
               ref={selected ? selectedRef : undefined}
               className={cn(
-                'relative block w-full min-w-0 cursor-pointer overflow-hidden rounded-lg border bg-background p-2 shadow-xs outline-none transition-colors has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring',
+                'relative block w-full min-w-0 cursor-pointer overflow-hidden border bg-background p-2 outline-none transition-colors has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring',
                 selected
                   ? 'border-foreground bg-accent'
-                  : 'hover:border-muted-foreground/50',
+                  : 'hover:border-foreground',
               )}
             >
               <input
@@ -107,7 +107,7 @@ function TemplatePicker({
                 onChange={() => onSelect(template.id)}
                 className="sr-only"
               />
-              <div className="aspect-video w-full min-w-0 overflow-hidden rounded-md bg-muted">
+              <div className="aspect-video w-full min-w-0 overflow-hidden bg-muted">
                 <Preview
                   scene={scene}
                   label={`${template.name} template preview for ${data.repository.fullName}`}

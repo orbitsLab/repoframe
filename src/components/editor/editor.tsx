@@ -146,11 +146,11 @@ function Editor({ repo, templateId }: EditorProps) {
       <div className="border-b p-3">
         <button
           type="button"
-          className="group flex w-full items-center gap-3 rounded-lg border bg-background p-2 text-left outline-none transition-colors hover:border-muted-foreground/50 hover:bg-accent/50 focus-visible:ring-2 focus-visible:ring-ring"
+          className="flex w-full items-center gap-3 border bg-background p-2 text-left outline-none transition-colors hover:border-foreground hover:bg-accent/50 focus-visible:ring-2 focus-visible:ring-ring"
           onClick={() => setShowTemplates(true)}
         >
           <span
-            className="block h-10 shrink-0 overflow-hidden rounded-md border bg-muted"
+            className="block h-10 shrink-0 overflow-hidden border bg-muted"
             style={{ width: thumbnailWidth }}
             aria-hidden="true"
           >
@@ -167,7 +167,7 @@ function Editor({ repo, templateId }: EditorProps) {
             </span>
           </span>
           <ChevronRight
-            className="size-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5"
+            className="size-4 shrink-0 text-muted-foreground"
             aria-hidden="true"
           />
           <span className="sr-only">Change template</span>
@@ -213,7 +213,7 @@ function Editor({ repo, templateId }: EditorProps) {
             />
             <input
               id="repository-input"
-              className="h-9 w-full rounded-md border bg-muted/35 pl-9 pr-3 text-sm shadow-xs outline-none placeholder:text-muted-foreground focus-visible:bg-background focus-visible:ring-2 focus-visible:ring-ring"
+              className="h-9 w-full border bg-muted/35 pl-9 pr-3 text-sm outline-none placeholder:text-muted-foreground focus-visible:bg-background focus-visible:ring-2 focus-visible:ring-ring"
               value={repoInput}
               onChange={(event) => setRepoInput(event.target.value)}
               placeholder="owner/repository"
@@ -403,7 +403,7 @@ function MobileRatioPicker({
         <Popover.Content
           align="end"
           sideOffset={8}
-          className="z-50 rounded-md border bg-popover p-2 text-popover-foreground shadow-md"
+          className="z-50 border bg-popover p-2 text-popover-foreground shadow-md"
         >
           <fieldset className="grid grid-cols-2 gap-1">
             <legend className="sr-only">Aspect ratio</legend>
@@ -411,7 +411,7 @@ function MobileRatioPicker({
               <label
                 key={ratio}
                 className={cn(
-                  'grid h-8 cursor-pointer place-items-center rounded px-3 text-xs font-medium transition-colors has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring',
+                  'grid h-8 cursor-pointer place-items-center px-3 text-xs font-medium transition-colors has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring',
                   value === ratio
                     ? 'bg-foreground text-background'
                     : 'text-muted-foreground hover:bg-accent hover:text-foreground',
@@ -451,15 +451,15 @@ function RatioPicker({
   onChange(ratio: AspectRatio): void;
 }) {
   return (
-    <fieldset className="hidden h-9 items-stretch rounded-md border p-0.5 md:flex">
+    <fieldset className="hidden h-9 items-stretch border md:flex">
       <legend className="sr-only">Aspect ratio</legend>
       {ratios.map((ratio) => (
         <label
           key={ratio}
           className={cn(
-            'grid cursor-pointer place-items-center rounded px-2.5 text-xs font-medium transition-colors has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring',
+            'grid cursor-pointer place-items-center px-2.5 text-xs font-medium transition-colors has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring',
             value === ratio
-              ? 'bg-foreground text-background shadow-xs'
+              ? 'bg-foreground text-background'
               : 'text-muted-foreground hover:text-foreground',
           )}
         >

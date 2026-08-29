@@ -84,7 +84,7 @@ function SettingsPanel({
       {placement === 'design' && sections.length > 1 ? (
         <div className="shrink-0 border-b p-3">
           <div
-            className="grid grid-flow-col auto-cols-fr gap-0.5 rounded-md border bg-foreground/[0.04] p-0.5"
+            className="grid grid-flow-col auto-cols-fr border"
             role="tablist"
             aria-label="Design settings"
           >
@@ -98,9 +98,9 @@ function SettingsPanel({
                   role="tab"
                   aria-selected={currentSection === section}
                   className={cn(
-                    'flex h-9 min-w-0 items-center justify-center gap-1.5 rounded-[5px] px-1 text-[11px] font-medium outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ring',
+                    'flex h-9 min-w-0 items-center justify-center gap-1.5 px-1 text-[11px] font-medium outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ring',
                     currentSection === section
-                      ? 'bg-foreground/[0.1] text-foreground shadow-xs ring-1 ring-foreground/5'
+                      ? 'bg-foreground text-background'
                       : 'text-muted-foreground hover:text-foreground',
                   )}
                   onClick={() => setActiveSection(section)}

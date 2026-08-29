@@ -90,11 +90,11 @@ function ExportPopover({
         <Popover.Content
           align="end"
           sideOffset={8}
-          className="z-50 w-64 rounded-lg border bg-popover p-4 text-popover-foreground shadow-lg outline-none"
+          className="z-50 w-64 border bg-popover p-4 text-popover-foreground shadow-lg outline-none"
         >
           <div className="mb-4 border-b pb-3">
             <p className="text-sm font-semibold">Export card</p>
-            <p className="mt-1 truncate font-mono text-[10px] text-muted-foreground">
+            <p className="mt-1 truncate font-data text-[10px] text-muted-foreground">
               {filename}
             </p>
           </div>
@@ -104,7 +104,7 @@ function ExportPopover({
               {formats.map((item) => (
                 <label
                   key={item}
-                  className="grid h-9 cursor-pointer place-items-center rounded-md border text-xs font-medium has-[:checked]:border-foreground has-[:checked]:bg-foreground has-[:checked]:text-background"
+                  className="grid h-9 cursor-pointer place-items-center border text-xs font-medium has-[:checked]:border-foreground has-[:checked]:bg-foreground has-[:checked]:text-background"
                 >
                   <input
                     className="sr-only"
@@ -126,7 +126,7 @@ function ExportPopover({
               {scales.map((item) => (
                 <label
                   key={item}
-                  className="grid h-9 cursor-pointer place-items-center rounded-md border text-[11px] font-medium has-[:checked]:border-foreground has-[:checked]:bg-foreground has-[:checked]:text-background"
+                  className="grid h-9 cursor-pointer place-items-center border text-[11px] font-medium has-[:checked]:border-foreground has-[:checked]:bg-foreground has-[:checked]:text-background"
                 >
                   <input
                     className="sr-only"
@@ -140,7 +140,7 @@ function ExportPopover({
                 </label>
               ))}
             </div>
-            <p className="font-mono text-[10px] text-muted-foreground">
+            <p className="font-data text-[10px] text-muted-foreground">
               {scene
                 ? `${scene.width * scale} × ${scene.height * scale} px`
                 : '—'}

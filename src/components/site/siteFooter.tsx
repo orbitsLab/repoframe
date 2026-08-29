@@ -2,19 +2,123 @@ import Link from 'next/link';
 
 import { Logo } from '@/components/logo';
 import { githubUrl } from '@/lib/site';
+import { cn } from '@/lib/utils';
 
+/** Footer navigation, grouped the way the site itself is grouped. */
+const columns = [
+  {
+    title: 'Make',
+    links: [
+      { label: 'Editor', href: '/app' },
+      { label: 'Templates', href: '/templates' },
+    ],
+  },
+  {
+    title: 'Source',
+    links: [{ label: 'GitHub', href: githubUrl }],
+  },
+  {
+    // Placeholder destinations: the platform roots stand in until the project
+    // has handles to point at.
+    title: 'Social',
+    links: [
+      { label: 'Instagram', href: 'https://instagram.com' },
+      { label: 'Threads', href: 'https://threads.net' },
+      { label: 'Facebook', href: 'https://facebook.com' },
+      { label: 'YouTube', href: 'https://youtube.com' },
+      { label: 'X', href: 'https://x.com' },
+      { label: 'LinkedIn', href: 'https://linkedin.com' },
+      { label: 'Bluesky', href: 'https://bsky.app' },
+    ],
+  },
+] as const;
+
+/** Facts about the build, printed as a specification strip. */
+const meta = [
+  ['Runs', 'In your browser'],
+  ['Storage', 'IndexedDB'],
+  ['Export', 'PNG · WebP · JPEG'],
+] as const;
+
+/**
+ * Renders the site footer: navigation, a specification strip, and the
+ * oversized wordmark the pages sign off with.
+ */
 function SiteFooter() {
   return (
     <footer className="border-t">
-      <div className="mx-auto flex max-w-6xl flex-col gap-5 px-6 py-10 text-sm text-muted-foreground sm:flex-row sm:items-center">
-        <Logo className="text-foreground" />
-        <p className="sm:mr-auto">Local-first and open source.</p>
-        <nav className="flex flex-wrap gap-4" aria-label="Footer navigation">
-          <Link href="/templates">Templates</Link>
-          <Link href="/docs">Docs</Link>
-          <Link href="/about">About</Link>
-          <a href={githubUrl}>GitHub</a>
-        </nav>
+      <div className="mx-auto max-w-6xl px-6">
+        <div className="grid gap-12 py-16 sm:grid-cols-2 lg:grid-cols-[5fr_7fr] lg:gap-16">
+          <div>
+            <Logo />
+            <p className="mt-5 max-w-xs text-muted-foreground text-sm leading-6">
+              A social card for any public GitHub repository, built and exported
+              entirely on your own machine.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 gap-8 sm:grid-cols-3">
+            {columns.map((column) => (
+              <nav key={column.title} aria-label={column.title}>
+                <p className="site-data">{column.title}</p>
+                <ul className="mt-4 space-y-2.5">
+                  {column.links.map((link) => (
+                    <li key={link.label}>
+                      <Link
+                        href={link.href}
+                        className="text-muted-foreground text-sm outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring"
+                      >
+                        {link.label}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </nav>
+            ))}
+          </div>
+        </div>
+
+        {/* Anchored to the extremes rather than parcelled into equal thirds, so
+            the strip reads to both edges of the page. */}
+        <dl className="grid gap-px border-t sm:grid-cols-3">
+          {meta.map(([label, value], index) => (
+            <div
+              key={label}
+              className={cn(
+                'py-5',
+                index === meta.length - 1
+                  ? 'sm:text-right'
+                  : index > 0 && 'sm:text-center',
+              )}
+            >
+              <dt className="site-data">{label}</dt>
+              <dd className="mt-2 font-medium text-sm">{value}</dd>
+            </div>
+          ))}
+        </dl>
+
+        {/* The wordmark signs the page off inside its own registration frame,
+            the same device the cards are presented in. It sits barely above the
+            page ground and runs off the bottom edge, so it reads as a watermark
+            rather than a heading. */}
+        <div className="@container relative border-t pt-12">
+          <span
+            aria-hidden="true"
+            className="site-crop -top-2 -left-2 border-t border-l"
+          />
+          <span
+            aria-hidden="true"
+            className="site-crop -top-2 -right-2 border-t border-r"
+          />
+          <div className="overflow-hidden">
+            <p
+              aria-hidden="true"
+              className="site-display -mb-[4cqw] select-none whitespace-nowrap bg-linear-to-b from-foreground to-muted-foreground/40 bg-clip-text text-[18.7cqw] text-transparent"
+            >
+              Repo Frame
+            </p>
+          </div>
+        </div>
       </div>
     </footer>
   );

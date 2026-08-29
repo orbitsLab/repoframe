@@ -8,8 +8,11 @@ import { githubUrl } from '@/lib/site';
 
 function SiteHeader() {
   return (
-    <header className="border-b bg-background/95">
-      <div className="mx-auto flex h-16 max-w-6xl items-center gap-4 px-4 sm:px-6">
+    <header
+      data-site-header
+      className="sticky top-0 z-50 h-(--header-height) border-b bg-background/85 backdrop-blur-md"
+    >
+      <div className="mx-auto flex h-full max-w-6xl items-center gap-4 px-4 sm:px-6">
         <Logo className="mr-auto" />
         <nav
           className="hidden items-center gap-5 text-sm text-muted-foreground md:flex"
@@ -17,12 +20,6 @@ function SiteHeader() {
         >
           <Link className="hover:text-foreground" href="/templates">
             Templates
-          </Link>
-          <Link className="hover:text-foreground" href="/docs">
-            Docs
-          </Link>
-          <Link className="hover:text-foreground" href="/about">
-            About
           </Link>
           <a
             className="inline-flex items-center gap-1.5 hover:text-foreground"

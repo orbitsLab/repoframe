@@ -4,7 +4,7 @@ import { siteUrl } from '@/lib/site';
 import { templates } from '@/lib/templates/registry';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const paths = ['', '/templates', '/docs', '/about'];
+  const paths = ['', '/templates'];
   const templatePaths = templates.map(
     (template) => `/templates/${template.id}`,
   );

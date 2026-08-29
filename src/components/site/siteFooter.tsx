@@ -112,8 +112,8 @@ function SiteFooter() {
           />
           <div className="overflow-hidden">
             <p
+              className="site-display -mb-[4cqw] select-none whitespace-nowrap bg-linear-to-b from-foreground to-muted-foreground/40 bg-clip-text text-[18.7cqw] text-background/20 dark:text-black outline-1"
               aria-hidden="true"
-              className="site-display -mb-[4cqw] select-none whitespace-nowrap bg-linear-to-b from-foreground to-muted-foreground/40 bg-clip-text text-[18.7cqw] text-transparent"
             >
               Repo Frame
             </p>

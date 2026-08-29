@@ -1,190 +1,154 @@
-import { ArrowRight, Check, CodeXml, Download, Palette } from 'lucide-react';
-import Link from 'next/link';
+import { Hero } from '@/components/site/hero';
+import { RepoForm } from '@/components/site/repoForm';
+import { Reveal } from '@/components/site/reveal';
+import { SectionMarker } from '@/components/site/sectionMarker';
+import { Workbench } from '@/components/site/workbench';
 
-import { SampleCard } from '@/components/site/sampleCard';
-import { Button } from '@/components/ui/button';
-import { templates } from '@/lib/templates/registry';
+/** What Repo Frame reads from GitHub, and where each field comes from. */
+const readings = [
+  ['Name, description, topics', 'repos/{owner}/{repo}'],
+  ['Stars, forks, watchers', 'Repository counts'],
+  ['Open issues, pull requests', 'pulls (link header)'],
+  ['Language split', 'repos/{owner}/{repo}/languages'],
+  ['Contributors', 'repos/{owner}/{repo}/contributors'],
+  ['Latest release', 'releases/latest'],
+  ['Licence', 'Repository licence'],
+] as const;
 
-const steps = [
-  {
-    number: '01',
-    title: 'Paste a repository',
-    copy: 'Repo Frame loads public project details directly from GitHub.',
-  },
-  {
-    number: '02',
-    title: 'Choose what matters',
-    copy: 'Select a template, visible content, typography, and card treatment.',
-  },
-  {
-    number: '03',
-    title: 'Export the card',
-    copy: 'Download a sharp PNG or WebP without uploading your design.',
-  },
-];
+/** The three claims behind running entirely on the client. */
+const guarantees = [
+  ['Accounts', 'None'],
+  ['Uploads', 'None'],
+  ['Storage', 'Your browser'],
+] as const;
+
+/** Renders the specification table of the data a card is built from. */
+function Anatomy() {
+  return (
+    <section
+      data-snap
+      className="relative flex min-h-[calc(100svh-var(--header-height))] items-center border-b pb-20"
+      aria-labelledby="anatomy-heading"
+    >
+      <Reveal className="mx-auto grid w-full max-w-6xl gap-12 px-6 py-20 lg:grid-cols-[5fr_7fr] lg:gap-16">
+        <div>
+          <p className="site-eyebrow text-muted-foreground">What it reads</p>
+          <h2
+            id="anatomy-heading"
+            className="site-display mt-5 text-3xl sm:text-4xl"
+          >
+            A card is only as good as the data behind it.
+          </h2>
+          <p className="mt-6 max-w-md text-muted-foreground text-sm leading-6">
+            Paste a URL and Repo Frame calls the public GitHub API from your
+            browser, normalises the response, and hands the result to the
+            template. Nothing is invented, and nothing is stored on a server.
+          </p>
+        </div>
+
+        <dl className="border-t">
+          {readings.map(([field, source]) => (
+            <div
+              key={field}
+              className="flex flex-col gap-1 border-b py-4 sm:flex-row sm:flex-wrap sm:items-baseline sm:justify-between sm:gap-x-6"
+            >
+              <dt className="min-w-0 font-medium text-sm">{field}</dt>
+              <dd
+                className="site-data min-w-0 break-words normal-case"
+                translate="no"
+              >
+                {source}
+              </dd>
+            </div>
+          ))}
+        </dl>
+      </Reveal>
+      <SectionMarker index={2} label="What it reads" next="The workbench" />
+    </section>
+  );
+}
+
+/** Renders the section stating the local-first guarantee. */
+function LocalFirst() {
+  return (
+    <section
+      data-snap
+      className="relative flex min-h-[calc(100svh-var(--header-height))] items-center border-b pb-20"
+      aria-labelledby="local-heading"
+    >
+      <Reveal className="mx-auto grid w-full max-w-6xl gap-10 px-6 py-20 lg:grid-cols-[7fr_5fr] lg:gap-16">
+        <div>
+          <p className="site-eyebrow text-muted-foreground">Local first</p>
+          <h2
+            id="local-heading"
+            className="site-display mt-5 text-balance text-3xl sm:text-5xl"
+          >
+            There is no server to trust, because there is no server.
+          </h2>
+        </div>
+        <dl className="self-end">
+          {guarantees.map(([label, value]) => (
+            <div
+              key={label}
+              className="flex items-baseline justify-between gap-6 border-t py-4 last:border-b"
+            >
+              <dt className="site-data">{label}</dt>
+              <dd className="font-medium text-sm">{value}</dd>
+            </div>
+          ))}
+        </dl>
+      </Reveal>
+      <SectionMarker index={4} label="Local first" next="Get started" />
+    </section>
+  );
+}
+
+/** Renders the closing repository field. */
+function Closing() {
+  return (
+    <section
+      data-snap
+      className="relative flex min-h-[calc(100svh-var(--header-height))] items-center pb-20"
+      aria-labelledby="cta-heading"
+    >
+      {/* Last block before the footer, so it stays put rather than fading out. */}
+      <Reveal
+        exit={false}
+        className="mx-auto w-full max-w-6xl px-6 py-24 lg:py-32"
+      >
+        <p className="site-eyebrow text-muted-foreground">Get started</p>
+        <h2
+          id="cta-heading"
+          className="site-display mt-5 max-w-2xl text-4xl sm:text-5xl"
+        >
+          Give the link something to show.
+        </h2>
+        <RepoForm id="closing-repository" className="mt-8 max-w-xl" />
+        <p className="mt-4 text-muted-foreground text-xs">
+          Or open the editor with{' '}
+          <a
+            className="underline underline-offset-4 hover:no-underline"
+            href="/app?repo=alfaarghya/alfa-leetcode-api"
+            translate="no"
+          >
+            alfa-leetcode-api
+          </a>{' '}
+          to look around first.
+        </p>
+      </Reveal>
+      <SectionMarker index={5} label="Get started" />
+    </section>
+  );
+}
 
 export default function HomePage() {
   return (
-    <main>
-      <section className="border-b">
-        <div className="mx-auto grid max-w-6xl gap-14 px-6 py-20 lg:grid-cols-[0.9fr_1.1fr] lg:items-center lg:py-28">
-          <div>
-            <p className="site-eyebrow mb-5 text-muted-foreground">
-              Open-source GitHub card generator
-            </p>
-            <h1 className="max-w-xl text-5xl font-semibold tracking-[-0.045em] sm:text-6xl">
-              Make your repository worth sharing.
-            </h1>
-            <p className="mt-6 max-w-lg text-lg leading-8 text-muted-foreground">
-              Turn a public GitHub repository into a polished social card. Pick
-              the content, tune the design, and export it locally.
-            </p>
-            <form
-              action="/app"
-              method="get"
-              className="mt-8 flex max-w-lg flex-col gap-2 sm:flex-row"
-            >
-              <label className="sr-only" htmlFor="hero-repository">
-                GitHub repository
-              </label>
-              <input
-                id="hero-repository"
-                name="repo"
-                className="h-11 min-w-0 flex-1 rounded-md border bg-background px-4 text-sm outline-none placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring"
-                placeholder="https://github.com/alfaarghya/alfa-leetcode-api"
-                required
-              />
-              <Button type="submit" size="lg">
-                Create card
-                <ArrowRight aria-hidden="true" />
-              </Button>
-            </form>
-            <p className="mt-3 text-xs text-muted-foreground">
-              No account. No upload. Public repositories only.
-            </p>
-          </div>
-          <div className="relative">
-            <div className="absolute -inset-4 -z-10 rounded-2xl bg-muted" />
-            <SampleCard templateId="minimal" className="shadow-lg" />
-          </div>
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-6xl px-6 py-20">
-        <div className="max-w-xl">
-          <p className="site-eyebrow text-muted-foreground">How it works</p>
-          <h2 className="mt-3 text-3xl font-semibold tracking-tight">
-            From repository to image in three steps.
-          </h2>
-        </div>
-        <ol className="mt-10 grid gap-px overflow-hidden rounded-lg border bg-border md:grid-cols-3">
-          {steps.map((step) => (
-            <li key={step.number} className="bg-background p-7">
-              <span className="font-mono text-xs text-muted-foreground">
-                {step.number}
-              </span>
-              <h3 className="mt-8 font-semibold">{step.title}</h3>
-              <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                {step.copy}
-              </p>
-            </li>
-          ))}
-        </ol>
-      </section>
-
-      <section className="border-y bg-muted/40">
-        <div className="mx-auto max-w-6xl px-6 py-20">
-          <div className="flex items-end justify-between gap-6">
-            <div>
-              <p className="site-eyebrow text-muted-foreground">Templates</p>
-              <h2 className="mt-3 text-3xl font-semibold tracking-tight">
-                Start with a composition that works.
-              </h2>
-            </div>
-            <Button asChild variant="outline" className="hidden sm:inline-flex">
-              <Link href="/templates">View all</Link>
-            </Button>
-          </div>
-          <div className="mt-10 grid gap-5 md:grid-cols-3">
-            {templates.map((template) => (
-              <Link
-                key={template.id}
-                href={`/templates/${template.id}`}
-                className="group rounded-xl border bg-card p-3 shadow-xs outline-none transition-transform hover:-translate-y-0.5 focus-visible:ring-2 focus-visible:ring-ring"
-              >
-                <SampleCard templateId={template.id} />
-                <span className="mt-4 flex items-center justify-between gap-3 px-1 pb-1">
-                  <span>
-                    <span className="block font-medium">{template.name}</span>
-                    <span className="block text-sm text-muted-foreground">
-                      {template.category}
-                    </span>
-                  </span>
-                  <ArrowRight
-                    className="size-4 transition-transform group-hover:translate-x-0.5"
-                    aria-hidden="true"
-                  />
-                </span>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="mx-auto grid max-w-6xl gap-12 px-6 py-20 lg:grid-cols-2 lg:items-center">
-        <div>
-          <p className="site-eyebrow text-muted-foreground">Customization</p>
-          <h2 className="mt-3 text-3xl font-semibold tracking-tight">
-            Flexible enough to feel yours. Curated enough to stay good.
-          </h2>
-          <p className="mt-5 max-w-xl leading-7 text-muted-foreground">
-            Change visible metrics, colours, typography, spacing, and card
-            treatment without wrestling with a free-form canvas.
-          </p>
-        </div>
-        <div className="grid gap-3 sm:grid-cols-2">
-          {[
-            ['Theme', 'Background and accent colours', Palette],
-            ['Typography', 'Twelve self-hosted font choices', Check],
-            ['Cards', 'Radius, spacing, and structure', CodeXml],
-            ['Export', 'PNG and supported WebP output', Download],
-          ].map(([title, copy, Icon]) => (
-            <div key={String(title)} className="rounded-lg border p-5">
-              <Icon className="size-5" aria-hidden="true" />
-              <h3 className="mt-6 font-semibold">{String(title)}</h3>
-              <p className="mt-1 text-sm text-muted-foreground">
-                {String(copy)}
-              </p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <section className="border-y bg-foreground text-background">
-        <div className="mx-auto grid max-w-6xl gap-10 px-6 py-16 md:grid-cols-[0.8fr_1.2fr] md:items-center">
-          <p className="site-eyebrow opacity-65">Local-first by design</p>
-          <p className="text-xl leading-8 tracking-tight sm:text-2xl">
-            Your project stays in your browser. Repo Frame has no accounts, no
-            server, and no database. Repository data is fetched from GitHub
-            directly by your browser, and your designs never leave your device.
-          </p>
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-3xl px-6 py-24 text-center">
-        <h2 className="text-4xl font-semibold tracking-tight">
-          Give your repository a better first impression.
-        </h2>
-        <p className="mx-auto mt-5 max-w-xl text-muted-foreground">
-          Open the editor with the example project or paste your own public
-          repository.
-        </p>
-        <Button asChild size="lg" className="mt-8">
-          <Link href="/app?repo=alfaarghya/alfa-leetcode-api">
-            Try alfa-leetcode-api
-          </Link>
-        </Button>
-      </section>
+    <main id="main">
+      <Hero />
+      <Anatomy />
+      <Workbench />
+      <LocalFirst />
+      <Closing />
     </main>
   );
 }

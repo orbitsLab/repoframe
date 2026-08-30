@@ -28,7 +28,12 @@ import {
 } from '@/lib/templates/shared/tokens';
 import type { ProjectDataPath } from '@/types/data/path';
 import type { Fill, Scene, SceneNode } from '@/types/scene';
-import type { BuildInput, SettingField, Template } from '@/types/template';
+import type {
+  BuildInput,
+  ColorPreset,
+  SettingField,
+  Template,
+} from '@/types/template';
 
 /** Share of the fade that holds full colour before it starts to settle. */
 const colorHold = 0.5;
@@ -105,18 +110,72 @@ const settingsSchema: SettingField[] = [
   },
 ];
 
-const defaultSettings: Record<string, unknown> = {
-  metrics: ['stars', 'forks', 'issues'],
-  showLanguageLabel: true,
-  eyebrow: 'BUILT WITH',
+/** Colours this template ships with, shared by its default preset. */
+const defaultColors = {
   backgroundColor: palettes.terminal.background,
   accentColor: '#ff5a3c',
   bannerColor: '#ff5a3c',
   textColor: autoColor,
+};
+
+const defaultSettings: Record<string, unknown> = {
+  metrics: ['stars', 'forks', 'issues'],
+  showLanguageLabel: true,
+  eyebrow: 'BUILT WITH',
+  ...defaultColors,
   fontFamily: 'Sora Variable',
   monoFamily: 'JetBrains Mono Variable',
   settlePoint: 50,
 };
+
+/** Colour palettes offered for this template. */
+const colorPresets: ColorPreset[] = [
+  {
+    id: 'sunset',
+    name: 'Sunset',
+    settings: defaultColors,
+  },
+  {
+    id: 'tide',
+    name: 'Tide',
+    settings: {
+      backgroundColor: '#05121a',
+      accentColor: '#22d3ee',
+      bannerColor: '#1d4ed8',
+      textColor: autoColor,
+    },
+  },
+  {
+    id: 'meadow',
+    name: 'Meadow',
+    settings: {
+      backgroundColor: '#08130d',
+      accentColor: '#4ade80',
+      bannerColor: '#15803d',
+      textColor: autoColor,
+    },
+  },
+  {
+    id: 'dusk',
+    name: 'Dusk',
+    settings: {
+      backgroundColor: '#0f0a18',
+      accentColor: '#c084fc',
+      bannerColor: '#6d28d9',
+      textColor: autoColor,
+    },
+  },
+  {
+    id: 'daybreak',
+    name: 'Daybreak',
+    settings: {
+      backgroundColor: '#f4f1e8',
+      accentColor: '#a85f10',
+      bannerColor: '#f59e0b',
+      textColor: autoColor,
+    },
+  },
+];
 
 function requiredData(settings: Record<string, unknown>) {
   const resolved = mergeSettings(defaultSettings, settings);
@@ -425,6 +484,7 @@ const horizonTemplate: Template = {
   requiredData,
   settingsSchema,
   defaultSettings,
+  colorPresets,
   build,
 };
 

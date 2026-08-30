@@ -24,7 +24,12 @@ import {
 } from '@/lib/templates/shared/tokens';
 import type { ProjectDataPath } from '@/types/data/path';
 import type { Scene, SceneNode } from '@/types/scene';
-import type { BuildInput, SettingField, Template } from '@/types/template';
+import type {
+  BuildInput,
+  ColorPreset,
+  SettingField,
+  Template,
+} from '@/types/template';
 
 const settingsSchema: SettingField[] = [
   {
@@ -91,17 +96,67 @@ const settingsSchema: SettingField[] = [
   },
 ];
 
+/** Colours this template ships with, shared by its default preset. */
+const defaultColors = {
+  backgroundColor: '#0f172a',
+  accentColor: '#38bdf8',
+  textColor: autoColor,
+};
+
 const defaultSettings: Record<string, unknown> = {
   metrics: ['stars', 'forks'],
   showRelease: true,
   showLicense: true,
   eyebrow: 'NEW RELEASE',
-  backgroundColor: '#0f172a',
-  accentColor: '#38bdf8',
-  textColor: autoColor,
+  ...defaultColors,
   fontFamily: 'Archivo Variable',
   cardRadius: 28,
 };
+
+/** Colour palettes offered for this template. */
+const colorPresets: ColorPreset[] = [
+  {
+    id: 'sky',
+    name: 'Sky',
+    settings: defaultColors,
+  },
+  {
+    id: 'emerald',
+    name: 'Emerald',
+    settings: {
+      backgroundColor: '#06231c',
+      accentColor: '#34d399',
+      textColor: autoColor,
+    },
+  },
+  {
+    id: 'amber',
+    name: 'Amber',
+    settings: {
+      backgroundColor: '#1c1508',
+      accentColor: '#fbbf24',
+      textColor: autoColor,
+    },
+  },
+  {
+    id: 'magenta',
+    name: 'Magenta',
+    settings: {
+      backgroundColor: '#1a0f22',
+      accentColor: '#e879f9',
+      textColor: autoColor,
+    },
+  },
+  {
+    id: 'paper',
+    name: 'Paper',
+    settings: {
+      backgroundColor: '#f5f5f0',
+      accentColor: '#0f172a',
+      textColor: autoColor,
+    },
+  },
+];
 
 function requiredData(settings: Record<string, unknown>) {
   const resolved = mergeSettings(defaultSettings, settings);
@@ -320,6 +375,7 @@ const releaseTemplate: Template = {
   requiredData,
   settingsSchema,
   defaultSettings,
+  colorPresets,
   build,
 };
 

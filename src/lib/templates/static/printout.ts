@@ -32,7 +32,12 @@ import {
 } from '@/lib/templates/shared/tokens';
 import type { ProjectDataPath } from '@/types/data/path';
 import type { Scene, SceneNode } from '@/types/scene';
-import type { BuildInput, SettingField, Template } from '@/types/template';
+import type {
+  BuildInput,
+  ColorPreset,
+  SettingField,
+  Template,
+} from '@/types/template';
 
 /** Fixed cell count in the metric strip, one per metric off the figure. */
 const cellSlots = 4;
@@ -100,16 +105,66 @@ const settingsSchema: SettingField[] = [
   },
 ];
 
+/** Colours this template ships with, shared by its default preset. */
+const defaultColors = {
+  backgroundColor: '#f0ebdd',
+  accentColor: '#c8503c',
+  textColor: '#2b2723',
+};
+
 const defaultSettings: Record<string, unknown> = {
   heroMetric: 'stars',
   metrics: ['stars', 'forks', 'watchers', 'issues'],
   showLanguages: true,
   wordmark: 'REPOFRAME',
-  backgroundColor: '#f0ebdd',
-  accentColor: '#c8503c',
-  textColor: '#2b2723',
+  ...defaultColors,
   fontFamily: 'Source Code Pro Variable',
 };
+
+/** Colour palettes offered for this template. */
+const colorPresets: ColorPreset[] = [
+  {
+    id: 'tractor',
+    name: 'Tractor',
+    settings: defaultColors,
+  },
+  {
+    id: 'greenbar',
+    name: 'Green Bar',
+    settings: {
+      backgroundColor: '#e2ecdd',
+      accentColor: '#2f6f4f',
+      textColor: '#1c241d',
+    },
+  },
+  {
+    id: 'thermal',
+    name: 'Thermal',
+    settings: {
+      backgroundColor: '#f7f4ef',
+      accentColor: '#1a1a1a',
+      textColor: '#1a1a1a',
+    },
+  },
+  {
+    id: 'bluebar',
+    name: 'Blue Bar',
+    settings: {
+      backgroundColor: '#e4eaf2',
+      accentColor: '#1f3ad6',
+      textColor: '#171c26',
+    },
+  },
+  {
+    id: 'carbon',
+    name: 'Carbon',
+    settings: {
+      backgroundColor: '#17161a',
+      accentColor: '#d9d4c6',
+      textColor: '#ece8dd',
+    },
+  },
+];
 
 function requiredData(settings: Record<string, unknown>) {
   const resolved = mergeSettings(defaultSettings, settings);
@@ -644,6 +699,7 @@ const printoutTemplate: Template = {
   requiredData,
   settingsSchema,
   defaultSettings,
+  colorPresets,
   build,
 };
 

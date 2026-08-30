@@ -11,7 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { autoColor } from '@/lib/templates/shared/tokens';
+import { autoColor, hexPattern } from '@/lib/templates/shared/tokens';
 import { cn } from '@/lib/utils';
 
 import type { SettingField } from '@/types/template';
@@ -19,6 +19,8 @@ import type { SettingField } from '@/types/template';
 type SettingControlProps = {
   field: SettingField;
   value: unknown;
+  /** Quick-pick colours for a color field, drawn from the template palettes. */
+  swatches?: string[];
   onChange(value: unknown): void;
 };
 
@@ -31,11 +33,23 @@ const chip =
  *
  * @param props - Setting schema, current value, and change callback.
  */
-function SettingControl({ field, value, onChange }: SettingControlProps) {
+function SettingControl({
+  field,
+  value,
+  swatches,
+  onChange,
+}: SettingControlProps) {
   const id = `setting-${field.key}`;
 
   if (field.type === 'color') {
-    return <ColorControl field={field} value={value} onChange={onChange} />;
+    return (
+      <ColorControl
+        field={field}
+        value={value}
+        swatches={swatches}
+        onChange={onChange}
+      />
+    );
   }
 
   if (field.type === 'select') {
@@ -285,27 +299,6 @@ function ControlLabel({
   );
 }
 
-/** Preset colours drawn from the palettes the templates already ship with. */
-const swatches: Record<string, string[]> = {
-  backgroundColor: [
-    '#f6f3ec',
-    '#ffffff',
-    '#ebe9ff',
-    '#0b0d10',
-    '#0d1117',
-    '#101014',
-  ],
-  accentColor: [
-    '#5b5bd6',
-    '#6c5ce7',
-    '#7ee787',
-    '#58a6ff',
-    '#f97316',
-    '#38bdf8',
-  ],
-  textColor: ['#0b0b0f', '#ffffff', '#e6edf3', '#b4471f', '#4cc9f0'],
-};
-
 /**
  * Renders a dropdown for a setting with more options than fit as chips.
  *
@@ -355,17 +348,21 @@ function SelectControl({ field, value, onChange }: SettingControlProps) {
 }
 
 /**
- * Renders a color picker and any presets registered for the setting.
+ * Renders a color picker with the quick-pick colours passed for the setting.
  *
- * @param props - Color setting schema, current value, and change callback.
+ * @param props - Color setting schema, current value, swatches, and callback.
  */
-function ColorControl({ field, value, onChange }: SettingControlProps) {
+function ColorControl({
+  field,
+  value,
+  swatches = [],
+  onChange,
+}: SettingControlProps) {
   const id = `setting-${field.key}`;
-  const isHex = typeof value === 'string' && /^#[0-9a-f]{6}$/i.test(value);
+  const isHex = typeof value === 'string' && hexPattern.test(value);
   const allowAuto = field.type === 'color' && field.allowAuto === true;
   const isAuto = allowAuto && !isHex;
   const color = isHex ? (value as string).toLowerCase() : '#000000';
-  const presets = swatches[field.key] ?? [];
 
   return (
     <div>
@@ -381,7 +378,7 @@ function ColorControl({ field, value, onChange }: SettingControlProps) {
         labelledBy={`${id}-label`}
         auto={isAuto}
       />
-      {allowAuto || presets.length > 0 ? (
+      {allowAuto || swatches.length > 0 ? (
         <div className="mt-2.5 flex flex-wrap items-center gap-2">
           {allowAuto ? (
             <button
@@ -396,7 +393,7 @@ function ColorControl({ field, value, onChange }: SettingControlProps) {
               Auto
             </button>
           ) : null}
-          {presets.map((preset) => (
+          {swatches.map((preset) => (
             <button
               key={preset}
               type="button"

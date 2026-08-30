@@ -24,7 +24,12 @@ import {
 } from '@/lib/templates/shared/tokens';
 import type { ProjectDataPath } from '@/types/data/path';
 import type { Scene, SceneNode } from '@/types/scene';
-import type { BuildInput, SettingField, Template } from '@/types/template';
+import type {
+  BuildInput,
+  ColorPreset,
+  SettingField,
+  Template,
+} from '@/types/template';
 
 const settingsSchema: SettingField[] = [
   {
@@ -89,16 +94,66 @@ const settingsSchema: SettingField[] = [
   },
 ];
 
-const defaultSettings: Record<string, unknown> = {
-  metrics: ['stars', 'forks', 'issues'],
-  eyebrow: 'OPEN SOURCE',
+/** Colours this template ships with, shared by its default preset. */
+const defaultColors = {
   backgroundColor: '#0e0e10',
   accentColor: '#2b31e8',
   textColor: autoColor,
+};
+
+const defaultSettings: Record<string, unknown> = {
+  metrics: ['stars', 'forks', 'issues'],
+  eyebrow: 'OPEN SOURCE',
+  ...defaultColors,
   fontFamily: 'Archivo Variable',
   washStrength: 70,
   avatarRadius: 0,
 };
+
+/** Colour palettes offered for this template. */
+const colorPresets: ColorPreset[] = [
+  {
+    id: 'electric',
+    name: 'Electric',
+    settings: defaultColors,
+  },
+  {
+    id: 'crimson',
+    name: 'Crimson',
+    settings: {
+      backgroundColor: '#0e0a0a',
+      accentColor: '#d92336',
+      textColor: autoColor,
+    },
+  },
+  {
+    id: 'chartreuse',
+    name: 'Acid',
+    settings: {
+      backgroundColor: '#101208',
+      accentColor: '#b8e614',
+      textColor: autoColor,
+    },
+  },
+  {
+    id: 'ivory',
+    name: 'Ivory',
+    settings: {
+      backgroundColor: '#f3f1ea',
+      accentColor: '#2b31e8',
+      textColor: autoColor,
+    },
+  },
+  {
+    id: 'cyan',
+    name: 'Cyan',
+    settings: {
+      backgroundColor: '#06121a',
+      accentColor: '#22d3ee',
+      textColor: autoColor,
+    },
+  },
+];
 
 function requiredData(settings: Record<string, unknown>) {
   const resolved = mergeSettings(defaultSettings, settings);
@@ -316,6 +371,7 @@ const coverTemplate: Template = {
   requiredData,
   settingsSchema,
   defaultSettings,
+  colorPresets,
   build,
 };
 

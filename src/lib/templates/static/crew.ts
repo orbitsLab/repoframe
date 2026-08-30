@@ -28,7 +28,12 @@ import {
 import type { ProjectDataPath } from '@/types/data/path';
 import type { ProjectData } from '@/types/data/project';
 import type { Scene, SceneNode } from '@/types/scene';
-import type { BuildInput, SettingField, Template } from '@/types/template';
+import type {
+  BuildInput,
+  ColorPreset,
+  SettingField,
+  Template,
+} from '@/types/template';
 
 /** Fixed tile count beside the hero, so node ids stay stable across ratios. */
 const tileSlots = 24;
@@ -92,16 +97,66 @@ const settingsSchema: SettingField[] = [
   },
 ];
 
+/** Colours this template ships with, shared by its default preset. */
+const defaultColors = {
+  backgroundColor: '#141414',
+  accentColor: '#ff5a3c',
+  textColor: autoColor,
+};
+
 const defaultSettings: Record<string, unknown> = {
   metrics: ['stars', 'forks', 'issues'],
   showContributors: true,
   eyebrow: 'BUILT BY',
-  backgroundColor: '#141414',
-  accentColor: '#ff5a3c',
-  textColor: autoColor,
+  ...defaultColors,
   fontFamily: 'Space Grotesk Variable',
   avatarRadius: 0,
 };
+
+/** Colour palettes offered for this template. */
+const colorPresets: ColorPreset[] = [
+  {
+    id: 'coral',
+    name: 'Coral',
+    settings: defaultColors,
+  },
+  {
+    id: 'cobalt',
+    name: 'Cobalt',
+    settings: {
+      backgroundColor: '#0e1424',
+      accentColor: '#4d7cff',
+      textColor: autoColor,
+    },
+  },
+  {
+    id: 'gold',
+    name: 'Gold',
+    settings: {
+      backgroundColor: '#16140f',
+      accentColor: '#e0b83c',
+      textColor: autoColor,
+    },
+  },
+  {
+    id: 'gallery',
+    name: 'Gallery',
+    settings: {
+      backgroundColor: '#f0eeea',
+      accentColor: '#b03a2e',
+      textColor: autoColor,
+    },
+  },
+  {
+    id: 'jade',
+    name: 'Jade',
+    settings: {
+      backgroundColor: '#0b1512',
+      accentColor: '#2dd4a7',
+      textColor: autoColor,
+    },
+  },
+];
 
 function requiredData(settings: Record<string, unknown>) {
   const resolved = mergeSettings(defaultSettings, settings);
@@ -506,6 +561,7 @@ const crewTemplate: Template = {
   requiredData,
   settingsSchema,
   defaultSettings,
+  colorPresets,
   build,
 };
 

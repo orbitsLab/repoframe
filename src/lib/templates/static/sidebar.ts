@@ -30,6 +30,7 @@ import type { ProjectDataPath } from '@/types/data/path';
 import type { Scene, SceneNode } from '@/types/scene';
 import type {
   BuildInput,
+  ColorPreset,
   MeasureText,
   SettingField,
   Template,
@@ -107,17 +108,67 @@ const settingsSchema: SettingField[] = [
   },
 ];
 
+/** Colours this template ships with, shared by its default preset. */
+const defaultColors = {
+  backgroundColor: palettes.paper.background,
+  accentColor: '#1f3ad6',
+  textColor: autoColor,
+};
+
 const defaultSettings: Record<string, unknown> = {
   metrics: ['stars', 'forks', 'issues'],
   showAvatar: true,
   eyebrow: 'REPOSITORY',
-  backgroundColor: palettes.paper.background,
-  accentColor: '#1f3ad6',
-  textColor: autoColor,
+  ...defaultColors,
   fontFamily: 'Archivo Variable',
   monoFamily: 'Azeret Mono Variable',
   avatarRadius: 0,
 };
+
+/** Colour palettes offered for this template. */
+const colorPresets: ColorPreset[] = [
+  {
+    id: 'indigo',
+    name: 'Indigo',
+    settings: defaultColors,
+  },
+  {
+    id: 'oxblood',
+    name: 'Oxblood',
+    settings: {
+      backgroundColor: '#f3eee7',
+      accentColor: '#7a1f2b',
+      textColor: autoColor,
+    },
+  },
+  {
+    id: 'pine',
+    name: 'Pine',
+    settings: {
+      backgroundColor: '#edf0ec',
+      accentColor: '#1f5138',
+      textColor: autoColor,
+    },
+  },
+  {
+    id: 'slate',
+    name: 'Slate',
+    settings: {
+      backgroundColor: '#14171a',
+      accentColor: '#cbd5e1',
+      textColor: autoColor,
+    },
+  },
+  {
+    id: 'saffron',
+    name: 'Saffron',
+    settings: {
+      backgroundColor: '#faf3e4',
+      accentColor: '#a3620f',
+      textColor: autoColor,
+    },
+  },
+];
 
 function requiredData(settings: Record<string, unknown>) {
   const resolved = mergeSettings(defaultSettings, settings);
@@ -457,6 +508,7 @@ const sidebarTemplate: Template = {
   requiredData,
   settingsSchema,
   defaultSettings,
+  colorPresets,
   build,
 };
 

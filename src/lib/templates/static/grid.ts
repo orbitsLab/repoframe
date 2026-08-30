@@ -29,7 +29,12 @@ import {
 } from '@/lib/templates/shared/tokens';
 import type { ProjectDataPath } from '@/types/data/path';
 import type { Scene, SceneNode } from '@/types/scene';
-import type { BuildInput, SettingField, Template } from '@/types/template';
+import type {
+  BuildInput,
+  ColorPreset,
+  SettingField,
+  Template,
+} from '@/types/template';
 
 /** Cells the name band spans before the avatar cell closes the top rows. */
 const nameRows = 2;
@@ -96,16 +101,66 @@ const settingsSchema: SettingField[] = [
   },
 ];
 
-const defaultSettings: Record<string, unknown> = {
-  metrics: ['stars', 'forks', 'watchers', 'issues', 'pullRequests'],
-  showLanguage: true,
+/** Colours this template ships with, shared by its default preset. */
+const defaultColors = {
   backgroundColor: palettes.ink.background,
   accentColor: '#e0432a',
   textColor: autoColor,
+};
+
+const defaultSettings: Record<string, unknown> = {
+  metrics: ['stars', 'forks', 'watchers', 'issues', 'pullRequests'],
+  showLanguage: true,
+  ...defaultColors,
   fontFamily: 'Space Grotesk Variable',
   monoFamily: 'JetBrains Mono Variable',
   avatarRadius: 0,
 };
+
+/** Colour palettes offered for this template. */
+const colorPresets: ColorPreset[] = [
+  {
+    id: 'signal',
+    name: 'Signal',
+    settings: defaultColors,
+  },
+  {
+    id: 'klein',
+    name: 'Klein',
+    settings: {
+      backgroundColor: '#f2f2f4',
+      accentColor: '#002fa7',
+      textColor: autoColor,
+    },
+  },
+  {
+    id: 'ochre',
+    name: 'Ochre',
+    settings: {
+      backgroundColor: '#f7f1e2',
+      accentColor: '#9a6a08',
+      textColor: autoColor,
+    },
+  },
+  {
+    id: 'carbon',
+    name: 'Carbon',
+    settings: {
+      backgroundColor: '#141414',
+      accentColor: '#f5f5f5',
+      textColor: autoColor,
+    },
+  },
+  {
+    id: 'teal',
+    name: 'Teal',
+    settings: {
+      backgroundColor: '#eaf2f2',
+      accentColor: '#0f6f70',
+      textColor: autoColor,
+    },
+  },
+];
 
 function requiredData(settings: Record<string, unknown>) {
   const resolved = mergeSettings(defaultSettings, settings);
@@ -511,6 +566,7 @@ const gridTemplate: Template = {
   requiredData,
   settingsSchema,
   defaultSettings,
+  colorPresets,
   build,
 };
 

@@ -26,7 +26,12 @@ import {
 import type { ProjectDataPath } from '@/types/data/path';
 import type { ProjectData } from '@/types/data/project';
 import type { Scene, SceneNode } from '@/types/scene';
-import type { BuildInput, SettingField, Template } from '@/types/template';
+import type {
+  BuildInput,
+  ColorPreset,
+  SettingField,
+  Template,
+} from '@/types/template';
 
 const languageColors = ['#7ee787', '#58a6ff', '#d2a8ff', '#ffa657', '#f778ba'];
 
@@ -96,16 +101,66 @@ const settingsSchema: SettingField[] = [
   },
 ];
 
+/** Colours this template ships with, shared by its default preset. */
+const defaultColors = {
+  backgroundColor: palettes.terminal.background,
+  accentColor: palettes.terminal.accent,
+  textColor: autoColor,
+};
+
 const defaultSettings: Record<string, unknown> = {
   metrics: ['stars', 'forks', 'issues'],
   showLanguages: true,
   prompt: '$ gh repo view',
-  backgroundColor: palettes.terminal.background,
-  accentColor: palettes.terminal.accent,
-  textColor: autoColor,
+  ...defaultColors,
   fontFamily: 'JetBrains Mono Variable',
   windowRadius: 24,
 };
+
+/** Colour palettes offered for this template. */
+const colorPresets: ColorPreset[] = [
+  {
+    id: 'phosphor',
+    name: 'Phosphor',
+    settings: defaultColors,
+  },
+  {
+    id: 'amber',
+    name: 'Amber',
+    settings: {
+      backgroundColor: '#100c00',
+      accentColor: '#ffb000',
+      textColor: autoColor,
+    },
+  },
+  {
+    id: 'ice',
+    name: 'Ice',
+    settings: {
+      backgroundColor: '#0b0f14',
+      accentColor: '#7dd3fc',
+      textColor: autoColor,
+    },
+  },
+  {
+    id: 'magenta',
+    name: 'Magenta',
+    settings: {
+      backgroundColor: '#0f0a12',
+      accentColor: '#ff79c6',
+      textColor: autoColor,
+    },
+  },
+  {
+    id: 'shell',
+    name: 'Shell',
+    settings: {
+      backgroundColor: '#f4f2ec',
+      accentColor: '#1a7f4b',
+      textColor: autoColor,
+    },
+  },
+];
 
 function requiredData(settings: Record<string, unknown>) {
   const resolved = mergeSettings(defaultSettings, settings);
@@ -521,6 +576,7 @@ const terminalTemplate: Template = {
   requiredData,
   settingsSchema,
   defaultSettings,
+  colorPresets,
   build,
 };
 

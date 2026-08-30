@@ -25,7 +25,12 @@ import {
 } from '@/lib/templates/shared/tokens';
 import type { ProjectDataPath } from '@/types/data/path';
 import type { Scene, SceneNode } from '@/types/scene';
-import type { BuildInput, SettingField, Template } from '@/types/template';
+import type {
+  BuildInput,
+  ColorPreset,
+  SettingField,
+  Template,
+} from '@/types/template';
 
 /** Height reserved for the metric band pinned to the bottom edge. */
 const metricBandHeight = 124;
@@ -83,15 +88,65 @@ const settingsSchema: SettingField[] = [
   },
 ];
 
-const defaultSettings: Record<string, unknown> = {
-  metrics: ['stars', 'forks', 'issues'],
-  eyebrow: 'OPEN SOURCE PROJECT',
+/** Colours this template ships with, shared by its default preset. */
+const defaultColors = {
   backgroundColor: palettes.ink.background,
   accentColor: palettes.ink.accent,
   textColor: autoColor,
+};
+
+const defaultSettings: Record<string, unknown> = {
+  metrics: ['stars', 'forks', 'issues'],
+  eyebrow: 'OPEN SOURCE PROJECT',
+  ...defaultColors,
   fontFamily: 'Manrope Variable',
   cardRadius: 32,
 };
+
+/** Colour palettes offered for this template. */
+const colorPresets: ColorPreset[] = [
+  {
+    id: 'ink',
+    name: 'Ink',
+    settings: defaultColors,
+  },
+  {
+    id: 'graphite',
+    name: 'Graphite',
+    settings: {
+      backgroundColor: '#1c1c1c',
+      accentColor: '#d7d3c8',
+      textColor: autoColor,
+    },
+  },
+  {
+    id: 'oxide',
+    name: 'Oxide',
+    settings: {
+      backgroundColor: '#f4ede4',
+      accentColor: '#b4471f',
+      textColor: autoColor,
+    },
+  },
+  {
+    id: 'sage',
+    name: 'Sage',
+    settings: {
+      backgroundColor: '#e8ece3',
+      accentColor: '#3f6b4a',
+      textColor: autoColor,
+    },
+  },
+  {
+    id: 'cobalt',
+    name: 'Cobalt',
+    settings: {
+      backgroundColor: '#eef1f8',
+      accentColor: '#1f3ad6',
+      textColor: autoColor,
+    },
+  },
+];
 
 function requiredData(settings: Record<string, unknown>) {
   const resolved = mergeSettings(defaultSettings, settings);
@@ -348,6 +403,7 @@ const minimalTemplate: Template = {
   requiredData,
   settingsSchema,
   defaultSettings,
+  colorPresets,
   build,
 };
 

@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 
+import { ColorPresets, presetSwatches } from '@/components/editor/colorPresets';
 import {
   SettingControl,
   VisibleContentControl,
@@ -21,6 +22,7 @@ type SettingsPanelProps = {
   settings: Record<string, unknown>;
   placement: 'content' | 'design';
   onChange(key: string, value: unknown): void;
+  onApplyPreset(settings: Record<string, string>): void;
 };
 
 const designSections: SettingSection[] = [
@@ -49,13 +51,14 @@ const sectionIcons: Record<SettingSection, LucideIcon> = {
 /**
  * Renders schema-driven content or design controls for the active template.
  *
- * @param props - Active template, settings, panel placement, and change callback.
+ * @param props - Active template, settings, placement, and change callbacks.
  */
 function SettingsPanel({
   template,
   settings,
   placement,
   onChange,
+  onApplyPreset,
 }: SettingsPanelProps) {
   const sections =
     placement === 'content'
@@ -117,6 +120,13 @@ function SettingsPanel({
       ) : null}
 
       <div className="relative min-h-0 flex-1 space-y-5 overflow-y-auto overscroll-contain p-4">
+        {currentSection === 'theme' ? (
+          <ColorPresets
+            presets={template.colorPresets}
+            settings={settings}
+            onApply={onApplyPreset}
+          />
+        ) : null}
         {inclusionFields.length > 0 ? (
           <VisibleContentControl
             fields={inclusionFields}
@@ -132,6 +142,11 @@ function SettingsPanel({
               <SettingControl
                 field={control.field}
                 value={control.value}
+                swatches={
+                  field.type === 'color'
+                    ? presetSwatches(template.colorPresets, field.key)
+                    : undefined
+                }
                 onChange={(value) => onChange(field.key, value)}
               />
             </div>

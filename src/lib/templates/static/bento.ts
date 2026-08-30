@@ -33,7 +33,12 @@ import {
 import type { ProjectDataPath } from '@/types/data/path';
 import type { ProjectData } from '@/types/data/project';
 import type { RectNode, Scene, SceneNode } from '@/types/scene';
-import type { BuildInput, SettingField, Template } from '@/types/template';
+import type {
+  BuildInput,
+  ColorPreset,
+  SettingField,
+  Template,
+} from '@/types/template';
 
 const languageColors = ['#6c5ce7', '#00b894', '#0984e3', '#fdcb6e'];
 
@@ -115,18 +120,68 @@ const settingsSchema: SettingField[] = [
   },
 ];
 
+/** Colours this template ships with, shared by its default preset. */
+const defaultColors = {
+  backgroundColor: palettes.bento.background,
+  accentColor: palettes.bento.accent,
+  textColor: autoColor,
+};
+
 const defaultSettings: Record<string, unknown> = {
   metrics: ['stars', 'forks', 'issues'],
   showLanguages: true,
   showContributors: true,
   showRelease: true,
-  backgroundColor: palettes.bento.background,
-  accentColor: palettes.bento.accent,
-  textColor: autoColor,
+  ...defaultColors,
   fontFamily: 'Manrope Variable',
   cardRadius: 28,
   cardGap: 24,
 };
+
+/** Colour palettes offered for this template. */
+const colorPresets: ColorPreset[] = [
+  {
+    id: 'lilac',
+    name: 'Lilac',
+    settings: defaultColors,
+  },
+  {
+    id: 'mint',
+    name: 'Mint',
+    settings: {
+      backgroundColor: '#e6f4ee',
+      accentColor: '#0b7a5c',
+      textColor: autoColor,
+    },
+  },
+  {
+    id: 'butter',
+    name: 'Butter',
+    settings: {
+      backgroundColor: '#fdf3d8',
+      accentColor: '#a85f10',
+      textColor: autoColor,
+    },
+  },
+  {
+    id: 'charcoal',
+    name: 'Charcoal',
+    settings: {
+      backgroundColor: '#17171a',
+      accentColor: '#a78bfa',
+      textColor: autoColor,
+    },
+  },
+  {
+    id: 'rose',
+    name: 'Rose',
+    settings: {
+      backgroundColor: '#fdeaf0',
+      accentColor: '#d1477a',
+      textColor: autoColor,
+    },
+  },
+];
 
 function requiredData(settings: Record<string, unknown>) {
   const resolved = mergeSettings(defaultSettings, settings);
@@ -699,6 +754,7 @@ const bentoTemplate: Template = {
   requiredData,
   settingsSchema,
   defaultSettings,
+  colorPresets,
   build,
 };
 

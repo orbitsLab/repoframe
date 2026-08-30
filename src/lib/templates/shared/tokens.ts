@@ -218,6 +218,8 @@ export {
   autoColor,
   bandScale,
   displayFontOptions,
+  hexPattern,
+  luminance,
   monoFontOptions,
   mutedInk,
   palettes,

@@ -28,7 +28,12 @@ import {
 } from '@/lib/templates/shared/tokens';
 import type { ProjectDataPath } from '@/types/data/path';
 import type { Scene, SceneNode } from '@/types/scene';
-import type { BuildInput, SettingField, Template } from '@/types/template';
+import type {
+  BuildInput,
+  ColorPreset,
+  SettingField,
+  Template,
+} from '@/types/template';
 
 /** Fixed figure count, so node ids stay stable as facts are toggled. */
 const figureSlots = 8;
@@ -110,18 +115,68 @@ const settingsSchema: SettingField[] = [
   },
 ];
 
+/** Colours this template ships with, shared by its default preset. */
+const defaultColors = {
+  backgroundColor: palettes.paper.background,
+  accentColor: '#c8341c',
+  textColor: autoColor,
+};
+
 const defaultSettings: Record<string, unknown> = {
   metrics: ['stars', 'forks', 'watchers', 'issues'],
   showLanguage: true,
   showLicense: true,
   showRelease: true,
   eyebrow: 'BY THE NUMBERS',
-  backgroundColor: palettes.paper.background,
-  accentColor: '#c8341c',
-  textColor: autoColor,
+  ...defaultColors,
   fontFamily: 'Archivo Variable',
   monoFamily: 'JetBrains Mono Variable',
 };
+
+/** Colour palettes offered for this template. */
+const colorPresets: ColorPreset[] = [
+  {
+    id: 'cinnabar',
+    name: 'Cinnabar',
+    settings: defaultColors,
+  },
+  {
+    id: 'gazette',
+    name: 'Gazette',
+    settings: {
+      backgroundColor: '#eef0f6',
+      accentColor: '#23407a',
+      textColor: autoColor,
+    },
+  },
+  {
+    id: 'moss',
+    name: 'Moss',
+    settings: {
+      backgroundColor: '#f0f1e6',
+      accentColor: '#556b2f',
+      textColor: autoColor,
+    },
+  },
+  {
+    id: 'nightprint',
+    name: 'Night',
+    settings: {
+      backgroundColor: '#191714',
+      accentColor: '#e0c9a6',
+      textColor: autoColor,
+    },
+  },
+  {
+    id: 'wine',
+    name: 'Wine',
+    settings: {
+      backgroundColor: '#f6f0ee',
+      accentColor: '#7b2233',
+      textColor: autoColor,
+    },
+  },
+];
 
 function requiredData(settings: Record<string, unknown>) {
   const resolved = mergeSettings(defaultSettings, settings);
@@ -487,6 +542,7 @@ const almanacTemplate: Template = {
   requiredData,
   settingsSchema,
   defaultSettings,
+  colorPresets,
   build,
 };
 

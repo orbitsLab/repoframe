@@ -28,7 +28,12 @@ import {
 } from '@/lib/templates/shared/tokens';
 import type { ProjectDataPath } from '@/types/data/path';
 import type { Fill, Scene, SceneNode } from '@/types/scene';
-import type { BuildInput, SettingField, Template } from '@/types/template';
+import type {
+  BuildInput,
+  ColorPreset,
+  SettingField,
+  Template,
+} from '@/types/template';
 
 /**
  * Bar colours keyed by rank rather than language name.
@@ -110,17 +115,67 @@ const settingsSchema: SettingField[] = [
   },
 ];
 
+/** Colours this template ships with, shared by its default preset. */
+const defaultColors = {
+  backgroundColor: palettes.terminal.background,
+  accentColor: '#ff5a3c',
+  textColor: autoColor,
+};
+
 const defaultSettings: Record<string, unknown> = {
   metrics: ['stars', 'forks', 'issues'],
   showLanguageLabels: true,
   eyebrow: 'BUILT WITH',
-  backgroundColor: palettes.terminal.background,
-  accentColor: '#ff5a3c',
-  textColor: autoColor,
+  ...defaultColors,
   fontFamily: 'Sora Variable',
   monoFamily: 'JetBrains Mono Variable',
   settlePoint: 50,
 };
+
+/** Colour palettes offered for this template. */
+const colorPresets: ColorPreset[] = [
+  {
+    id: 'prism',
+    name: 'Prism',
+    settings: defaultColors,
+  },
+  {
+    id: 'aurora',
+    name: 'Aurora',
+    settings: {
+      backgroundColor: '#06121a',
+      accentColor: '#34d399',
+      textColor: autoColor,
+    },
+  },
+  {
+    id: 'vapour',
+    name: 'Vapour',
+    settings: {
+      backgroundColor: '#0d0a18',
+      accentColor: '#c084fc',
+      textColor: autoColor,
+    },
+  },
+  {
+    id: 'solar',
+    name: 'Solar',
+    settings: {
+      backgroundColor: '#140c04',
+      accentColor: '#fbbf24',
+      textColor: autoColor,
+    },
+  },
+  {
+    id: 'chalk',
+    name: 'Chalk',
+    settings: {
+      backgroundColor: '#f3f1ea',
+      accentColor: '#e0432a',
+      textColor: autoColor,
+    },
+  },
+];
 
 function requiredData(settings: Record<string, unknown>) {
   const resolved = mergeSettings(defaultSettings, settings);
@@ -480,6 +535,7 @@ const spectrumTemplate: Template = {
   requiredData,
   settingsSchema,
   defaultSettings,
+  colorPresets,
   build,
 };
 

@@ -24,7 +24,12 @@ import {
 } from '@/lib/templates/shared/tokens';
 import type { ProjectDataPath } from '@/types/data/path';
 import type { Scene, SceneNode } from '@/types/scene';
-import type { BuildInput, SettingField, Template } from '@/types/template';
+import type {
+  BuildInput,
+  ColorPreset,
+  SettingField,
+  Template,
+} from '@/types/template';
 
 const settingsSchema: SettingField[] = [
   {
@@ -79,15 +84,65 @@ const settingsSchema: SettingField[] = [
   },
 ];
 
-const defaultSettings: Record<string, unknown> = {
-  metrics: ['stars', 'forks', 'issues'],
-  eyebrow: 'OPEN SOURCE',
+/** Colours this template ships with, shared by its default preset. */
+const defaultColors = {
   backgroundColor: '#f0ece3',
   accentColor: '#e0432a',
   textColor: autoColor,
+};
+
+const defaultSettings: Record<string, unknown> = {
+  metrics: ['stars', 'forks', 'issues'],
+  eyebrow: 'OPEN SOURCE',
+  ...defaultColors,
   fontFamily: 'Archivo Variable',
   seamPosition: 55,
 };
+
+/** Colour palettes offered for this template. */
+const colorPresets: ColorPreset[] = [
+  {
+    id: 'vermilion',
+    name: 'Vermilion',
+    settings: defaultColors,
+  },
+  {
+    id: 'midnight',
+    name: 'Midnight',
+    settings: {
+      backgroundColor: '#e9eaee',
+      accentColor: '#16213e',
+      textColor: autoColor,
+    },
+  },
+  {
+    id: 'acid',
+    name: 'Acid',
+    settings: {
+      backgroundColor: '#101010',
+      accentColor: '#d8f34a',
+      textColor: autoColor,
+    },
+  },
+  {
+    id: 'peach',
+    name: 'Peach',
+    settings: {
+      backgroundColor: '#fff1e6',
+      accentColor: '#d94f16',
+      textColor: autoColor,
+    },
+  },
+  {
+    id: 'slate',
+    name: 'Slate',
+    settings: {
+      backgroundColor: '#dfe3e6',
+      accentColor: '#2f4858',
+      textColor: autoColor,
+    },
+  },
+];
 
 function requiredData(settings: Record<string, unknown>) {
   const resolved = mergeSettings(defaultSettings, settings);
@@ -336,6 +391,7 @@ const splitTemplate: Template = {
   requiredData,
   settingsSchema,
   defaultSettings,
+  colorPresets,
   build,
 };
 

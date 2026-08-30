@@ -27,7 +27,12 @@ import {
 } from '@/lib/templates/shared/tokens';
 import type { ProjectDataPath } from '@/types/data/path';
 import type { Scene, SceneNode } from '@/types/scene';
-import type { BuildInput, SettingField, Template } from '@/types/template';
+import type {
+  BuildInput,
+  ColorPreset,
+  SettingField,
+  Template,
+} from '@/types/template';
 
 /**
  * Bar colours keyed by rank rather than language name.
@@ -118,18 +123,68 @@ const settingsSchema: SettingField[] = [
   },
 ];
 
+/** Colours this template ships with, shared by its default preset. */
+const defaultColors = {
+  backgroundColor: palettes.terminal.background,
+  accentColor: '#f97316',
+  textColor: autoColor,
+};
+
 const defaultSettings: Record<string, unknown> = {
   metrics: ['stars', 'forks', 'issues'],
   showLanguages: true,
   showContributors: true,
-  backgroundColor: palettes.terminal.background,
-  accentColor: '#f97316',
-  textColor: autoColor,
+  ...defaultColors,
   fontFamily: 'DM Sans Variable',
   monoFamily: 'Roboto Mono Variable',
   barRadius: 6,
   avatarRadius: 48,
 };
+
+/** Colour palettes offered for this template. */
+const colorPresets: ColorPreset[] = [
+  {
+    id: 'ember',
+    name: 'Ember',
+    settings: defaultColors,
+  },
+  {
+    id: 'violet',
+    name: 'Violet',
+    settings: {
+      backgroundColor: '#0f0b1a',
+      accentColor: '#a78bfa',
+      textColor: autoColor,
+    },
+  },
+  {
+    id: 'spring',
+    name: 'Spring',
+    settings: {
+      backgroundColor: '#08130f',
+      accentColor: '#22c55e',
+      textColor: autoColor,
+    },
+  },
+  {
+    id: 'steel',
+    name: 'Steel',
+    settings: {
+      backgroundColor: '#eef0f2',
+      accentColor: '#334155',
+      textColor: autoColor,
+    },
+  },
+  {
+    id: 'rose',
+    name: 'Rose',
+    settings: {
+      backgroundColor: '#150b10',
+      accentColor: '#fb7185',
+      textColor: autoColor,
+    },
+  },
+];
 
 function requiredData(settings: Record<string, unknown>) {
   const resolved = mergeSettings(defaultSettings, settings);
@@ -623,6 +678,7 @@ const stackTemplate: Template = {
   requiredData,
   settingsSchema,
   defaultSettings,
+  colorPresets,
   build,
 };
 

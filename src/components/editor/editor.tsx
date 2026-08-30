@@ -178,6 +178,7 @@ function Editor({ repo, templateId }: EditorProps) {
         settings={state.settings}
         placement="content"
         onChange={state.setSetting}
+        onApplyPreset={state.applySettings}
       />
     </div>
   );
@@ -189,6 +190,7 @@ function Editor({ repo, templateId }: EditorProps) {
         settings={state.settings}
         placement="design"
         onChange={state.setSetting}
+        onApplyPreset={state.applySettings}
       />
     </div>
   );

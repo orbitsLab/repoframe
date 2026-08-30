@@ -28,7 +28,12 @@ import {
 } from '@/lib/templates/shared/tokens';
 import type { ProjectDataPath } from '@/types/data/path';
 import type { Scene, SceneNode } from '@/types/scene';
-import type { BuildInput, SettingField, Template } from '@/types/template';
+import type {
+  BuildInput,
+  ColorPreset,
+  SettingField,
+  Template,
+} from '@/types/template';
 
 /** Fixed row count, so node ids stay stable as entries are toggled. */
 const rowSlots = 9;
@@ -101,18 +106,68 @@ const settingsSchema: SettingField[] = [
   },
 ];
 
+/** Colours this template ships with, shared by its default preset. */
+const defaultColors = {
+  backgroundColor: palettes.ink.background,
+  accentColor: '#1f3ad6',
+  textColor: autoColor,
+};
+
 const defaultSettings: Record<string, unknown> = {
   metrics: ['stars', 'forks', 'watchers', 'issues'],
   showLanguage: true,
   showLicense: true,
   showRelease: true,
   eyebrow: 'CONTENTS',
-  backgroundColor: palettes.ink.background,
-  accentColor: '#1f3ad6',
-  textColor: autoColor,
+  ...defaultColors,
   fontFamily: 'DM Sans Variable',
   monoFamily: 'JetBrains Mono Variable',
 };
+
+/** Colour palettes offered for this template. */
+const colorPresets: ColorPreset[] = [
+  {
+    id: 'index',
+    name: 'Index',
+    settings: defaultColors,
+  },
+  {
+    id: 'ledger',
+    name: 'Ledger',
+    settings: {
+      backgroundColor: '#f7f5f0',
+      accentColor: '#1a1a1a',
+      textColor: autoColor,
+    },
+  },
+  {
+    id: 'rubric',
+    name: 'Rubric',
+    settings: {
+      backgroundColor: '#f6f1ea',
+      accentColor: '#b02a1e',
+      textColor: autoColor,
+    },
+  },
+  {
+    id: 'verdigris',
+    name: 'Verdigris',
+    settings: {
+      backgroundColor: '#eef2f0',
+      accentColor: '#2c6e63',
+      textColor: autoColor,
+    },
+  },
+  {
+    id: 'nocturne',
+    name: 'Nocturne',
+    settings: {
+      backgroundColor: '#131417',
+      accentColor: '#9db4ff',
+      textColor: autoColor,
+    },
+  },
+];
 
 function requiredData(settings: Record<string, unknown>) {
   const resolved = mergeSettings(defaultSettings, settings);
@@ -465,6 +520,7 @@ const contentsTemplate: Template = {
   requiredData,
   settingsSchema,
   defaultSettings,
+  colorPresets,
   build,
 };
 

@@ -25,7 +25,12 @@ import {
 } from '@/lib/templates/shared/tokens';
 import type { ProjectDataPath } from '@/types/data/path';
 import type { Scene, SceneNode } from '@/types/scene';
-import type { BuildInput, SettingField, Template } from '@/types/template';
+import type {
+  BuildInput,
+  ColorPreset,
+  SettingField,
+  Template,
+} from '@/types/template';
 
 const languageColors = ['#f97316', '#22c55e', '#3b82f6', '#a855f7', '#ec4899'];
 
@@ -91,16 +96,66 @@ const settingsSchema: SettingField[] = [
   },
 ];
 
+/** Colours this template ships with, shared by its default preset. */
+const defaultColors = {
+  backgroundColor: '#101014',
+  accentColor: '#f97316',
+  textColor: autoColor,
+};
+
 const defaultSettings: Record<string, unknown> = {
   metrics: ['stars', 'forks', 'issues'],
   showTopics: true,
   showLanguages: true,
-  backgroundColor: '#101014',
-  accentColor: '#f97316',
-  textColor: autoColor,
+  ...defaultColors,
   fontFamily: 'Sora Variable',
   avatarRadius: 96,
 };
+
+/** Colour palettes offered for this template. */
+const colorPresets: ColorPreset[] = [
+  {
+    id: 'tangerine',
+    name: 'Tangerine',
+    settings: defaultColors,
+  },
+  {
+    id: 'iris',
+    name: 'Iris',
+    settings: {
+      backgroundColor: '#0d0b16',
+      accentColor: '#8b7cf6',
+      textColor: autoColor,
+    },
+  },
+  {
+    id: 'lime',
+    name: 'Lime',
+    settings: {
+      backgroundColor: '#0b1210',
+      accentColor: '#4ade80',
+      textColor: autoColor,
+    },
+  },
+  {
+    id: 'bone',
+    name: 'Bone',
+    settings: {
+      backgroundColor: '#efece4',
+      accentColor: '#cc4b18',
+      textColor: autoColor,
+    },
+  },
+  {
+    id: 'ice',
+    name: 'Ice',
+    settings: {
+      backgroundColor: '#0a1016',
+      accentColor: '#7dd3fc',
+      textColor: autoColor,
+    },
+  },
+];
 
 function requiredData(settings: Record<string, unknown>) {
   const resolved = mergeSettings(defaultSettings, settings);
@@ -479,6 +534,7 @@ const showcaseTemplate: Template = {
   requiredData,
   settingsSchema,
   defaultSettings,
+  colorPresets,
   build,
 };
 

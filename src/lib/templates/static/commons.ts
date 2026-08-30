@@ -27,7 +27,12 @@ import {
 import type { ProjectDataPath } from '@/types/data/path';
 import type { ProjectData } from '@/types/data/project';
 import type { Scene, SceneNode } from '@/types/scene';
-import type { BuildInput, SettingField, Template } from '@/types/template';
+import type {
+  BuildInput,
+  ColorPreset,
+  SettingField,
+  Template,
+} from '@/types/template';
 
 /** Fixed row count in the leaderboard, so node ids hold still. */
 const rankSlots = 6;
@@ -97,17 +102,67 @@ const settingsSchema: SettingField[] = [
   },
 ];
 
+/** Colours this template ships with, shared by its default preset. */
+const defaultColors = {
+  backgroundColor: '#fdfaec',
+  accentColor: '#2f6f4f',
+  textColor: autoColor,
+};
+
 const defaultSettings: Record<string, unknown> = {
   metrics: ['stars', 'forks', 'watchers'],
   showContributors: true,
   showGrid: true,
   eyebrow: 'THE COMMONS',
-  backgroundColor: '#fdfaec',
-  accentColor: '#2f6f4f',
-  textColor: autoColor,
+  ...defaultColors,
   fontFamily: 'DM Sans Variable',
   avatarRadius: 40,
 };
+
+/** Colour palettes offered for this template. */
+const colorPresets: ColorPreset[] = [
+  {
+    id: 'commons',
+    name: 'Commons',
+    settings: defaultColors,
+  },
+  {
+    id: 'bluestocking',
+    name: 'Bluebook',
+    settings: {
+      backgroundColor: '#f7f7f2',
+      accentColor: '#2b4a8f',
+      textColor: autoColor,
+    },
+  },
+  {
+    id: 'terracotta',
+    name: 'Clay',
+    settings: {
+      backgroundColor: '#fbf3ea',
+      accentColor: '#b4531f',
+      textColor: autoColor,
+    },
+  },
+  {
+    id: 'slate',
+    name: 'Slate Sheet',
+    settings: {
+      backgroundColor: '#eef1f2',
+      accentColor: '#3a4a54',
+      textColor: autoColor,
+    },
+  },
+  {
+    id: 'nightledger',
+    name: 'Nightfall',
+    settings: {
+      backgroundColor: '#16150f',
+      accentColor: '#b7d97a',
+      textColor: autoColor,
+    },
+  },
+];
 
 function requiredData(settings: Record<string, unknown>) {
   const resolved = mergeSettings(defaultSettings, settings);
@@ -511,6 +566,7 @@ const commonsTemplate: Template = {
   requiredData,
   settingsSchema,
   defaultSettings,
+  colorPresets,
   build,
 };
 

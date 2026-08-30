@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { templates } from '@/lib/templates/registry';
+import { autoColor, hexPattern } from '@/lib/templates/shared/tokens';
 import type { ProjectDataPath } from '@/types/data/path';
 
 const validPaths = new Set<ProjectDataPath>([
@@ -53,6 +54,49 @@ describe('template registry', () => {
     );
 
     expect(template.requiredData(settings)).toEqual(['repository']);
+  });
+
+  it.each(templates)('$id ships a palette per colour field', (template) => {
+    const colorKeys = template.settingsSchema
+      .filter((field) => field.type === 'color')
+      .map((field) => field.key);
+    const ids = template.colorPresets.map((preset) => preset.id);
+
+    expect(template.colorPresets).toHaveLength(5);
+    expect(new Set(ids).size).toBe(ids.length);
+    // Derived ink swatches resolve against these two.
+    expect(colorKeys).toContain('backgroundColor');
+    expect(colorKeys).toContain('accentColor');
+
+    // Identical palettes would leave two chips selected at once.
+    const shapes = template.colorPresets.map((preset) =>
+      JSON.stringify(Object.entries(preset.settings).sort()),
+    );
+    expect(new Set(shapes).size).toBe(shapes.length);
+
+    for (const preset of template.colorPresets) {
+      expect(Object.keys(preset.settings).sort()).toEqual(
+        [...colorKeys].sort(),
+      );
+
+      for (const [key, color] of Object.entries(preset.settings)) {
+        const field = template.settingsSchema.find(
+          (entry) => entry.key === key,
+        );
+        const allowsAuto = field?.type === 'color' && field.allowAuto === true;
+        expect(color === autoColor ? allowsAuto : hexPattern.test(color)).toBe(
+          true,
+        );
+      }
+    }
+  });
+
+  it.each(templates)('$id offers its own colours first', (template) => {
+    const [first] = template.colorPresets;
+
+    for (const [key, color] of Object.entries(first.settings)) {
+      expect(template.defaultSettings[key]).toBe(color);
+    }
   });
 });
 

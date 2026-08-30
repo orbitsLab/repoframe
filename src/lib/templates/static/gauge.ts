@@ -32,7 +32,12 @@ import {
 } from '@/lib/templates/shared/tokens';
 import type { ProjectDataPath } from '@/types/data/path';
 import type { Scene, SceneNode } from '@/types/scene';
-import type { BuildInput, SettingField, Template } from '@/types/template';
+import type {
+  BuildInput,
+  ColorPreset,
+  SettingField,
+  Template,
+} from '@/types/template';
 
 /** Fixed row count in the ruled reading column. */
 const readingSlots = 4;
@@ -98,16 +103,66 @@ const settingsSchema: SettingField[] = [
   },
 ];
 
+/** Colours this template ships with, shared by its default preset. */
+const defaultColors = {
+  backgroundColor: '#b3bd85',
+  accentColor: '#d9822b',
+  textColor: '#2b3018',
+};
+
 const defaultSettings: Record<string, unknown> = {
   heroMetric: 'stars',
   metrics: ['stars', 'forks', 'watchers', 'issues'],
   wordmark: 'REPOFRAME',
-  backgroundColor: '#b3bd85',
-  accentColor: '#d9822b',
-  textColor: '#2b3018',
+  ...defaultColors,
   fontFamily: 'Azeret Mono Variable',
   cardRadius: 20,
 };
+
+/** Colour palettes offered for this template. */
+const colorPresets: ColorPreset[] = [
+  {
+    id: 'olive',
+    name: 'Olive',
+    settings: defaultColors,
+  },
+  {
+    id: 'instrument',
+    name: 'Dial',
+    settings: {
+      backgroundColor: '#1b1f18',
+      accentColor: '#cddc39',
+      textColor: '#e6ecd8',
+    },
+  },
+  {
+    id: 'ivory',
+    name: 'Ivory',
+    settings: {
+      backgroundColor: '#e8e3d2',
+      accentColor: '#b02a1e',
+      textColor: '#23201a',
+    },
+  },
+  {
+    id: 'aqua',
+    name: 'Aqua',
+    settings: {
+      backgroundColor: '#9fc4c0',
+      accentColor: '#1f4a55',
+      textColor: '#17262a',
+    },
+  },
+  {
+    id: 'slate',
+    name: 'Slate',
+    settings: {
+      backgroundColor: '#4a5159',
+      accentColor: '#ffb000',
+      textColor: '#f2f4f6',
+    },
+  },
+];
 
 function requiredData(settings: Record<string, unknown>) {
   const resolved = mergeSettings(defaultSettings, settings);
@@ -504,6 +559,7 @@ const gaugeTemplate: Template = {
   requiredData,
   settingsSchema,
   defaultSettings,
+  colorPresets,
   build,
 };
 

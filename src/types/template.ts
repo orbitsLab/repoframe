@@ -48,6 +48,14 @@ type SettingField =
       options: SettingOption[];
     });
 
+/** Named colour palette a template offers as a one-click theme. */
+type ColorPreset = {
+  id: string;
+  name: string;
+  /** Colour setting keys from the template schema mapped to their values. */
+  settings: Record<string, string>;
+};
+
 /** Typography and layout constraints used for text measurement. */
 type MeasureTextStyle = {
   fontFamily: string;
@@ -88,6 +96,8 @@ type Template = {
   requiredData(settings: Record<string, unknown>): ProjectDataPath[];
   settingsSchema: SettingField[];
   defaultSettings: Record<string, unknown>;
+  /** Colour palettes offered as one-click themes for this template. */
+  colorPresets: ColorPreset[];
   /** Builds a renderer-independent scene from project data and settings. */
   build(input: BuildInput): Scene;
 };
@@ -95,6 +105,7 @@ type Template = {
 export type {
   AspectRatio,
   BuildInput,
+  ColorPreset,
   MeasuredText,
   MeasureText,
   MeasureTextStyle,

@@ -27,7 +27,12 @@ import {
 } from '@/lib/templates/shared/tokens';
 import type { ProjectDataPath } from '@/types/data/path';
 import type { Scene, SceneNode } from '@/types/scene';
-import type { BuildInput, SettingField, Template } from '@/types/template';
+import type {
+  BuildInput,
+  ColorPreset,
+  SettingField,
+  Template,
+} from '@/types/template';
 
 const settingsSchema: SettingField[] = [
   {
@@ -95,17 +100,67 @@ const settingsSchema: SettingField[] = [
   },
 ];
 
+/** Colours this template ships with, shared by its default preset. */
+const defaultColors = {
+  backgroundColor: palettes.paper.background,
+  accentColor: palettes.paper.accent,
+  textColor: autoColor,
+};
+
 const defaultSettings: Record<string, unknown> = {
   heroMetric: 'stars',
   metrics: ['forks', 'watchers', 'issues'],
   showAvatar: true,
   eyebrow: 'GITHUB REPOSITORY',
-  backgroundColor: palettes.paper.background,
-  accentColor: palettes.paper.accent,
-  textColor: autoColor,
+  ...defaultColors,
   fontFamily: 'Outfit Variable',
   avatarRadius: 40,
 };
+
+/** Colour palettes offered for this template. */
+const colorPresets: ColorPreset[] = [
+  {
+    id: 'ember',
+    name: 'Ember',
+    settings: defaultColors,
+  },
+  {
+    id: 'ultramarine',
+    name: 'Marine',
+    settings: {
+      backgroundColor: '#eef0fa',
+      accentColor: '#2438c8',
+      textColor: autoColor,
+    },
+  },
+  {
+    id: 'forest',
+    name: 'Forest',
+    settings: {
+      backgroundColor: '#edf1ec',
+      accentColor: '#2f6f4f',
+      textColor: autoColor,
+    },
+  },
+  {
+    id: 'night',
+    name: 'Night',
+    settings: {
+      backgroundColor: '#121212',
+      accentColor: '#ff5a3c',
+      textColor: autoColor,
+    },
+  },
+  {
+    id: 'plum',
+    name: 'Plum',
+    settings: {
+      backgroundColor: '#f6edf4',
+      accentColor: '#7b2d5e',
+      textColor: autoColor,
+    },
+  },
+];
 
 function requiredData(settings: Record<string, unknown>) {
   const resolved = mergeSettings(defaultSettings, settings);
@@ -374,6 +429,7 @@ const signalTemplate: Template = {
   requiredData,
   settingsSchema,
   defaultSettings,
+  colorPresets,
   build,
 };
 

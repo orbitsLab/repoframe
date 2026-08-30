@@ -23,7 +23,12 @@ import {
 } from '@/lib/templates/shared/tokens';
 import type { ProjectDataPath } from '@/types/data/path';
 import type { Scene, SceneNode } from '@/types/scene';
-import type { BuildInput, SettingField, Template } from '@/types/template';
+import type {
+  BuildInput,
+  ColorPreset,
+  SettingField,
+  Template,
+} from '@/types/template';
 
 const settingsSchema: SettingField[] = [
   {
@@ -71,14 +76,64 @@ const settingsSchema: SettingField[] = [
   },
 ];
 
-const defaultSettings: Record<string, unknown> = {
-  metrics: ['stars', 'forks', 'issues'],
+/** Colours this template ships with, shared by its default preset. */
+const defaultColors = {
   backgroundColor: '#0d1117',
   accentColor: '#58a6ff',
   textColor: autoColor,
+};
+
+const defaultSettings: Record<string, unknown> = {
+  metrics: ['stars', 'forks', 'issues'],
+  ...defaultColors,
   fontFamily: 'Space Grotesk Variable',
   cardRadius: 24,
 };
+
+/** Colour palettes offered for this template. */
+const colorPresets: ColorPreset[] = [
+  {
+    id: 'dark',
+    name: 'Dark',
+    settings: defaultColors,
+  },
+  {
+    id: 'light',
+    name: 'Light',
+    settings: {
+      backgroundColor: '#ffffff',
+      accentColor: '#0969da',
+      textColor: autoColor,
+    },
+  },
+  {
+    id: 'dracula',
+    name: 'Dracula',
+    settings: {
+      backgroundColor: '#282a36',
+      accentColor: '#bd93f9',
+      textColor: autoColor,
+    },
+  },
+  {
+    id: 'nord',
+    name: 'Nord',
+    settings: {
+      backgroundColor: '#2e3440',
+      accentColor: '#88c0d0',
+      textColor: autoColor,
+    },
+  },
+  {
+    id: 'solarized',
+    name: 'Solarized',
+    settings: {
+      backgroundColor: '#fdf6e3',
+      accentColor: '#96710b',
+      textColor: autoColor,
+    },
+  },
+];
 
 function requiredData(settings: Record<string, unknown>) {
   const resolved = mergeSettings(defaultSettings, settings);
@@ -355,6 +410,7 @@ const badgeTemplate: Template = {
   requiredData,
   settingsSchema,
   defaultSettings,
+  colorPresets,
   build,
 };
 

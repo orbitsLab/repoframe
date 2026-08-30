@@ -32,7 +32,12 @@ import {
 } from '@/lib/templates/shared/tokens';
 import type { ProjectDataPath } from '@/types/data/path';
 import type { Scene, SceneNode } from '@/types/scene';
-import type { BuildInput, SettingField, Template } from '@/types/template';
+import type {
+  BuildInput,
+  ColorPreset,
+  SettingField,
+  Template,
+} from '@/types/template';
 
 /** Fixed row count in the ruled metric column. */
 const readingSlots = 4;
@@ -97,16 +102,66 @@ const settingsSchema: SettingField[] = [
   },
 ];
 
+/** Colours this template ships with, shared by its default preset. */
+const defaultColors = {
+  backgroundColor: '#efeade',
+  accentColor: '#b4471f',
+  textColor: '#141210',
+};
+
 const defaultSettings: Record<string, unknown> = {
   heroMetric: 'stars',
   metrics: ['stars', 'forks', 'watchers', 'issues'],
   showLanguages: true,
   wordmark: 'REPOFRAME',
-  backgroundColor: '#efeade',
-  accentColor: '#b4471f',
-  textColor: '#141210',
+  ...defaultColors,
   fontFamily: 'JetBrains Mono Variable',
 };
+
+/** Colour palettes offered for this template. */
+const colorPresets: ColorPreset[] = [
+  {
+    id: 'ledger',
+    name: 'Ledger',
+    settings: defaultColors,
+  },
+  {
+    id: 'graph',
+    name: 'Graph',
+    settings: {
+      backgroundColor: '#eaf0ee',
+      accentColor: '#17635a',
+      textColor: '#10201d',
+    },
+  },
+  {
+    id: 'carbon',
+    name: 'Carbon',
+    settings: {
+      backgroundColor: '#141414',
+      accentColor: '#f5a524',
+      textColor: '#efe9df',
+    },
+  },
+  {
+    id: 'manila',
+    name: 'Manila',
+    settings: {
+      backgroundColor: '#f3e7c9',
+      accentColor: '#7a4b12',
+      textColor: '#241a08',
+    },
+  },
+  {
+    id: 'ozone',
+    name: 'Ozone',
+    settings: {
+      backgroundColor: '#e9eef7',
+      accentColor: '#1f3ad6',
+      textColor: '#10142a',
+    },
+  },
+];
 
 function requiredData(settings: Record<string, unknown>) {
   const resolved = mergeSettings(defaultSettings, settings);
@@ -600,6 +655,7 @@ const readoutTemplate: Template = {
   requiredData,
   settingsSchema,
   defaultSettings,
+  colorPresets,
   build,
 };
 

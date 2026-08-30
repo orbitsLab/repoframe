@@ -26,7 +26,12 @@ import {
 } from '@/lib/templates/shared/tokens';
 import type { ProjectDataPath } from '@/types/data/path';
 import type { Scene, SceneNode } from '@/types/scene';
-import type { BuildInput, SettingField, Template } from '@/types/template';
+import type {
+  BuildInput,
+  ColorPreset,
+  SettingField,
+  Template,
+} from '@/types/template';
 
 /** Fixed specification rows so node ids stay stable as data changes. */
 const specSlots = 5;
@@ -100,17 +105,67 @@ const settingsSchema: SettingField[] = [
   },
 ];
 
+/** Colours this template ships with, shared by its default preset. */
+const defaultColors = {
+  backgroundColor: palettes.blueprint.background,
+  accentColor: palettes.blueprint.accent,
+  textColor: autoColor,
+};
+
 const defaultSettings: Record<string, unknown> = {
   metrics: ['stars', 'forks', 'issues'],
   showSpec: true,
   eyebrow: 'REPOSITORY SPECIFICATION',
-  backgroundColor: palettes.blueprint.background,
-  accentColor: palettes.blueprint.accent,
-  textColor: autoColor,
+  ...defaultColors,
   showGuides: true,
   fontFamily: 'Archivo Variable',
   monoFamily: 'JetBrains Mono Variable',
 };
+
+/** Colour palettes offered for this template. */
+const colorPresets: ColorPreset[] = [
+  {
+    id: 'blueprint',
+    name: 'Blueprint',
+    settings: defaultColors,
+  },
+  {
+    id: 'drafting',
+    name: 'Drafting',
+    settings: {
+      backgroundColor: '#f0efe8',
+      accentColor: '#1f4fa8',
+      textColor: autoColor,
+    },
+  },
+  {
+    id: 'redline',
+    name: 'Redline',
+    settings: {
+      backgroundColor: '#0d1b2a',
+      accentColor: '#ff5a3c',
+      textColor: autoColor,
+    },
+  },
+  {
+    id: 'ozone',
+    name: 'Ozone',
+    settings: {
+      backgroundColor: '#071a1c',
+      accentColor: '#5eead4',
+      textColor: autoColor,
+    },
+  },
+  {
+    id: 'sepia',
+    name: 'Sepia',
+    settings: {
+      backgroundColor: '#f2e9d8',
+      accentColor: '#6b4a1f',
+      textColor: autoColor,
+    },
+  },
+];
 
 function requiredData(settings: Record<string, unknown>) {
   const resolved = mergeSettings(defaultSettings, settings);
@@ -633,6 +688,7 @@ const blueprintTemplate: Template = {
   requiredData,
   settingsSchema,
   defaultSettings,
+  colorPresets,
   build,
 };
 

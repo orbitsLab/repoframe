@@ -56,6 +56,8 @@ type EditorState = {
   setRatio(ratio: AspectRatio): void;
   /** Updates a template setting and fetches newly required project data. */
   setSetting(key: string, value: unknown): void;
+  /** Applies several template settings at once, such as a colour preset. */
+  applySettings(patch: Record<string, unknown>): void;
   /** Clears the current loading error. */
   clearError(): void;
 };
@@ -169,10 +171,14 @@ const useEditorStore = create<EditorState>((set, get) => ({
   },
 
   setSetting(key, value) {
+    get().applySettings({ [key]: value });
+  },
+
+  applySettings(patch) {
     const state = get();
     const template = getActiveTemplate(state.templateId);
     const previousRequired = template.requiredData(state.settings);
-    const settings = { ...state.settings, [key]: value };
+    const settings = { ...state.settings, ...patch };
     const addedPaths = template
       .requiredData(settings)
       .filter((path) => !previousRequired.includes(path));

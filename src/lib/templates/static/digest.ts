@@ -26,7 +26,12 @@ import {
 } from '@/lib/templates/shared/tokens';
 import type { ProjectDataPath } from '@/types/data/path';
 import type { Scene, SceneNode } from '@/types/scene';
-import type { BuildInput, SettingField, Template } from '@/types/template';
+import type {
+  BuildInput,
+  ColorPreset,
+  SettingField,
+  Template,
+} from '@/types/template';
 
 /** Fixed chip count, so node ids hold still as the language list changes. */
 const chipSlots = 4;
@@ -92,16 +97,66 @@ const settingsSchema: SettingField[] = [
   },
 ];
 
+/** Colours this template ships with, shared by its default preset. */
+const defaultColors = {
+  backgroundColor: '#e8eaf8',
+  accentColor: '#4c5bd4',
+  textColor: autoColor,
+};
+
 const defaultSettings: Record<string, unknown> = {
   metrics: ['issues', 'pullRequests', 'stars', 'forks', 'watchers'],
   showLanguages: true,
   showContributors: true,
-  backgroundColor: '#e8eaf8',
-  accentColor: '#4c5bd4',
-  textColor: autoColor,
+  ...defaultColors,
   fontFamily: 'Manrope Variable',
   cardRadius: 32,
 };
+
+/** Colour palettes offered for this template. */
+const colorPresets: ColorPreset[] = [
+  {
+    id: 'periwinkle',
+    name: 'Indigo',
+    settings: defaultColors,
+  },
+  {
+    id: 'seafoam',
+    name: 'Seafoam',
+    settings: {
+      backgroundColor: '#e4f2ee',
+      accentColor: '#12796a',
+      textColor: autoColor,
+    },
+  },
+  {
+    id: 'blush',
+    name: 'Blush',
+    settings: {
+      backgroundColor: '#fbeaf0',
+      accentColor: '#c2426b',
+      textColor: autoColor,
+    },
+  },
+  {
+    id: 'graphite',
+    name: 'Graphite',
+    settings: {
+      backgroundColor: '#16171c',
+      accentColor: '#8ea2ff',
+      textColor: autoColor,
+    },
+  },
+  {
+    id: 'sand',
+    name: 'Sand',
+    settings: {
+      backgroundColor: '#f4eee2',
+      accentColor: '#a2601f',
+      textColor: autoColor,
+    },
+  },
+];
 
 function requiredData(settings: Record<string, unknown>) {
   const resolved = mergeSettings(defaultSettings, settings);
@@ -528,6 +583,7 @@ const digestTemplate: Template = {
   requiredData,
   settingsSchema,
   defaultSettings,
+  colorPresets,
   build,
 };
 

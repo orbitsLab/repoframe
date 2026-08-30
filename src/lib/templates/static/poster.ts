@@ -26,7 +26,12 @@ import {
 } from '@/lib/templates/shared/tokens';
 import type { ProjectDataPath } from '@/types/data/path';
 import type { Scene, SceneNode } from '@/types/scene';
-import type { BuildInput, SettingField, Template } from '@/types/template';
+import type {
+  BuildInput,
+  ColorPreset,
+  SettingField,
+  Template,
+} from '@/types/template';
 
 const settingsSchema: SettingField[] = [
   {
@@ -87,16 +92,66 @@ const settingsSchema: SettingField[] = [
   },
 ];
 
+/** Colours this template ships with, shared by its default preset. */
+const defaultColors = {
+  backgroundColor: palettes.poster.background,
+  accentColor: palettes.poster.foreground,
+  textColor: autoColor,
+};
+
 const defaultSettings: Record<string, unknown> = {
   metrics: ['stars', 'forks', 'issues'],
   showTopics: true,
   eyebrow: 'OPEN SOURCE',
-  backgroundColor: palettes.poster.background,
-  accentColor: palettes.poster.foreground,
-  textColor: autoColor,
+  ...defaultColors,
   fontFamily: 'Archivo Variable',
   borderWidth: 8,
 };
+
+/** Colour palettes offered for this template. */
+const colorPresets: ColorPreset[] = [
+  {
+    id: 'blaze',
+    name: 'Blaze',
+    settings: defaultColors,
+  },
+  {
+    id: 'citron',
+    name: 'Citron',
+    settings: {
+      backgroundColor: '#e9e10f',
+      accentColor: '#101010',
+      textColor: autoColor,
+    },
+  },
+  {
+    id: 'cyanotype',
+    name: 'Cyanotype',
+    settings: {
+      backgroundColor: '#1f4fd8',
+      accentColor: '#f2efe6',
+      textColor: autoColor,
+    },
+  },
+  {
+    id: 'bone',
+    name: 'Bone',
+    settings: {
+      backgroundColor: '#ece7dc',
+      accentColor: '#101010',
+      textColor: autoColor,
+    },
+  },
+  {
+    id: 'inkfield',
+    name: 'Ink Field',
+    settings: {
+      backgroundColor: '#101010',
+      accentColor: '#ff4a1c',
+      textColor: autoColor,
+    },
+  },
+];
 
 function requiredData(settings: Record<string, unknown>) {
   const resolved = mergeSettings(defaultSettings, settings);
@@ -359,6 +414,7 @@ const posterTemplate: Template = {
   requiredData,
   settingsSchema,
   defaultSettings,
+  colorPresets,
   build,
 };
 

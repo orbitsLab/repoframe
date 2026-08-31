@@ -1,6 +1,7 @@
 import Link from 'next/link';
 
 import { Logo } from '@/components/logo';
+import { FooterWordmark } from '@/components/site/footerWordmark';
 import { githubUrl } from '@/lib/site';
 import { cn } from '@/lib/utils';
 
@@ -111,12 +112,7 @@ function SiteFooter() {
             className="site-crop -top-2 -right-2 border-t border-r"
           />
           <div className="overflow-hidden">
-            <p
-              className="site-display -mb-[4cqw] select-none whitespace-nowrap bg-linear-to-b from-foreground to-muted-foreground/40 bg-clip-text text-[18.7cqw] text-background/20 dark:text-black outline-1"
-              aria-hidden="true"
-            >
-              Repo Frame
-            </p>
+            <FooterWordmark />
           </div>
         </div>
       </div>

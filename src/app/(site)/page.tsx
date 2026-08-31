@@ -1,19 +1,28 @@
 import { Hero } from '@/components/site/hero';
-import { RepoForm } from '@/components/site/repoForm';
+import { GithubMark, XMark } from '@/components/site/platformMarks';
+import { RegistrationField } from '@/components/site/registrationField';
 import { Reveal } from '@/components/site/reveal';
 import { SectionMarker } from '@/components/site/sectionMarker';
+import { WaveArrow } from '@/components/site/waveArrow';
 import { Workbench } from '@/components/site/workbench';
+import { supportContent } from '@/content/support';
 
-/** What Repo Frame reads from GitHub, and where each field comes from. */
+/** What a card can read, and whether it is fetched up front or only when shown. */
 const readings = [
-  ['Name, description, topics', 'repos/{owner}/{repo}'],
-  ['Stars, forks, watchers', 'Repository counts'],
-  ['Open issues, pull requests', 'pulls (link header)'],
-  ['Language split', 'repos/{owner}/{repo}/languages'],
-  ['Contributors', 'repos/{owner}/{repo}/contributors'],
-  ['Latest release', 'releases/latest'],
-  ['Licence', 'Repository licence'],
+  ['Name, description, topics', 'Always'],
+  ['Stars, forks, watchers', 'Always'],
+  ['Open issues, pull requests', 'On request'],
+  ['Language split', 'On request'],
+  ['Contributors', 'On request'],
+  ['Latest release', 'On request'],
+  ['Licence', 'Always'],
 ] as const;
+
+/** The logo each support card is watermarked with, keyed by platform. */
+const marks = {
+  github: GithubMark,
+  x: XMark,
+} as const;
 
 /** The three claims behind running entirely on the client. */
 const guarantees = [
@@ -40,9 +49,8 @@ function Anatomy() {
             A card is only as good as the data behind it.
           </h2>
           <p className="mt-6 max-w-md text-muted-foreground text-sm leading-6">
-            Paste a URL and Repo Frame calls the public GitHub API from your
-            browser, normalises the response, and hands the result to the
-            template. Nothing is invented, and nothing is stored on a server.
+            Paste a URL and every field on the card is read straight from the
+            repository itself. Nothing leaves your device.
           </p>
         </div>
 
@@ -53,12 +61,7 @@ function Anatomy() {
               className="flex flex-col gap-1 border-b py-4 sm:flex-row sm:flex-wrap sm:items-baseline sm:justify-between sm:gap-x-6"
             >
               <dt className="min-w-0 font-medium text-sm">{field}</dt>
-              <dd
-                className="site-data min-w-0 break-words normal-case"
-                translate="no"
-              >
-                {source}
-              </dd>
+              <dd className="site-data min-w-0 break-words">{source}</dd>
             </div>
           ))}
         </dl>
@@ -98,57 +101,99 @@ function LocalFirst() {
           ))}
         </dl>
       </Reveal>
-      <SectionMarker index={4} label="Local first" next="Get started" />
+      <SectionMarker
+        index={4}
+        label="Local first"
+        next={supportContent.eyebrow}
+      />
     </section>
   );
 }
 
-/** Renders the closing repository field. */
-function Closing() {
+/** Renders the closing call for support. */
+function Support() {
   return (
     <section
       data-snap
       className="relative flex min-h-[calc(100svh-var(--header-height))] items-center pb-20"
-      aria-labelledby="cta-heading"
+      aria-labelledby="support-heading"
     >
       {/* Last block before the footer, so it stays put rather than fading out. */}
       <Reveal
         exit={false}
         className="mx-auto w-full max-w-6xl px-6 py-24 lg:py-32"
       >
-        <p className="site-eyebrow text-muted-foreground">Get started</p>
-        <h2
-          id="cta-heading"
-          className="site-display mt-5 max-w-2xl text-4xl sm:text-5xl"
-        >
-          Give the link something to show.
-        </h2>
-        <RepoForm id="closing-repository" className="mt-8 max-w-xl" />
-        <p className="mt-4 text-muted-foreground text-xs">
-          Or open the editor with{' '}
-          <a
-            className="underline underline-offset-4 hover:no-underline"
-            href="/app?repo=alfaarghya/alfa-leetcode-api"
-            translate="no"
-          >
-            alfa-leetcode-api
-          </a>{' '}
-          to look around first.
+        <p className="site-eyebrow text-muted-foreground">
+          {supportContent.eyebrow}
         </p>
+        <h2
+          id="support-heading"
+          className="site-display mt-5 max-w-5xl text-balance text-4xl sm:text-5xl"
+        >
+          {supportContent.heading}
+        </h2>
+
+        <ol className="mt-12 grid gap-px border bg-border sm:grid-cols-2">
+          {supportContent.cards.map(
+            ({ platform, action, detail, cta, href }, index) => {
+              const Mark = marks[platform];
+
+              return (
+                <li key={action} className="bg-background">
+                  <a
+                    href={href}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="group relative flex h-full min-h-56 touch-manipulation flex-col overflow-hidden p-7 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset"
+                  >
+                    {/* Both platform marks are achromatic, so the watermark is the
+                    page's own foreground held far back until the card is read. */}
+                    <Mark className="-right-8 -bottom-10 pointer-events-none absolute size-48 text-foreground opacity-[0.05] transition-[transform,opacity] duration-500 ease-out group-hover:-translate-x-1 group-hover:-translate-y-1 group-hover:scale-105 group-hover:opacity-[0.16] group-focus-visible:opacity-[0.16]" />
+
+                    <span
+                      aria-hidden="true"
+                      className="site-data relative text-muted-foreground"
+                    >
+                      {`0${index + 1}`}
+                    </span>
+
+                    <span className="relative mt-8 block">
+                      <span className="block font-medium text-xl">
+                        {action}
+                      </span>
+                      <span className="mt-2 block max-w-xs text-muted-foreground text-sm leading-6">
+                        {detail}
+                      </span>
+                      <span className="site-data mt-6 flex items-center gap-2 text-muted-foreground transition-colors group-hover:text-foreground group-focus-visible:text-foreground">
+                        {cta}
+                        <WaveArrow className="h-3 w-9 transition-transform duration-300 ease-out group-hover:translate-x-1 group-focus-visible:translate-x-1" />
+                      </span>
+                    </span>
+                  </a>
+                </li>
+              );
+            },
+          )}
+        </ol>
       </Reveal>
-      <SectionMarker index={5} label="Get started" />
+      <SectionMarker index={5} label={supportContent.eyebrow} />
     </section>
   );
 }
 
+/** Renders the landing page in its numbered section order. */
 export default function HomePage() {
   return (
-    <main id="main">
+    <main id="main" className="relative">
+      {/* One field for every section, so the window is never cut at a section
+          edge. The header and footer sit outside it. */}
+      <RegistrationField />
+
       <Hero />
       <Anatomy />
       <Workbench />
       <LocalFirst />
-      <Closing />
+      <Support />
     </main>
   );
 }

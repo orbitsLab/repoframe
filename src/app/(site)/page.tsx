@@ -1,4 +1,6 @@
+import type { Metadata } from 'next';
 import FAQ from '@/components/site/faq';
+
 import { Hero } from '@/components/site/hero';
 import { GithubMark, XMark } from '@/components/site/platformMarks';
 import { RegistrationField } from '@/components/site/registrationField';
@@ -174,6 +176,10 @@ function Support() {
     </section>
   );
 }
+
+export const metadata: Metadata = {
+  alternates: { canonical: '/' },
+};
 
 /** Renders the landing page in its numbered section order. */
 export default function HomePage() {

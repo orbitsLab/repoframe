@@ -4,7 +4,11 @@ import { EditorLoader } from '@/components/editor/editorLoader';
 
 export const metadata: Metadata = {
   title: 'Editor',
-  description: 'Customize and export a social card for a GitHub repository.',
+  description:
+    'Paste a GitHub repository URL, pick a template, and export its social card as a PNG. No account, nothing uploaded.',
+  // Every ?repo= and ?template= combination renders the same tool, so they all
+  // collapse onto one address rather than crawling as separate pages.
+  alternates: { canonical: '/app' },
 };
 
 export default async function AppPage({ searchParams }: PageProps<'/app'>) {

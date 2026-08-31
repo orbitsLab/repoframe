@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
 import { CardFrame } from '@/components/site/cardFrame';
+import { JsonLd, templateBreadcrumb } from '@/components/site/jsonLd';
 import { Reveal } from '@/components/site/reveal';
 import { fullMetrics, SampleCard } from '@/components/site/sampleCard';
 import { Button } from '@/components/ui/button';
@@ -24,6 +25,13 @@ export async function generateMetadata({
     ? {
         title: `${template.name} template`,
         description: template.description,
+        alternates: { canonical: `/templates/${template.id}` },
+        openGraph: {
+          title: `${template.name} template — Repo Frame`,
+          description: template.description,
+          url: `/templates/${template.id}`,
+          type: 'article',
+        },
       }
     : {};
 }
@@ -42,6 +50,7 @@ export default async function TemplatePage({ params }: TemplatePageProps) {
 
   return (
     <main id="main">
+      <JsonLd data={templateBreadcrumb(template.name, template.id)} />
       <section className="border-b" aria-labelledby="template-heading">
         <Reveal exit={false} className="mx-auto max-w-6xl px-6 py-16 sm:py-24">
           <p className="site-data">

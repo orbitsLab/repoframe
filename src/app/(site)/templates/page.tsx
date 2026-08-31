@@ -10,7 +10,8 @@ import { cn } from '@/lib/utils';
 
 export const metadata: Metadata = {
   title: 'Templates',
-  description: 'Browse Repo Frame templates for GitHub social cards.',
+  description: `Browse all ${templates.length} Repo Frame templates for GitHub social cards, each in four aspect ratios.`,
+  alternates: { canonical: '/templates' },
 };
 
 /** Facts about the set, printed as a specification strip. */

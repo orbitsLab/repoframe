@@ -3,14 +3,28 @@ import type { MetadataRoute } from 'next';
 import { siteUrl } from '@/lib/site';
 import { templates } from '@/lib/templates/registry';
 
-export default function sitemap(): MetadataRoute.Sitemap {
-  const paths = ['', '/templates'];
-  const templatePaths = templates.map(
-    (template) => `/templates/${template.id}`,
-  );
+/** Pages worth crawling, ranked by how much of the product each one carries. */
+const routes = [
+  { path: '', priority: 1, changeFrequency: 'weekly' },
+  { path: '/app', priority: 0.9, changeFrequency: 'monthly' },
+  { path: '/templates', priority: 0.8, changeFrequency: 'weekly' },
+] as const;
 
-  return [...paths, ...templatePaths].map((path) => ({
-    url: `${siteUrl}${path}`,
-    lastModified: new Date(),
-  }));
+export default function sitemap(): MetadataRoute.Sitemap {
+  const lastModified = new Date();
+
+  return [
+    ...routes.map(({ path, priority, changeFrequency }) => ({
+      url: `${siteUrl}${path}`,
+      lastModified,
+      changeFrequency,
+      priority,
+    })),
+    ...templates.map((template) => ({
+      url: `${siteUrl}/templates/${template.id}`,
+      lastModified,
+      changeFrequency: 'monthly' as const,
+      priority: 0.6,
+    })),
+  ];
 }

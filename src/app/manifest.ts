@@ -1,11 +1,13 @@
 import type { MetadataRoute } from 'next';
 
+import { siteDescription } from '@/lib/site';
+
 /** Web app manifest describing install metadata and launcher icons. */
 export default function manifest(): MetadataRoute.Manifest {
   return {
     name: 'Repo Frame — GitHub social card generator',
     short_name: 'Repo Frame',
-    description: 'Generate polished social cards for GitHub repositories.',
+    description: siteDescription,
     start_url: '/',
     display: 'standalone',
     background_color: '#ffffff',

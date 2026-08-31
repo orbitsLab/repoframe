@@ -1,11 +1,13 @@
-import { CodeXml } from 'lucide-react';
 import Link from 'next/link';
 
 import { Logo } from '@/components/logo';
-import { Button } from '@/components/ui/button';
+import { GithubMark } from '@/components/site/platformMarks';
+import { Button, bareIcon } from '@/components/ui/button';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { githubUrl } from '@/lib/site';
+import { cn } from '@/lib/utils';
 
+/** Renders the public header with navigation, theme, and editor actions. */
 function SiteHeader() {
   return (
     <header
@@ -21,15 +23,13 @@ function SiteHeader() {
           <Link className="hover:text-foreground" href="/templates">
             Templates
           </Link>
-          <a
-            className="inline-flex items-center gap-1.5 hover:text-foreground"
-            href={githubUrl}
-          >
-            <CodeXml className="size-4" aria-hidden="true" />
-            GitHub
-          </a>
+          <Button asChild variant="ghost" size="icon" className={cn(bareIcon)}>
+            <a href={githubUrl} aria-label="Repo Frame on GitHub">
+              <GithubMark />
+            </a>
+          </Button>
         </nav>
-        <ThemeToggle />
+        <ThemeToggle variant="ghost" className={cn(bareIcon)} />
         <Button asChild size="sm">
           <Link href="/app">Open editor</Link>
         </Button>

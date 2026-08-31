@@ -57,4 +57,11 @@ function Button({
   );
 }
 
-export { Button, buttonVariants };
+/**
+ * Bare icon control: no plate, no fill, colour alone answers the pointer.
+ * Pair with `variant="ghost"` and `size="icon"`.
+ */
+const bareIcon =
+  'text-muted-foreground hover:bg-transparent hover:text-foreground dark:hover:bg-transparent [&_svg]:size-6!';
+
+export { Button, bareIcon, buttonVariants };

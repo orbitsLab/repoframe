@@ -30,7 +30,7 @@ import { Preview } from '@/components/editor/preview';
 import { SettingsPanel } from '@/components/editor/settingsPanel';
 import { TemplatePicker } from '@/components/editor/templatePicker';
 import { Logo } from '@/components/logo';
-import { Button } from '@/components/ui/button';
+import { Button, bareIcon } from '@/components/ui/button';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { buildEditorScene, getActiveTemplate } from '@/editor/scene';
 import { type EditorState, useEditorStore } from '@/editor/store';
@@ -257,7 +257,7 @@ function Editor({ repo, templateId }: EditorProps) {
         </form>
 
         <div className="ml-auto flex items-center gap-2">
-          <ThemeToggle />
+          <ThemeToggle variant="ghost" className={bareIcon} />
           <RatioPicker value={state.ratio} onChange={state.setRatio} />
           <MobileRatioPicker value={state.ratio} onChange={state.setRatio} />
           <ExportPopover

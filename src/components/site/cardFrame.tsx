@@ -1,5 +1,10 @@
-import type { ReactNode } from 'react';
+'use client';
 
+import type { ReactNode } from 'react';
+import { useRef } from 'react';
+
+import { CountUp } from '@/components/site/countUp';
+import { CropMarks, useFocusRack } from '@/components/site/focusRack';
 import { cn } from '@/lib/utils';
 
 type CardFrameProps = {
@@ -9,7 +14,11 @@ type CardFrameProps = {
   /** Rendered pixel height shown by the vertical callout. */
   height?: number;
   /** Caption printed below the width callout. */
-  caption?: string;
+  caption?: ReactNode;
+  /** Counts the measured dimensions up when the frame enters view. */
+  animateMeasurements?: boolean;
+  /** Allows an owning sequence to release the measurement counters. */
+  measurementsStartWhen?: boolean;
   className?: string;
 };
 
@@ -27,12 +36,18 @@ function CardFrame({
   width,
   height,
   caption,
+  animateMeasurements = false,
+  measurementsStartWhen = true,
   className,
 }: CardFrameProps) {
   const measured = width !== undefined && height !== undefined;
+  const scope = useRef<HTMLDivElement>(null);
+
+  useFocusRack(scope, { distance: 8, blur: 2 });
 
   return (
     <div
+      ref={scope}
       className={cn(
         'relative',
         // The width callout is absolute, so the frame reserves room for it.
@@ -47,29 +62,17 @@ function CardFrame({
         </p>
       ) : null}
 
-      <div className="relative">
-        <div className="relative overflow-hidden border border-current/20 bg-current/5">
+      <div data-focus-frame className="relative">
+        <div
+          data-focus-subject
+          className="relative overflow-hidden border border-current/20 bg-current/5"
+        >
           {children}
         </div>
 
         {/* Crop marks sit outside the plate so the frame reads as registration
             chrome rather than a border. */}
-        <span
-          aria-hidden="true"
-          className="site-crop -top-2 -left-2 border-t border-l"
-        />
-        <span
-          aria-hidden="true"
-          className="site-crop -top-2 -right-2 border-t border-r"
-        />
-        <span
-          aria-hidden="true"
-          className="site-crop -bottom-2 -left-2 border-b border-l"
-        />
-        <span
-          aria-hidden="true"
-          className="site-crop -right-2 -bottom-2 border-r border-b"
-        />
+        <CropMarks />
 
         {measured ? (
           <span
@@ -79,7 +82,25 @@ function CardFrame({
             <span className="h-2 w-px bg-current/25" />
             <span className="h-px flex-1 bg-current/25" />
             <span className="site-data text-current/60">
-              {width} × {height}
+              {animateMeasurements ? (
+                <>
+                  <CountUp
+                    from={0}
+                    to={width}
+                    startWhen={measurementsStartWhen}
+                  />{' '}
+                  ×{' '}
+                  <CountUp
+                    from={0}
+                    to={height}
+                    startWhen={measurementsStartWhen}
+                  />
+                </>
+              ) : (
+                <>
+                  {width} × {height}
+                </>
+              )}
             </span>
             <span className="h-px flex-1 bg-current/25" />
             <span className="h-2 w-px bg-current/25" />

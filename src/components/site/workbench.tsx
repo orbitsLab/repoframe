@@ -176,6 +176,7 @@ function Workbench() {
           <CardFrame
             width={1200}
             height={675}
+            animateMeasurements
             caption={`Template ${move.name} · Palette ${preset.name}`}
           >
             <SampleCard
@@ -217,7 +218,7 @@ function Workbench() {
             Five cards out of many,{' '}
             <Link
               href="/templates"
-              className="underline underline-offset-4 outline-none hover:no-underline focus-visible:ring-2 focus-visible:ring-ring"
+              className="underline underline-offset-4 outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring"
             >
               see all the templates
             </Link>

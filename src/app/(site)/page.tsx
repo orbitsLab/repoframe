@@ -38,15 +38,12 @@ function Anatomy() {
     <section
       data-snap
       className="relative flex min-h-[calc(100svh-var(--header-height))] items-center border-b pb-20"
-      aria-labelledby="anatomy-heading"
+      aria-labelledby="anatomy"
     >
       <Reveal className="mx-auto grid w-full max-w-6xl gap-12 px-6 py-20 lg:grid-cols-[5fr_7fr] lg:gap-16">
         <div>
           <p className="site-eyebrow text-muted-foreground">What it reads</p>
-          <h2
-            id="anatomy-heading"
-            className="site-display mt-5 text-3xl sm:text-4xl"
-          >
+          <h2 id="anatomy" className="site-display mt-5 text-3xl sm:text-4xl">
             A card is only as good as the data behind it.
           </h2>
           <p className="mt-6 max-w-md text-muted-foreground text-sm leading-6">
@@ -78,13 +75,13 @@ function LocalFirst() {
     <section
       data-snap
       className="relative flex min-h-[calc(100svh-var(--header-height))] items-center border-b pb-20"
-      aria-labelledby="local-heading"
+      aria-labelledby="local-first"
     >
       <Reveal className="mx-auto grid w-full max-w-6xl gap-10 px-6 py-20 lg:grid-cols-[7fr_5fr] lg:gap-16">
         <div>
           <p className="site-eyebrow text-muted-foreground">Local first</p>
           <h2
-            id="local-heading"
+            id="local-first"
             className="site-display mt-5 text-balance text-3xl sm:text-5xl"
           >
             There is no server to trust, because there is no server.
@@ -113,7 +110,7 @@ function Support() {
     <section
       data-snap
       className="relative flex min-h-[calc(100svh-var(--header-height))] items-center pb-20"
-      aria-labelledby="support-heading"
+      aria-labelledby="support"
     >
       {/* Last block before the footer, so it stays put rather than fading out. */}
       <Reveal
@@ -124,7 +121,7 @@ function Support() {
           {supportContent.eyebrow}
         </p>
         <h2
-          id="support-heading"
+          id="support"
           className="site-display mt-5 max-w-5xl text-balance text-4xl sm:text-5xl"
         >
           {supportContent.heading}

@@ -150,7 +150,7 @@ function Workbench() {
     <section
       data-snap
       className="relative border-b pb-20"
-      aria-labelledby="workbench-heading"
+      aria-labelledby="workbench"
     >
       <div
         ref={scope}
@@ -161,10 +161,7 @@ function Workbench() {
       >
         <div className="lg:col-start-2 lg:row-start-1">
           <p className="site-eyebrow text-muted-foreground">The workbench</p>
-          <h2
-            id="workbench-heading"
-            className="site-display mt-5 text-3xl sm:text-4xl"
-          >
+          <h2 id="workbench" className="site-display mt-5 text-3xl sm:text-4xl">
             Check how your repository card look.
           </h2>
         </div>

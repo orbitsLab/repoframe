@@ -51,7 +51,7 @@ function Hero() {
               stagger: 0.08,
             })
             .from(
-              '#hero-heading [data-focus-mark]',
+              '#hero [data-focus-mark]',
               { scale: 0.4, opacity: 0, duration: 0.5, stagger: 0.04 },
               '-=0.35',
             );
@@ -68,7 +68,7 @@ function Hero() {
       ref={scope}
       data-snap
       className="relative flex min-h-[calc(100svh-var(--header-height))] flex-col border-b pb-20"
-      aria-labelledby="hero-heading"
+      aria-labelledby="hero"
     >
       <div className="relative mx-auto grid w-full max-w-6xl flex-1 items-center gap-14 px-6 py-16 lg:grid-cols-[1fr_1fr] lg:gap-14 lg:py-20">
         <div>
@@ -76,10 +76,7 @@ function Hero() {
             Open source · Runs in your browser
           </p>
 
-          <h1
-            id="hero-heading"
-            className="site-display mt-6 text-5xl sm:text-6xl"
-          >
+          <h1 id="hero" className="site-display mt-6 text-5xl sm:text-6xl">
             <span data-hero-rise className="block">
               {/* The product's own crop marks, used on the word they name. */}
               <FocusWord>Frame</FocusWord> the repo.

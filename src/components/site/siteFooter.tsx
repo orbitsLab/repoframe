@@ -19,17 +19,16 @@ const columns = [
     links: [{ label: 'GitHub', href: githubUrl }],
   },
   {
-    // Placeholder destinations: the platform roots stand in until the project
-    // has handles to point at.
+    // Only the accounts that exist. Threads, Facebook, YouTube and Bluesky are
+    // held back until Orbits Lab has a handle on each.
     title: 'Social',
     links: [
-      { label: 'Instagram', href: 'https://instagram.com' },
-      { label: 'Threads', href: 'https://threads.net' },
-      { label: 'Facebook', href: 'https://facebook.com' },
-      { label: 'YouTube', href: 'https://youtube.com' },
-      { label: 'X', href: 'https://x.com' },
-      { label: 'LinkedIn', href: 'https://linkedin.com' },
-      { label: 'Bluesky', href: 'https://bsky.app' },
+      { label: 'X', href: 'https://x.com/orbitslab' },
+      {
+        label: 'LinkedIn',
+        href: 'https://www.linkedin.com/company/orbitslab',
+      },
+      { label: 'Instagram', href: 'https://instagram.com/labs.orbits' },
     ],
   },
 ] as const;

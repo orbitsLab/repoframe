@@ -51,7 +51,29 @@ function SiteFooter() {
       <div className="mx-auto max-w-6xl px-6">
         <div className="grid gap-12 py-16 sm:grid-cols-2 lg:grid-cols-[5fr_7fr] lg:gap-16">
           <div>
-            <Logo />
+            <div className="flex items-start gap-3">
+              <Logo />
+              <span aria-hidden="true" className="site-data mt-3">
+                X
+              </span>
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="font-semibold tracking-tight">
+                    Orbits Lab
+                  </span>
+                  <span
+                    aria-hidden="true"
+                    className="size-7 w-10 shrink-0 bg-foreground"
+                    style={{
+                      WebkitMask:
+                        'url(/orbitsLabsLogo.svg) center / contain no-repeat',
+                      mask: 'url(/orbitsLabsLogo.svg) center / contain no-repeat',
+                    }}
+                  />
+                </div>
+                <p className="ml-3 text-[10px] -mt-2">Powered by</p>
+              </div>
+            </div>
             <p className="mt-5 max-w-xs text-muted-foreground text-sm leading-6">
               A social card for any public GitHub repository, built and exported
               entirely on your own machine.

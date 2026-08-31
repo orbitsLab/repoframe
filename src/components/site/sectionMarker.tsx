@@ -1,5 +1,5 @@
 /** Total number of numbered sections on the landing page. */
-const sectionCount = 5;
+const sectionCount = 6;
 
 type SectionMarkerProps = {
   /** One-based position, printed against the total. */

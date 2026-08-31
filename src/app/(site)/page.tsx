@@ -1,3 +1,4 @@
+import FAQ from '@/components/site/faq';
 import { Hero } from '@/components/site/hero';
 import { GithubMark, XMark } from '@/components/site/platformMarks';
 import { RegistrationField } from '@/components/site/registrationField';
@@ -101,11 +102,7 @@ function LocalFirst() {
           ))}
         </dl>
       </Reveal>
-      <SectionMarker
-        index={4}
-        label="Local first"
-        next={supportContent.eyebrow}
-      />
+      <SectionMarker index={4} label="Local first" next="FAQ" />
     </section>
   );
 }
@@ -176,7 +173,7 @@ function Support() {
           )}
         </ol>
       </Reveal>
-      <SectionMarker index={5} label={supportContent.eyebrow} />
+      <SectionMarker index={6} label={supportContent.eyebrow} />
     </section>
   );
 }
@@ -193,6 +190,7 @@ export default function HomePage() {
       <Anatomy />
       <Workbench />
       <LocalFirst />
+      <FAQ />
       <Support />
     </main>
   );

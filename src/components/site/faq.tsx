@@ -13,17 +13,17 @@ const faqCategories = [
       {
         question: 'How does Repo Frame fetch repository data?',
         answer:
-          'Repo Frame queries GitHub\'s public REST and GraphQL APIs directly from your browser. Simply paste any GitHub URL or "owner/repo" path to fetch repository metadata, star counts, fork counts, language breakdown, open issues, pull requests, and licence details.',
+          "Your browser calls GitHub's public REST API directly, with no server in between. Paste a repository URL or an owner/repo shorthand. The name, description, topics, stars, forks, watchers and licence are read up front; the language split, contributors, open issues, pull requests and latest release are read only when a template asks for them. Responses are cached in your browser for 30 minutes.",
       },
       {
         question: 'Do I need a GitHub account or API token?',
         answer:
-          "No account or token is required for standard usage. GitHub allows 60 unauthenticated API requests per hour per IP. If you generate cards heavily or run into rate limits, you can optionally supply a Personal Access Token (PAT), which is stored strictly in your browser's local storage.",
+          'No. Repo Frame only reads what GitHub already publishes, so there is nothing to sign in to and no token to paste. GitHub does limit how often it answers one address: 60 requests an hour. Your browser keeps each repository for 30 minutes before asking again, which holds normal editing well inside that, and if you reach the limit anyway Repo Frame tells you when it resets.',
       },
       {
         question: 'Does Repo Frame support private repositories?',
         answer:
-          'Repo Frame is primarily designed for public GitHub repositories. Because data processing is 100% client-side without intermediate servers, accessing private repositories would require elevated token permissions, which we leave optional to ensure complete privacy and security.',
+          'No. Repo Frame works with public repositories only. It reads a repository the same way any visitor without access does, so a private one comes back as not found.',
       },
     ],
   },
@@ -33,18 +33,18 @@ const faqCategories = [
       {
         question: 'What templates and export formats are supported?',
         answer:
-          'Repo Frame includes multiple hand-crafted compositions—including Cover, Release, Marquee, Almanac, Gauge, Minimal, and Terminal. Cards can be exported as high-resolution PNG or SVG images rendered at the standard 1200×675 (16:9) aspect ratio, ideal for OpenGraph preview images, Twitter posts, or README headers.',
+          'This build ships 26 templates, among them Minimal, Split, Bento, Release, Cover, Terminal, Almanac, Gauge and Marquee. Each renders in four aspect ratios: 16:9 (1200×675), 1:1, 4:5 and 9:16. Cards export as PNG, and as WebP or JPEG where your browser supports them, at 0.5× to 4× scale, so a 16:9 card can leave at 4800×2700.',
       },
       {
         question: 'Can I customize colors, fonts, and visible metrics?',
         answer:
-          'Yes. The Workbench gives you full control over color presets (Ink, Terminal, Paper, Poster, Default), custom accent colors, metric visibility (stars, forks, open PRs, language breakdown, release tags), and typographic layout density.',
+          'Yes. Every template carries its own palettes as chips you apply in one click, among them Slate, Carbon, Cobalt, Signal and Acid, and every colour can be set by hand instead. The settings panel also controls the typeface, which metrics appear (stars, forks, language split, contributors, licence, latest release, topics), and layout details such as spacing, radius and border weight. Each template declares its own controls, so the panel changes with the template.',
       },
       {
         question:
           "How do I set the exported card as my repository's social preview image?",
         answer:
-          'Once you export your card as a PNG image, navigate to your repository on GitHub, go to Settings → General → Social preview, and upload the image. You can also save it in your repository root (such as .github/assets/og-card.png) and feature it in your README.',
+          'Export the card as a PNG, then open your repository on GitHub and go to Settings → General → Social preview to upload it. You can also commit it to the repository (say, .github/assets/og-card.png) and feature it in your README.',
       },
     ],
   },
@@ -54,12 +54,12 @@ const faqCategories = [
       {
         question: 'Is any data stored or uploaded to external servers?',
         answer:
-          'Zero. Repo Frame is built on a 100% local-first architecture. There are no backend databases, tracking scripts, server-side processing, or file uploads. Everything—from API fetching to canvas rendering and image export—happens entirely within your web browser.',
+          'None. There is no backend, no database, no analytics and no upload. GitHub is the only host your browser talks to, and it is your browser that talks to it. Everything you make stays on your device: projects and cached repository data in IndexedDB, small preferences such as theme and aspect ratio in localStorage.',
       },
       {
         question: 'Is Repo Frame free and open source?',
         answer:
-          'Yes. Repo Frame is completely free and open source under the MIT License by OrbitsLab. You can inspect the source code, self-host your own instance, or contribute new templates and features on GitHub.',
+          'Yes. Repo Frame is free and open source under the Apache License 2.0, built by Orbits Lab. Read the source, host your own instance, or contribute a template on GitHub.',
       },
     ],
   },
@@ -70,22 +70,23 @@ export default function FAQ() {
     <section
       data-snap
       className="relative flex min-h-[calc(100svh-var(--header-height))] items-center border-b pb-20"
-      aria-labelledby="faq-heading"
+      aria-labelledby="faq"
     >
       <Reveal className="mx-auto w-full max-w-6xl px-6 py-20 lg:py-24">
         <div>
           <p className="site-eyebrow text-muted-foreground">FAQ</p>
-          <div className="mt-4">
+          <h2 id="faq" className="mt-4">
             <UnderlineLink
               href="#faq"
-              className="text-3xl sm:text-4xl lg:text-5xl font-semibold tracking-tight"
+              className="font-semibold text-3xl tracking-tight sm:text-4xl lg:text-5xl"
             >
               Your questions answered.
             </UnderlineLink>
-          </div>
+          </h2>
           <p className="mt-4 max-w-xl text-muted-foreground text-sm leading-6">
-            Everything you need to know about Repo Frame, how repository data is
-            fetched, card templates, and our local-first guarantee.
+            Everything you need to know about Repo Frame: how repository data is
+            read, what the templates and exports can do, and how your work stays
+            on your device.
           </p>
         </div>
 
@@ -119,7 +120,7 @@ export default function FAQ() {
                         <path d="M5 12l14 0" />
                       </svg>
                     </summary>
-                    <div className="mt-3 max-w-3xl text-sm leading-relaxed text-muted-foreground">
+                    <div className="mt-3 text-sm leading-relaxed text-muted-foreground">
                       <p>{item.answer}</p>
                     </div>
                   </details>
@@ -135,8 +136,8 @@ export default function FAQ() {
               Still have questions?
             </h3>
             <p className="mt-1 text-sm text-muted-foreground max-w-md">
-              Can't find the answer you're looking for? Reach out to the
-              OrbitsLab team or open an issue on GitHub.
+              Can't find the answer you're looking for? Reach out to the Orbits
+              Lab team or open an issue on GitHub.
             </p>
           </div>
           <a

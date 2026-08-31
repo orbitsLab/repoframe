@@ -38,7 +38,7 @@ function RepoForm({ id, className }: RepoFormProps) {
         placeholder="github.com/owner/repo…"
         required
       />
-      <Button type="submit" size="lg" className="rounded-none">
+      <Button type="submit" size="lg" className="h-11 rounded-none">
         Create Card
         <ArrowRight aria-hidden="true" />
       </Button>

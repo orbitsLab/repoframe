@@ -2,7 +2,7 @@ import Link from 'next/link';
 
 import { Logo } from '@/components/logo';
 import { FooterWordmark } from '@/components/site/footerWordmark';
-import { githubUrl } from '@/lib/site';
+import { githubUrl, orbitsLabUrl, socialLinks } from '@/lib/site';
 import { cn } from '@/lib/utils';
 
 /** Footer navigation, grouped the way the site itself is grouped. */
@@ -19,17 +19,10 @@ const columns = [
     links: [{ label: 'GitHub', href: githubUrl }],
   },
   {
-    // Only the accounts that exist. Threads, Facebook, YouTube and Bluesky are
-    // held back until Orbits Lab has a handle on each.
+    // Shared with the linked data that names the same accounts, so the footer
+    // and the Organization node can never drift apart.
     title: 'Social',
-    links: [
-      { label: 'X', href: 'https://x.com/orbitslab' },
-      {
-        label: 'LinkedIn',
-        href: 'https://www.linkedin.com/company/orbitslab',
-      },
-      { label: 'Instagram', href: 'https://instagram.com/labs.orbits' },
-    ],
+    links: socialLinks,
   },
 ] as const;
 
@@ -55,7 +48,11 @@ function SiteFooter() {
               <span aria-hidden="true" className="site-data mt-3">
                 X
               </span>
-              <div>
+              <a
+                href={orbitsLabUrl}
+                aria-label="Orbits Lab"
+                className="outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              >
                 <div className="flex items-center gap-2">
                   <span className="font-semibold tracking-tight">
                     Orbits Lab
@@ -70,8 +67,8 @@ function SiteFooter() {
                     }}
                   />
                 </div>
-                <p className="ml-3 text-[10px] -mt-2">Powered by</p>
-              </div>
+                <p className="-mt-2 ml-3 text-[10px]">Powered by</p>
+              </a>
             </div>
             <p className="mt-5 max-w-xs text-muted-foreground text-sm leading-6">
               A social card for any public GitHub repository, built and exported

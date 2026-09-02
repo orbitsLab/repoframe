@@ -1,6 +1,6 @@
 {
   "name": "repoframe",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Generate polished social cards for GitHub repos",
   "contributors": [
     "alfaarghya"

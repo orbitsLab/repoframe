@@ -7,6 +7,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-09-02
+
+### Fixed
+
+- A card already made was replaced by the example preview whenever GitHub
+  refused the next load: an exhausted request quota, a mistyped repository, or
+  no connection
+- Card data was held only in the 30-minute repository cache, so a card older
+  than that could not be shown again without a successful request
+- Example preview was announced while a saved card was still loading, before
+  the editor knew whether one existed
+- Settings changed after a failed load were dropped rather than saved
+- A repository opened from the landing page reset the template, ratio, and
+  design to their defaults
+- Requests GitHub had paused were reported as an unexpected error offering a
+  retry that could not succeed
+- Refreshing a repository discarded the cached copy before asking for a new
+  one, leaving nothing behind when the request was refused
+- The notice that a saved template is unavailable never reached the status bar
+
+### Changed
+
+- The active project is stored with the card data it was drawn from, so the
+  card, its template, and its design are restored before GitHub is asked for
+  anything. Projects saved by 1.0.0 are read and upgraded on the next save
+- The share image deals a stack of real cards beside the wordmark
+
 ## [1.0.0] - 2026-09-01
 
 First public release. Repo Frame turns a public GitHub repository into a social
@@ -77,5 +104,6 @@ card, entirely in the browser.
 - Theme changes repaint the page pixel by pixel
 - Docs and about pages removed in favour of the landing page and the repository
 
-[Unreleased]: https://github.com/orbitsLab/repoframe/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/orbitsLab/repoframe/compare/v1.0.1...HEAD
+[1.0.1]: https://github.com/orbitsLab/repoframe/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/orbitsLab/repoframe/releases/tag/v1.0.0

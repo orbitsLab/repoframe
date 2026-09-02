@@ -45,10 +45,23 @@ async function fetchContributors(
   owner: string,
   repo: string,
 ): Promise<GitHubResult<RawContributor[]>> {
-  return githubRequest<RawContributor[]>(
+  const result = await githubRequest<RawContributor[]>(
     `${repositoryPath(owner, repo)}/contributors?per_page=30`,
     async (response) => (response.status === 204 ? [] : response.json()),
   );
+
+  // GitHub refuses the list outright on repositories with a very long history,
+  // which is a card drawn without contributors rather than a failed load.
+  if (
+    !result.ok &&
+    result.error.kind === 'unexpected' &&
+    result.error.status === 403 &&
+    result.error.message?.includes('too large')
+  ) {
+    return { ok: true, data: [], rateLimit: result.rateLimit ?? {} };
+  }
+
+  return result;
 }
 
 /**
@@ -58,8 +71,11 @@ async function fetchContributors(
  * @param repo - GitHub repository name.
  * @returns The open pull request count or a typed GitHub error.
  */
-function fetchOpenPullRequests(owner: string, repo: string) {
-  return githubRequest<number>(
+async function fetchOpenPullRequests(
+  owner: string,
+  repo: string,
+): Promise<GitHubResult<number>> {
+  const result = await githubRequest<number>(
     `${repositoryPath(owner, repo)}/pulls?state=open&per_page=1`,
     async (response) => {
       const pulls = (await response.json()) as unknown[];
@@ -67,6 +83,14 @@ function fetchOpenPullRequests(owner: string, repo: string) {
       return readLinkLast(response.headers.get('link')) ?? pulls.length;
     },
   );
+
+  // GitHub uses 404 when a repository has pull requests turned off. The
+  // repository itself is read before this call, so it is a count of none.
+  if (!result.ok && result.error.kind === 'not-found') {
+    return { ok: true, data: 0, rateLimit: result.rateLimit ?? {} };
+  }
+
+  return result;
 }
 
 /**

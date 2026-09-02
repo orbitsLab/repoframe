@@ -10,7 +10,7 @@ type GitHubError =
   | { kind: 'not-found' }
   | { kind: 'unavailable' }
   | { kind: 'network' }
-  | { kind: 'unexpected'; status: number };
+  | { kind: 'unexpected'; status: number; message?: string };
 
 type GitHubResult<T> =
   | { ok: true; data: T; rateLimit: RateLimit }
@@ -47,7 +47,7 @@ async function githubRequest<T>(
   if (!response.ok) {
     return {
       ok: false,
-      error: readError(response.status, rateLimit),
+      error: readError(response.status, rateLimit, await readMessage(response)),
       rateLimit,
     };
   }
@@ -73,7 +73,21 @@ function readRateLimit(headers: Headers): RateLimit {
   };
 }
 
-function readError(status: number, rateLimit: RateLimit): GitHubError {
+async function readMessage(response: Response) {
+  try {
+    const body = (await response.json()) as { message?: unknown };
+
+    return typeof body.message === 'string' ? body.message : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+function readError(
+  status: number,
+  rateLimit: RateLimit,
+  message?: string,
+): GitHubError {
   if (
     (status === 403 || status === 429) &&
     rateLimit.remaining === 0 &&
@@ -90,7 +104,9 @@ function readError(status: number, rateLimit: RateLimit): GitHubError {
     return { kind: 'unavailable' };
   }
 
-  return { kind: 'unexpected', status };
+  // The message travels with the error: some endpoints answer 403 for reasons
+  // a caller can recover from, and the status alone does not say which.
+  return { kind: 'unexpected', status, message };
 }
 
 /**

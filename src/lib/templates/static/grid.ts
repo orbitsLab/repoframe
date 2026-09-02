@@ -17,7 +17,7 @@ import {
   stringArraySetting,
   stringSetting,
 } from '@/lib/templates/shared/settings';
-import { fitText } from '@/lib/templates/shared/text';
+import { fitCommonSize, fitText } from '@/lib/templates/shared/text';
 import {
   autoColor,
   displayFontOptions,
@@ -471,10 +471,17 @@ function poolNodes(
     const slot = Math.max(0, Math.min(visibleIndex, pool.length - 1));
     const cell = pool[slot];
     const shown = visibleIndex >= 0 && visibleIndex < pool.length;
-    const valueSize = Math.min(
-      (cell.height - style.padding * 2) * 0.62,
-      (cell.width - style.padding * 2) / 2.4,
-    );
+    const valueSize = fitCommonSize(input.measure, {
+      texts: [formatCount(values[metric.value])],
+      fontFamily: style.fontFamily,
+      fontWeight: 700,
+      letterSpacing: -1.5,
+      maxWidth: cell.width - style.padding * 2,
+      maxSize: Math.min(
+        (cell.height - style.padding * 2) * 0.62,
+        (cell.width - style.padding * 2) / 2.4,
+      ),
+    });
 
     return [
       textNode(`metric-${metric.value}-value`, {

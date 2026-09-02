@@ -5,6 +5,7 @@ import {
   stringArraySetting,
   stringSetting,
 } from '@/lib/templates/shared/settings';
+import { fitCommonSize } from '@/lib/templates/shared/text';
 import { mutedInk, spacing, typeScale } from '@/lib/templates/shared/tokens';
 import type { ProjectDataPath } from '@/types/data/path';
 import type { ProjectData } from '@/types/data/project';
@@ -104,7 +105,14 @@ function metricBandNodes(
   const values = metricValues(input.data);
   const columns = Math.max(1, visibleMetrics.length);
   const cells = row(area, columns, spacing.md);
-  const valueSize = Math.min(area.height * 0.56, area.width / columns / 3);
+  const valueSize = fitCommonSize(input.measure, {
+    texts: visibleMetrics.map((metric) => formatCount(values[metric])),
+    fontFamily,
+    fontWeight: 800,
+    letterSpacing: -1.5,
+    maxWidth: cells[0].width,
+    maxSize: Math.min(area.height * 0.56, area.width / columns / 3),
+  });
 
   return metricOptions.flatMap((metric): SceneNode[] => {
     const visibleIndex = visibleMetrics.indexOf(metric.value);

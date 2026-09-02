@@ -19,7 +19,7 @@ import {
   stringArraySetting,
   stringSetting,
 } from '@/lib/templates/shared/settings';
-import { fitText } from '@/lib/templates/shared/text';
+import { fitCommonSize, fitText } from '@/lib/templates/shared/text';
 import {
   autoColor,
   displayFontOptions,
@@ -420,7 +420,14 @@ function statsNodes(
     visibleMetrics.length > 2 ? 2 : Math.max(1, visibleMetrics.length);
   const rows = Math.max(1, Math.ceil(visibleMetrics.length / columns));
   const cells = grid(content, columns, rows, spacing.sm);
-  const valueSize = Math.min(56, content.width / columns / 2.4);
+  const valueSize = fitCommonSize(input.measure, {
+    texts: visibleMetrics.map((metric) => formatCount(values[metric])),
+    fontFamily: fontFamily,
+    fontWeight: 800,
+    letterSpacing: -1,
+    maxWidth: cells[0].width,
+    maxSize: Math.min(56, content.width / columns / 2.4),
+  });
   const nodes: SceneNode[] = [
     cardNode('stats-card', box, settings, theme, true),
   ];

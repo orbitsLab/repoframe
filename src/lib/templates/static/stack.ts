@@ -13,7 +13,7 @@ import {
   stringArraySetting,
   stringSetting,
 } from '@/lib/templates/shared/settings';
-import { fitText } from '@/lib/templates/shared/text';
+import { fitCommonSize, fitText } from '@/lib/templates/shared/text';
 import {
   autoColor,
   bandScale,
@@ -633,7 +633,14 @@ function metricNodes(
   // Visible metrics share the band; hidden ones stay in the tree at zero opacity.
   const columns = Math.max(1, visibleMetrics.length);
   const cells = row(area, columns, spacing.md);
-  const valueSize = Math.min(area.height * 0.52, area.width / columns / 3.4);
+  const valueSize = fitCommonSize(input.measure, {
+    texts: visibleMetrics.map((metric) => formatCount(values[metric])),
+    fontFamily: fonts.fontFamily,
+    fontWeight: 800,
+    letterSpacing: -0.8,
+    maxWidth: cells[0].width,
+    maxSize: Math.min(area.height * 0.52, area.width / columns / 3.4),
+  });
 
   return metricOptions.flatMap((metric): SceneNode[] => {
     const visibleIndex = visibleMetrics.indexOf(metric.value);

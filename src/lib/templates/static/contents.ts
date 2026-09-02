@@ -12,7 +12,7 @@ import {
   stringArraySetting,
   stringSetting,
 } from '@/lib/templates/shared/settings';
-import { fitText } from '@/lib/templates/shared/text';
+import { fitCommonSize, fitText } from '@/lib/templates/shared/text';
 import {
   autoColor,
   bandScale,
@@ -395,13 +395,17 @@ function rowNodes(
   const padding = Math.min(spacing.sm, rowHeight * 0.16);
   const numberWidth = Math.min(96, area.width * 0.12);
   const valueWidth = area.width * 0.5;
-  const valueSize = commonValueSize(
-    input,
-    entries,
-    fonts.fontFamily,
-    valueWidth,
-    Math.max(20, rowHeight - padding * 2),
-  );
+  // The list reads as a list only if the values share a size, so the longest
+  // entry sets the size for all of them rather than being clipped to fit.
+  const valueSize = fitCommonSize(input.measure, {
+    texts: entries.map((entry) => entry.value),
+    fontFamily: fonts.fontFamily,
+    fontWeight: 700,
+    letterSpacing: -1.5,
+    minSize: 16,
+    maxWidth: valueWidth,
+    maxSize: Math.max(20, rowHeight - padding * 2),
+  });
   const labelSize = Math.min(valueSize * 0.5, 30);
 
   return Array.from({ length: rowSlots }, (_, index): SceneNode => {
@@ -472,42 +476,6 @@ function rowNodes(
       ],
     };
   });
-}
-
-/**
- * Finds one figure size that every value fits at.
- *
- * The list reads as a list only if the values share a size, so the longest
- * entry sets the size for all of them rather than being clipped to fit.
- *
- * @param input - Project data and measurement tools.
- * @param entries - Entries the list will show.
- * @param fontFamily - Typeface the values are set in.
- * @param maxWidth - Width a value may occupy.
- * @param maxSize - Largest size a row can carry.
- * @returns The largest size that fits every value on one line.
- */
-function commonValueSize(
-  input: BuildInput,
-  entries: Entry[],
-  fontFamily: string,
-  maxWidth: number,
-  maxSize: number,
-) {
-  return entries.reduce((size, entry) => {
-    const fitted = fitText(input.measure, {
-      text: entry.value,
-      fontFamily,
-      fontWeight: 700,
-      maxWidth,
-      minSize: 16,
-      maxSize,
-      maxLines: 1,
-      letterSpacing: -1.5,
-    });
-
-    return Math.min(size, fitted.fontSize);
-  }, maxSize);
 }
 
 /** Bundled contents poster that lists every repository fact as a ruled row. */

@@ -58,5 +58,45 @@ function fitText(measure: MeasureText, input: FitTextInput): FittedText {
   return { ...measured, fontSize: low, lineHeight };
 }
 
+type FitCommonInput = {
+  texts: string[];
+  fontFamily: string;
+  fontWeight: number;
+  maxWidth: number;
+  maxSize: number;
+  minSize?: number;
+  letterSpacing?: number;
+};
+
+/**
+ * Finds the largest size at or below a cap where every string fits on one line.
+ *
+ * Figures set side by side share a size, so the widest one decides it: a count
+ * in the hundreds of thousands is several times the width of a two-digit one.
+ *
+ * @param measure - Renderer text measurement function.
+ * @param input - Strings, font, the width each may occupy, and size bounds.
+ * @returns The largest whole-pixel size that fits them all.
+ */
+function fitCommonSize(measure: MeasureText, input: FitCommonInput): number {
+  return input.texts.reduce(
+    (size, text) =>
+      Math.min(
+        size,
+        fitText(measure, {
+          text,
+          fontFamily: input.fontFamily,
+          fontWeight: input.fontWeight,
+          maxWidth: input.maxWidth,
+          minSize: input.minSize ?? 8,
+          maxSize: size,
+          maxLines: 1,
+          letterSpacing: input.letterSpacing,
+        }).fontSize,
+      ),
+    Math.max(0, Math.floor(input.maxSize)),
+  );
+}
+
 export type { FittedText };
-export { fitText };
+export { fitCommonSize, fitText };

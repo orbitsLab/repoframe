@@ -28,6 +28,38 @@ describe('loadProject cache orchestration', () => {
     vi.clearAllMocks();
   });
 
+  it('ignores the cached record when refreshing', async () => {
+    cache.readCachedRepo.mockResolvedValue({
+      data: project,
+      fetchedAt: 1_000_000,
+      requestedPaths: ['repository'],
+      openIssuesCount: 0,
+      age: 60_000,
+      missingPaths: [],
+    });
+    fetchers.fetchRepository.mockResolvedValue({
+      ok: true,
+      data: (emptyRepo as NormalizeInput).repository,
+      rateLimit: { remaining: 59 },
+    });
+
+    const result = await loadProject('Owner/Repo', ['repository'], {
+      refresh: true,
+    });
+
+    expect(cache.readCachedRepo).not.toHaveBeenCalled();
+    expect(fetchers.fetchRepository).toHaveBeenCalledWith('Owner', 'Repo');
+    expect(cache.writeCachedRepo).toHaveBeenCalledWith(
+      'Owner',
+      'Repo',
+      expect.anything(),
+      expect.arrayContaining(['repository']),
+      expect.any(Number),
+      true,
+    );
+    expect(result).toMatchObject({ ok: true, requestCount: 1 });
+  });
+
   it('returns a complete cache hit without fetching', async () => {
     cache.readCachedRepo.mockResolvedValue({
       data: project,

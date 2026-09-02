@@ -82,11 +82,18 @@ function Editor({ repo, templateId }: EditorProps) {
     return () => clearTimeout(timer);
   }, [panelWidths]);
 
+  // A settled load names the repository it landed on, but an unsettled one only
+  // fills an empty field, so a failed import leaves the reader's own text to retry.
   useEffect(() => {
-    if (state.source) {
-      setRepoInput(`${state.source.owner}/${state.source.repo}`);
+    if (!state.source) {
+      return;
     }
-  }, [state.source]);
+
+    const fullName = `${state.source.owner}/${state.source.repo}`;
+    setRepoInput((current) =>
+      current && state.status !== 'ready' ? current : fullName,
+    );
+  }, [state.source, state.status]);
 
   const scene = useMemo(
     () =>
@@ -116,6 +123,7 @@ function Editor({ repo, templateId }: EditorProps) {
       : 'Enter a public GitHub repository like owner/name.';
   }, [repoInput]);
   const previewLabel = buildPreviewLabel(state.projectData, state.settings);
+  const showingExample = isShowingExample(state);
   // The template thumbnail is a fixed height, so its width carries the ratio.
   const thumbnailWidth = scene
     ? Math.round((40 * scene.width) / scene.height)
@@ -310,7 +318,7 @@ function Editor({ repo, templateId }: EditorProps) {
             />
             {scene ? (
               <div className="relative z-10 grid size-full place-items-center">
-                {!state.source ? (
+                {showingExample ? (
                   <span className="absolute left-1/2 top-0 z-20 -translate-x-1/2 rounded-full border bg-background/95 px-3 py-1 font-mono text-[10px] font-medium uppercase tracking-wider text-muted-foreground shadow-xs backdrop-blur-sm sm:top-1">
                     Example preview
                   </span>
@@ -491,9 +499,12 @@ function PreviewStatus({
   onClear(): void;
   onTryExample(): void;
 }) {
-  const error = state.error ? errorMessage(state.error) : undefined;
+  const showingExample = isShowingExample(state);
+  const error = state.error
+    ? errorMessage(state.error, Boolean(state.source))
+    : undefined;
   const status = [
-    state.source ? '' : 'Example project',
+    showingExample ? 'Example project' : '',
     formatRateLimit(state.rateLimit),
   ].filter(Boolean);
 
@@ -512,7 +523,7 @@ function PreviewStatus({
         {!error && !state.notice ? (
           <span>
             {status.join(' · ')}
-            {!state.source ? (
+            {showingExample ? (
               <>
                 {' · '}
                 <StatusAction onClick={onTryExample}>
@@ -667,7 +678,19 @@ function formatMinutes(resetAt: Date) {
   return `${minutes} minute${minutes === 1 ? '' : 's'}`;
 }
 
-function errorMessage(error: LoadProjectError) {
+/**
+ * Reports whether the canvas is showing the bundled example project.
+ *
+ * @param state - Current editor state.
+ * @returns True once a load has settled without producing a card of the reader's own.
+ */
+function isShowingExample(state: EditorState) {
+  return (
+    !state.source && state.status !== 'restoring' && state.status !== 'loading'
+  );
+}
+
+function errorMessage(error: LoadProjectError, hasCard: boolean) {
   if (error.kind === 'invalid-url') {
     return 'Enter a public GitHub repository like owner/name.';
   }
@@ -678,7 +701,11 @@ function errorMessage(error: LoadProjectError) {
     return "Can't reach GitHub. Check your connection and try again.";
   }
   if (error.kind === 'rate-limited') {
-    return `You've used your 60 GitHub requests for this hour. Resets in ${formatMinutes(error.resetAt)}. You can keep editing the current card.`;
+    // A secondary limit names no reset time, only a few minutes to wait.
+    const wait = error.resetAt
+      ? `You've used your 60 GitHub requests for this hour. Resets in ${formatMinutes(error.resetAt)}.`
+      : 'GitHub has paused your requests for a few minutes.';
+    return hasCard ? `${wait} You can keep editing the current card.` : wait;
   }
   if (error.kind === 'unavailable') {
     return 'This repository is unavailable from GitHub.';

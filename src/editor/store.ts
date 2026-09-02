@@ -1,7 +1,11 @@
 import { create } from 'zustand';
 
 import { getActiveTemplate, settingsForTemplate } from '@/editor/scene';
-import { type LoadProjectError, loadProject } from '@/lib/github/load';
+import {
+  type LoadProjectError,
+  type LoadProjectOptions,
+  loadProject,
+} from '@/lib/github/load';
 import type { RateLimit } from '@/lib/github/rest';
 import { parseGitHubUrl } from '@/lib/github/url';
 import { sampleProject } from '@/lib/sampleProject';
@@ -11,17 +15,17 @@ import {
   writeLastRatio,
 } from '@/lib/storage/prefs';
 import {
+  type RestoredProject,
   readProject,
   type StoredProject,
   writeProject,
 } from '@/lib/storage/project';
-import { clearCachedRepo } from '@/lib/storage/repoCache';
 import { getTemplate, templates } from '@/lib/templates/registry';
 import type { ProjectData } from '@/types/data/project';
-import type { AspectRatio } from '@/types/template';
+import type { AspectRatio, Template } from '@/types/template';
 
 /** Repository loading states exposed by the editor. */
-type EditorStatus = 'idle' | 'loading' | 'ready' | 'error';
+type EditorStatus = 'restoring' | 'idle' | 'loading' | 'ready' | 'error';
 
 /** GitHub owner and repository currently loaded in the editor. */
 type RepositorySource = { owner: string; repo: string };
@@ -48,7 +52,7 @@ type EditorState = {
   initialize(input: InitializeInput): Promise<void>;
   /** Loads a public GitHub repository into the active template. */
   importRepository(url: string): Promise<void>;
-  /** Clears cached repository data and requests it again. */
+  /** Requests repository data again, ignoring the cached copy. */
   refreshRepository(): Promise<void>;
   /** Selects a template and fetches newly required project data. */
   selectTemplate(templateId: string): void;
@@ -72,26 +76,15 @@ const useEditorStore = create<EditorState>((set, get) => ({
   templateId: defaultTemplate.id,
   ratio: '16:9',
   settings: defaultTemplate.defaultSettings,
-  status: 'idle',
+  status: 'restoring',
   rateLimit: {},
   requestCount: 0,
 
   async initialize(input) {
+    const loadsBeforeRestore = latestLoad;
     const requestedTemplate = input.templateId
       ? getTemplate(input.templateId)
       : undefined;
-
-    if (input.repo) {
-      if (requestedTemplate) {
-        set({
-          templateId: requestedTemplate.id,
-          settings: requestedTemplate.defaultSettings,
-        });
-      }
-      await get().importRepository(input.repo);
-      return;
-    }
-
     const restored = await readProject(
       {
         templateId: defaultTemplate.id,
@@ -99,32 +92,24 @@ const useEditorStore = create<EditorState>((set, get) => ({
       },
       templates.map((template) => template.id),
     );
-
-    if (!restored) {
-      const ratio = readLastRatio() ?? readViewportRatio();
-      set({
-        ratio,
-        templateId: requestedTemplate?.id ?? get().templateId,
-        settings: requestedTemplate?.defaultSettings ?? get().settings,
-      });
+    // Storage can answer after an impatient reader has already imported
+    // something, and their repository outranks the saved one.
+    if (latestLoad !== loadsBeforeRestore) {
       return;
     }
 
-    const template =
-      requestedTemplate ?? getActiveTemplate(restored.project.templateId);
-    set({
-      templateId: template.id,
-      ratio: restored.project.ratio,
-      settings: settingsForTemplate(template, restored.project.settings),
-      notice: restored.templateWasReset
-        ? 'The saved template is unavailable, so Repo Frame selected Minimal.'
-        : undefined,
-    });
-    await loadRepository(
-      `${restored.project.source.owner}/${restored.project.source.repo}`,
-      set,
-      get,
+    const saved = restored?.project.source;
+    const target = input.repo ?? (saved && `${saved.owner}/${saved.repo}`);
+
+    set(
+      restored
+        ? restoredState(restored, requestedTemplate, get())
+        : freshState(requestedTemplate, get(), Boolean(target)),
     );
+
+    if (target) {
+      await loadRepository(target, set, get);
+    }
   },
 
   async importRepository(url) {
@@ -137,8 +122,9 @@ const useEditorStore = create<EditorState>((set, get) => ({
       return;
     }
 
-    await clearCachedRepo(source.owner, source.repo);
-    await loadRepository(`${source.owner}/${source.repo}`, set, get);
+    await loadRepository(`${source.owner}/${source.repo}`, set, get, {
+      refresh: true,
+    });
   },
 
   selectTemplate(templateId) {
@@ -152,7 +138,8 @@ const useEditorStore = create<EditorState>((set, get) => ({
         (path) => !previousTemplate.requiredData(state.settings).includes(path),
       );
 
-    set({ templateId: template.id, settings });
+    // Choosing a template answers the notice that a saved one was unavailable.
+    set({ templateId: template.id, settings, notice: undefined });
     schedulePersistence(get);
 
     if (addedPaths.length > 0 && state.source) {
@@ -200,17 +187,77 @@ const useEditorStore = create<EditorState>((set, get) => ({
   },
 }));
 
+/**
+ * Builds the state that puts a saved project back on screen before any request.
+ *
+ * @param restored - Project read from storage.
+ * @param requestedTemplate - Template named by the application URL, when valid.
+ * @param current - Current editor state.
+ * @returns The state patch restoring the saved card and design.
+ */
+function restoredState(
+  restored: RestoredProject,
+  requestedTemplate: Template | undefined,
+  current: EditorState,
+): Partial<EditorState> {
+  const project = restored.project;
+  const template = requestedTemplate ?? getActiveTemplate(project.templateId);
+
+  return {
+    templateId: template.id,
+    ratio: project.ratio,
+    settings: settingsForTemplate(
+      template,
+      requestedTemplate ? template.defaultSettings : project.settings,
+    ),
+    // Records written before v2 hold no card, so the example stands in until
+    // the repository loads.
+    projectData: project.data ?? current.projectData,
+    source: project.data ? project.source : undefined,
+    status: 'loading',
+    notice: restored.templateWasReset
+      ? 'The saved template is unavailable, so Repo Frame selected Minimal.'
+      : undefined,
+  };
+}
+
+/**
+ * Builds the opening state for a visitor with no saved project.
+ *
+ * @param requestedTemplate - Template named by the application URL, when valid.
+ * @param current - Current editor state.
+ * @param loading - Whether a repository request follows immediately.
+ * @returns The state patch opening the editor on the example project.
+ */
+function freshState(
+  requestedTemplate: Template | undefined,
+  current: EditorState,
+  loading: boolean,
+): Partial<EditorState> {
+  return {
+    ratio: readLastRatio() ?? readViewportRatio(),
+    templateId: requestedTemplate?.id ?? current.templateId,
+    settings: requestedTemplate?.defaultSettings ?? current.settings,
+    status: loading ? 'loading' : 'idle',
+  };
+}
+
 async function loadRepository(
   url: string,
   set: (state: Partial<EditorState>) => void,
   get: () => EditorState,
+  options?: LoadProjectOptions,
 ) {
   const loadId = ++latestLoad;
   const state = get();
   const template = getActiveTemplate(state.templateId);
-  set({ status: 'loading', error: undefined, notice: undefined });
+  set({ status: 'loading', error: undefined });
 
-  const result = await loadProject(url, template.requiredData(state.settings));
+  const result = await loadProject(
+    url,
+    template.requiredData(state.settings),
+    options,
+  );
   if (loadId !== latestLoad) {
     return;
   }
@@ -263,11 +310,12 @@ function schedulePersistence(get: () => EditorState) {
     }
 
     const project: StoredProject = {
-      version: 1,
+      version: 2,
       source: state.source,
       templateId: state.templateId,
       ratio: state.ratio,
       settings: state.settings,
+      data: state.projectData,
       savedAt: Date.now(),
     };
     void writeProject(project);

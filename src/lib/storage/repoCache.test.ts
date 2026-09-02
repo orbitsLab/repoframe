@@ -57,6 +57,29 @@ describe('repository cache', () => {
     expect(database.deleteStore).toHaveBeenCalledWith('repos', 'owner/repo');
   });
 
+  it('drops the paths of earlier loads when replacing a record', async () => {
+    database.readStore.mockResolvedValue({
+      requestedPaths: [
+        'repository',
+        'owner',
+        'metrics',
+        'topics',
+        'contributors',
+      ],
+    });
+
+    await writeCachedRepo('Owner', 'Repo', project, ['repository'], 4, true);
+
+    expect(database.readStore).not.toHaveBeenCalled();
+    expect(database.writeStore).toHaveBeenCalledWith(
+      'repos',
+      'owner/repo',
+      expect.objectContaining({
+        requestedPaths: ['repository', 'owner', 'metrics', 'topics'],
+      }),
+    );
+  });
+
   it('records every path supplied by shared endpoints', async () => {
     database.readStore.mockResolvedValue({
       requestedPaths: ['repository', 'owner', 'metrics', 'topics'],

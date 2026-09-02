@@ -6,7 +6,8 @@ type RateLimit = {
 };
 
 type GitHubError =
-  | { kind: 'rate-limited'; resetAt: Date }
+  /** GitHub is refusing requests; `resetAt` is absent when it names no reset. */
+  | { kind: 'rate-limited'; resetAt?: Date }
   | { kind: 'not-found' }
   | { kind: 'unavailable' }
   | { kind: 'network' }
@@ -88,10 +89,12 @@ function readError(
   rateLimit: RateLimit,
   message?: string,
 ): GitHubError {
+  // A spent quota is visible in the headers, but a secondary limit says so only
+  // in the body, and a browser that cannot read the headers has nothing else.
   if (
     (status === 403 || status === 429) &&
-    rateLimit.remaining === 0 &&
-    rateLimit.resetAt
+    ((rateLimit.remaining === 0 && rateLimit.resetAt) ||
+      /rate limit/i.test(message ?? ''))
   ) {
     return { kind: 'rate-limited', resetAt: rateLimit.resetAt };
   }

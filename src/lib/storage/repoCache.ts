@@ -78,6 +78,7 @@ async function readCachedRepo(
  * @param data - Normalized project data to cache.
  * @param required - Project data paths supplied by the current load.
  * @param openIssuesCount - GitHub's combined issue and pull request count.
+ * @param replace - Whether to drop the paths recorded by earlier loads.
  */
 async function writeCachedRepo(
   owner: string,
@@ -85,9 +86,12 @@ async function writeCachedRepo(
   data: ProjectData,
   required: ProjectDataPath[],
   openIssuesCount: number,
+  replace = false,
 ): Promise<void> {
   const key = getRepoKey(owner, repo);
-  const current = await readStore<RepoCacheRecord>('repos', key);
+  const current = replace
+    ? undefined
+    : await readStore<RepoCacheRecord>('repos', key);
   const requestedPaths = new Set(current?.requestedPaths ?? []);
 
   for (const path of expandRequestedPaths(required)) {
@@ -100,16 +104,6 @@ async function writeCachedRepo(
     requestedPaths: [...requestedPaths],
     openIssuesCount,
   });
-}
-
-/**
- * Removes cached data for a repository.
- *
- * @param owner - GitHub repository owner.
- * @param repo - GitHub repository name.
- */
-async function clearCachedRepo(owner: string, repo: string): Promise<void> {
-  await deleteStore('repos', getRepoKey(owner, repo));
 }
 
 function expandRequestedPaths(required: ProjectDataPath[]) {
@@ -141,4 +135,4 @@ function isCacheRecord(value: RepoCacheRecord) {
 }
 
 export type { CacheHit };
-export { cacheTtl, clearCachedRepo, readCachedRepo, writeCachedRepo };
+export { cacheTtl, readCachedRepo, writeCachedRepo };

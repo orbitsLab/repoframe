@@ -34,16 +34,24 @@ type LoadProjectResult =
     }
   | { ok: false; error: LoadProjectError; rateLimit?: RateLimit };
 
+/** Options controlling how a load treats cached repository data. */
+type LoadProjectOptions = {
+  /** Ignores the cached record and replaces it with freshly fetched data. */
+  refresh?: boolean;
+};
+
 /**
  * Loads and normalizes only the GitHub data required by the selected paths.
  *
  * @param url - GitHub repository URL or supported shorthand.
  * @param required - Project data paths needed by the caller.
+ * @param options - Cache handling for this load.
  * @returns The normalized project or a typed loading error.
  */
 async function loadProject(
   url: string,
   required: ProjectDataPath[],
+  options?: LoadProjectOptions,
 ): Promise<LoadProjectResult> {
   const parsed = parseGitHubUrl(url);
   if (!parsed.ok) {
@@ -53,7 +61,9 @@ async function loadProject(
     };
   }
 
-  const cached = await readCachedRepo(parsed.owner, parsed.repo, required);
+  const cached = options?.refresh
+    ? undefined
+    : await readCachedRepo(parsed.owner, parsed.repo, required);
   if (cached && cached.missingPaths.length === 0) {
     return {
       ok: true,
@@ -96,6 +106,7 @@ async function loadProject(
     data,
     fetchedPaths,
     openIssuesCount,
+    options?.refresh,
   );
 
   return { ok: true, data, rateLimit, requestCount: fetchers.length };
@@ -143,5 +154,5 @@ function mapResult<T>(
   };
 }
 
-export type { LoadProjectError, LoadProjectResult };
+export type { LoadProjectError, LoadProjectOptions, LoadProjectResult };
 export { loadProject };

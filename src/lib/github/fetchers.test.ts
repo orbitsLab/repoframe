@@ -4,6 +4,7 @@ import {
   fetchContributors,
   fetchLatestRelease,
   fetchOpenPullRequests,
+  fetchRepository,
 } from '@/lib/github/fetchers';
 
 /** Stubs the next GitHub response with a status, body, and headers. */
@@ -65,6 +66,31 @@ describe('endpoints GitHub answers with an error for a healthy repository', () =
     expect(result).toMatchObject({
       ok: false,
       error: { kind: 'unexpected', status: 403 },
+    });
+  });
+
+  it('reports a secondary rate limit as rate limited', async () => {
+    respondWith(403, {
+      message:
+        'You have exceeded a secondary rate limit. Please wait a few minutes before you try again.',
+    });
+
+    const result = await fetchOpenPullRequests('owner', 'repo');
+
+    expect(result).toMatchObject({
+      ok: false,
+      error: { kind: 'rate-limited', resetAt: undefined },
+    });
+  });
+
+  it('reports an exhausted quota whose headers it cannot read', async () => {
+    respondWith(403, { message: 'API rate limit exceeded for 1.2.3.4.' });
+
+    const result = await fetchRepository('owner', 'repo');
+
+    expect(result).toMatchObject({
+      ok: false,
+      error: { kind: 'rate-limited' },
     });
   });
 

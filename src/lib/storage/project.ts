@@ -1,13 +1,16 @@
 import { readStore, writeStore } from '@/lib/storage/db';
+import type { ProjectData } from '@/types/data/project';
 import type { AspectRatio } from '@/types/template';
 
 /** Persisted state required to restore the active project. */
 type StoredProject = {
-  version: 1;
+  version: 2;
   source: { owner: string; repo: string };
   templateId: string;
   ratio: AspectRatio;
   settings: Record<string, unknown>;
+  /** Repository data as last loaded, absent in records written before v2. */
+  data?: ProjectData;
   savedAt: number;
 };
 
@@ -24,6 +27,7 @@ type RestoredProject = {
 };
 
 const projectKey = 'current';
+const supportedVersions = [1, 2];
 const aspectRatios: AspectRatio[] = ['1:1', '4:5', '16:9', '9:16'];
 
 /**
@@ -37,10 +41,14 @@ async function readProject(
   defaults: ProjectDefaults,
   knownTemplateIds: readonly string[],
 ): Promise<RestoredProject | undefined> {
-  const project = await readStore<StoredProject>('project', projectKey);
-  if (!project || !isStoredProject(project)) {
+  const stored = await readStore<StoredProject>('project', projectKey);
+  if (!stored || !isStoredProject(stored)) {
     return undefined;
   }
+
+  // Records written before v2 carry no repository data, so they restore the
+  // design and load the card again.
+  const project: StoredProject = { ...stored, version: 2 };
 
   if (knownTemplateIds.includes(project.templateId)) {
     return { project, templateWasReset: false };
@@ -63,7 +71,7 @@ async function writeProject(project: StoredProject): Promise<void> {
 
 function isStoredProject(value: StoredProject) {
   return (
-    value.version === 1 &&
+    supportedVersions.includes(value.version) &&
     typeof value.source?.owner === 'string' &&
     typeof value.source.repo === 'string' &&
     typeof value.templateId === 'string' &&

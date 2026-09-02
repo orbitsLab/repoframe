@@ -9,6 +9,7 @@ import { measureText } from '@/lib/renderer/measure';
 import { sampleProject } from '@/lib/sampleProject';
 import { mergeSettings } from '@/lib/templates/shared/settings';
 import { cn } from '@/lib/utils';
+import type { ProjectData } from '@/types/data/project';
 import type { Scene } from '@/types/scene';
 import type { AspectRatio } from '@/types/template';
 
@@ -22,6 +23,8 @@ const fullMetrics = ['stars', 'forks', 'watchers', 'issues', 'pullRequests'];
 
 type SampleCardProps = {
   templateId: string;
+  /** Repository the card is built from. Defaults to the sample project. */
+  data?: ProjectData;
   /** Setting values applied over the template defaults. */
   settings?: Record<string, unknown>;
   ratio?: AspectRatio;
@@ -29,12 +32,13 @@ type SampleCardProps = {
 };
 
 /**
- * Renders a template's real scene using the committed sample project.
+ * Renders a template's real scene from committed repository data.
  *
- * @param props - Template identifier, setting overrides, ratio, and classes.
+ * @param props - Template identifier, repository data, setting overrides, ratio, and classes.
  */
 function SampleCard({
   templateId,
+  data = sampleProject,
   settings,
   ratio = '16:9',
   className,
@@ -59,7 +63,7 @@ function SampleCard({
 
       setScene(
         template.build({
-          data: sampleProject,
+          data,
           ratio,
           settings: mergeSettings(template.defaultSettings, overrides),
           measure: measureText,
@@ -70,7 +74,7 @@ function SampleCard({
     return () => {
       cancelled = true;
     };
-  }, [templateId, settingsKey, ratio]);
+  }, [templateId, data, settingsKey, ratio]);
 
   return (
     <div

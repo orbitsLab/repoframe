@@ -10,6 +10,7 @@ import { FocusWord } from '@/components/site/focusRack';
 import { RepoForm } from '@/components/site/repoForm';
 import { fullMetrics, SampleCard } from '@/components/site/sampleCard';
 import { SectionMarker } from '@/components/site/sectionMarker';
+import { showcaseProjects } from '@/lib/showcaseProjects';
 
 /**
  * Renders the landing hero: the repository form beside a live framed card.
@@ -120,6 +121,7 @@ function Hero() {
           >
             <SampleCard
               templateId="minimal"
+              data={showcaseProjects.linux}
               settings={{ metrics: fullMetrics }}
             />
           </CardFrame>

@@ -9,37 +9,43 @@ import { useMemo, useRef, useState } from 'react';
 import { CardFrame } from '@/components/site/cardFrame';
 import { fullMetrics, SampleCard } from '@/components/site/sampleCard';
 import { SectionMarker } from '@/components/site/sectionMarker';
+import { showcaseProjects } from '@/lib/showcaseProjects';
 import { cn } from '@/lib/utils';
 
-/** Scroll-driven compositions, each pairing a template with its own copy. */
+/** Scroll-driven compositions, each pairing a template with a repository and its own copy. */
 const moves = [
   {
     templateId: 'cover',
     name: 'Cover',
+    data: showcaseProjects.react,
     heading: 'Twenty-six compositions, none of them a blank canvas.',
     copy: 'Every template is a finished layout with its own opinion about hierarchy. Pick the one that suits the project and the work is mostly done.',
   },
   {
     templateId: 'release',
     name: 'Release',
+    data: showcaseProjects.tailwind,
     heading: 'A tag is news. Give it a card that says so.',
     copy: 'The latest release, its date and the licence, set around the repository name. The card you post the day you ship, not the one you leave in the README.',
   },
   {
     templateId: 'marquee',
     name: 'Marquee',
+    data: showcaseProjects.vite,
     heading: 'The name, until the name is the whole card.',
     copy: 'The repository name repeated line after line, one line picked out in the accent. Nothing but type, sized to the card it has to fill.',
   },
   {
     templateId: 'almanac',
     name: 'Almanac',
+    data: showcaseProjects.shadcn,
     heading: 'For projects whose numbers do the talking.',
     copy: 'A ruled mosaic where every figure is sized by the cell it sits in. Stars lead, the rest fall in behind, and nothing is padded to fill space.',
   },
   {
     templateId: 'gauge',
     name: 'Gauge',
+    data: showcaseProjects.next,
     heading: 'One figure, lit large.',
     copy: 'A bezelled module built around a single headline number, with the supporting readings kept small. Choose which metric leads and the layout follows.',
   },
@@ -174,10 +180,22 @@ function Workbench() {
             width={1200}
             height={675}
             animateMeasurements
-            caption={`Template ${move.name} · Palette ${preset.name}`}
+            caption={
+              <>
+                {move.data.repository.fullName}
+                {/* Narrow, the caption is all the card has to name itself with,
+                    so everything the reader can already see gives way: the word
+                    Template, and the palette the chips below it name anyway. */}
+                {' · '}
+                <span className="hidden sm:inline">Template </span>
+                {move.name}
+                <span className="hidden sm:inline">{` · Palette ${preset.name}`}</span>
+              </>
+            }
           >
             <SampleCard
               templateId={move.templateId}
+              data={move.data}
               settings={{ ...preset.settings, metrics: fullMetrics }}
             />
           </CardFrame>

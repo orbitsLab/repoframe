@@ -1,0 +1,9 @@
+# Every pull request requests a review from the maintainers by default.
+*                           @alfaarghya @kuntlme
+
+# Areas that carry the product's promises and its public contract.
+/src/lib/templates/         @alfaarghya @kuntlme
+/src/types/                 @alfaarghya @kuntlme
+/.github/                   @alfaarghya @kuntlme
+/LICENSE                    @alfaarghya @kuntlme
+/SECURITY.md                @alfaarghya @kuntlme

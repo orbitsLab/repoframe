@@ -1,0 +1,9 @@
+blank_issues_enabled: false
+
+contact_links:
+  - name: Question or idea
+    url: https://github.com/orbitsLab/repoframe/discussions
+    about: Ask how something works, or propose a change before opening an issue.
+  - name: Security vulnerability
+    url: https://github.com/orbitsLab/repoframe/security/advisories/new
+    about: Report a vulnerability privately. Do not open a public issue.

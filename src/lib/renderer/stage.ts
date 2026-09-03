@@ -18,19 +18,23 @@ Konva.autoDrawEnabled = false;
  *
  * @param scene - Renderer-independent scene to draw.
  * @param container - Element that hosts the Konva stage.
+ * @param scale - Fraction of the scene size the stage is drawn at.
  * @returns The rendered stage, which the caller must destroy when finished.
  */
-async function renderScene(scene: Scene, container: HTMLDivElement) {
+async function renderScene(scene: Scene, container: HTMLDivElement, scale = 1) {
   await fontsReady;
 
   const stage = new Konva.Stage({
     container,
-    width: scene.width,
-    height: scene.height,
+    width: scene.width * scale,
+    height: scene.height * scale,
+    scaleX: scale,
+    scaleY: scale,
   });
   const layer = new Konva.Layer();
-  // A preview is drawn below the scene size, so the layer keeps at least a
-  // doubled backing store to stop images softening on low-density screens.
+  // The layer is allocated at the size it is displayed at, so its backing
+  // store follows the screen density and keeps at least a doubled store to
+  // stop images softening on low-density screens.
   layer.getCanvas().setPixelRatio(Math.max(2, window.devicePixelRatio || 1));
   layer.add(
     new Konva.Rect({

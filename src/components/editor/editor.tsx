@@ -49,6 +49,8 @@ type EditorProps = {
 };
 
 const ratios: AspectRatio[] = ['1:1', '4:5', '16:9', '9:16'];
+/** Viewport at which the side panels replace the mobile sheets, matching `lg`. */
+const panelQuery = '(min-width: 1024px)';
 
 /**
  * Renders the responsive editor and initializes it from route parameters.
@@ -57,6 +59,7 @@ const ratios: AspectRatio[] = ['1:1', '4:5', '16:9', '9:16'];
  */
 function Editor({ repo, templateId }: EditorProps) {
   const state = useEditorStore();
+  const sidePanels = useSidePanels();
   const initialized = useRef(false);
   const [repoInput, setRepoInput] = useState(repo ?? '');
   const [fontsLoaded, setFontsLoaded] = useState(false);
@@ -298,17 +301,15 @@ function Editor({ repo, templateId }: EditorProps) {
           } as CSSProperties
         }
       >
-        <aside className="relative hidden min-h-0 border-r bg-sidebar lg:flex">
+        <SidePanel
+          show={sidePanels}
+          side="left"
+          width={panelWidths.left}
+          label="Resize content panel"
+          onResize={(left) => setPanelWidths((widths) => ({ ...widths, left }))}
+        >
           {contentPanel}
-          <PanelResizer
-            value={panelWidths.left}
-            side="left"
-            label="Resize content panel"
-            onChange={(left) =>
-              setPanelWidths((widths) => ({ ...widths, left }))
-            }
-          />
-        </aside>
+        </SidePanel>
 
         <section className="flex min-h-0 flex-col bg-muted/45">
           <div className="relative grid min-h-0 flex-1 place-items-center overflow-hidden p-3 sm:p-6 lg:p-10">
@@ -351,17 +352,17 @@ function Editor({ repo, templateId }: EditorProps) {
           />
         </section>
 
-        <aside className="relative hidden min-h-0 border-l bg-sidebar lg:flex">
-          <PanelResizer
-            value={panelWidths.right}
-            side="right"
-            label="Resize design panel"
-            onChange={(right) =>
-              setPanelWidths((widths) => ({ ...widths, right }))
-            }
-          />
+        <SidePanel
+          show={sidePanels}
+          side="right"
+          width={panelWidths.right}
+          label="Resize design panel"
+          onResize={(right) =>
+            setPanelWidths((widths) => ({ ...widths, right }))
+          }
+        >
           {designPanel}
-        </aside>
+        </SidePanel>
       </div>
 
       <div className="grid h-14 grid-cols-2 gap-2 border-t bg-card p-2 lg:hidden">
@@ -374,6 +375,78 @@ function Editor({ repo, templateId }: EditorProps) {
       </div>
     </main>
   );
+}
+
+/**
+ * Renders a resizable side panel, or nothing while the sheets carry it instead.
+ *
+ * @param props - Visibility, edge, resizer state, and the panel to host.
+ */
+function SidePanel({
+  show,
+  side,
+  width,
+  label,
+  onResize,
+  children,
+}: {
+  show: boolean;
+  side: 'left' | 'right';
+  width: number;
+  label: string;
+  onResize(width: number): void;
+  children: ReactNode;
+}) {
+  if (!show) {
+    return null;
+  }
+
+  const resizer = (
+    <PanelResizer value={width} side={side} label={label} onChange={onResize} />
+  );
+
+  return (
+    <aside
+      className={cn(
+        'relative flex min-h-0 bg-sidebar',
+        side === 'left' ? 'border-r' : 'border-l',
+      )}
+    >
+      {side === 'left' ? (
+        <>
+          {children}
+          {resizer}
+        </>
+      ) : (
+        <>
+          {resizer}
+          {children}
+        </>
+      )}
+    </aside>
+  );
+}
+
+/**
+ * Tracks whether the viewport is wide enough for the side panels.
+ *
+ * @returns Whether the panels render beside the canvas instead of in sheets.
+ */
+function useSidePanels() {
+  const [sidePanels, setSidePanels] = useState(
+    () => window.matchMedia(panelQuery).matches,
+  );
+
+  useEffect(() => {
+    const media = window.matchMedia(panelQuery);
+    const update = () => setSidePanels(media.matches);
+
+    media.addEventListener('change', update);
+    update();
+    return () => media.removeEventListener('change', update);
+  }, []);
+
+  return sidePanels;
 }
 
 /** @returns Saved panel widths clamped to the resizer bounds, or the defaults. */

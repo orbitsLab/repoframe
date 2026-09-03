@@ -31,12 +31,22 @@ function Preview({ scene, label, compact = false }: PreviewProps) {
     let stage: Awaited<ReturnType<typeof renderScene>> | undefined;
     let observer: ResizeObserver | undefined;
 
+    // A hidden host measures zero, so the scale it reports is zero too and the
+    // stage it carries holds no canvas until the host is shown.
+    function scaleFor(hostElement: HTMLDivElement) {
+      return Math.min(
+        hostElement.clientWidth / scene.width,
+        hostElement.clientHeight / scene.height,
+        1,
+      );
+    }
+
     async function mountStage(
       hostElement: HTMLDivElement,
       stageContainer: HTMLDivElement,
     ) {
       const renderContainer = document.createElement('div');
-      stage = await renderScene(scene, renderContainer);
+      stage = await renderScene(scene, renderContainer, scaleFor(hostElement));
       if (disposed) {
         stage.destroy();
         stage = undefined;
@@ -50,17 +60,11 @@ function Preview({ scene, label, compact = false }: PreviewProps) {
           return;
         }
 
-        // A host that is hidden or on its way out of the tree measures zero,
-        // and sizing the stage to nothing fails the draw that follows.
-        if (hostElement.clientWidth === 0 || hostElement.clientHeight === 0) {
+        const scale = scaleFor(hostElement);
+        if (scale === 0) {
           return;
         }
 
-        const scale = Math.min(
-          hostElement.clientWidth / scene.width,
-          hostElement.clientHeight / scene.height,
-          1,
-        );
         stage.scale({ x: scale, y: scale });
         stage.width(scene.width * scale);
         stage.height(scene.height * scale);
